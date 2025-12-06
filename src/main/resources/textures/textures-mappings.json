@@ -1,0 +1,48 @@
+[
+  {
+    "id": "air"
+  },
+  {
+    "id": "dirt",
+    "type": "CUBE",
+	"defaultTexture": "dirt"
+  },
+  {
+	"id": "stone",
+    "type": "CUBE",
+	"defaultTexture": "stone"
+  },
+  {
+    "id": "grass",
+    "type": "CUBE",
+    "textures": [
+		"dirt",
+		"grass_block_top",
+		null,
+		null,
+		null,
+		null
+    ],
+    "defaultTexture": "grass_block_side"
+  },
+  {
+    "id": "sand",
+    "type": "CUBE",
+	"defaultTexture": "sand"
+  },
+  {
+    "id": "gravel",
+    "type": "PLANT",
+	"defaultTexture": "red_tulip"
+  },
+  {
+    "id": "granite",
+    "type": "CUBE",
+	"defaultTexture": "granite"
+  },
+  {
+	"id": "bedrock",
+    "type": "CUBE",
+	"defaultTexture": "bedrock"
+  }
+]

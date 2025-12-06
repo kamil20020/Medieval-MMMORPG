@@ -1,0 +1,62 @@
+[
+  {
+    "id": "dirt",
+    "path": "blocks/dirt.png",
+    "row": 0,
+    "col": 0
+  },
+  {
+    "id": "grass_block_side",
+    "path": "blocks/grass_block_side.png",
+    "row": 0,
+    "col": 1
+  },
+  {
+    "id": "grass_block_top",
+    "path": "blocks/grass_block_top.png",
+    "row": 0,
+    "col": 2
+  },
+  {
+    "id": "gravel",
+    "path": "blocks/gravel.png",
+    "row": 0,
+    "col": 3
+  },
+  {
+    "id": "sand",
+    "path": "blocks/sand.png",
+    "row": 0,
+    "col": 4
+  },
+  {
+    "id": "granite",
+    "path": "blocks/granite.png",
+    "row": 0,
+    "col": 5
+  },
+  {
+    "id": "stone",
+    "path": "blocks/stone.png",
+    "row": 0,
+    "col": 6
+  },
+  {
+    "id": "bedrock",
+    "path": "blocks/bedrock.png",
+    "row": 0,
+    "col": 7
+  },
+  {
+    "id": "red_tulip",
+    "path": "plants/red_tulip.png",
+    "row": 1,
+    "col": 0
+  },
+  {
+    "id": "tall_grass",
+    "path": "plants/tall_grass.png",
+    "row": 1,
+    "col": 1
+  }
+]
