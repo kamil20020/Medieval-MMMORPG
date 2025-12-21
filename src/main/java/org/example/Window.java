@@ -55,7 +55,7 @@ public class Window {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        glFrontFace(GL_CW);
+        glFrontFace(GL_CCW);
         glClearColor(0f, 0f, 0f, 1.0f);
 
         updateViewPort(width, height);

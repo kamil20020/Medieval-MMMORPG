@@ -2,70 +2,124 @@ package org.example.mesh;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.assimp.AIFace;
+import org.lwjgl.assimp.AIMesh;
+import org.lwjgl.assimp.AIVector3D;
+import texture.GlbTexture;
 import texture.Texture;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.*;
 
-public class Mesh {
+public abstract class Mesh implements Meshable{
 
-    private final Vector3f[] vertices;
-    private final Integer[] quads;
-    private final Vector2f[] textureCords;
-    private final Integer[] textureCordsForVertices;
+    private int vertexArraysId;
+    private int vertexBufferId;
+    private int eboId;
+    protected int numberOfVertices;
+    protected int numberOfFaces;
+    protected Texture texture;
 
-    public Mesh(Vector3f[] vertices, Integer[] quads, Vector2f[] textureCords, Integer[] textureCordsForVertices){
+    private static final int STRIDE = 5 * Float.BYTES;
 
-        this.vertices = vertices;
-        this.quads = quads;
-        this.textureCords = textureCords;
-        this.textureCordsForVertices = textureCordsForVertices;
+    @Override
+    public void uploadToGpu(){
+
+        this.numberOfVertices = getNumberOfVertices();
+        this.numberOfFaces = getNumberOfFaces();
+
+        FloatBuffer buffer = loadVerticesBuffer();
+        IntBuffer indicesBuffer = initIndicesBuffer();
+
+        vertexArraysId = glGenVertexArrays();
+        glBindVertexArray(vertexArraysId);
+
+        bindVerticesBuffer(buffer);
+        bindEboBuffer(indicesBuffer);
     }
 
-    public void draw(int[] textures, float xMin, float yMin, float zMin){
+    private FloatBuffer loadVerticesBuffer(){
 
-        for(int i = 0, textureIndex = 0; i < quads.length; i += 4, textureIndex++){
+        //3 - x, y, z, 2 - uv texture, 3 - normals
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(numberOfVertices * 5);
 
-            int texture = textures[textureIndex];
+        appendVertices(buffer);
 
-            Texture.useTexture(texture);
+        buffer.flip();
 
-            glBegin(GL_QUADS);
+        return buffer;
+    }
 
-            for(int j = 0; j < 4; j++){
+    private IntBuffer initIndicesBuffer(){
 
-                int vIndex = quads[i + j];
+        IntBuffer indicesBuffer = BufferUtils.createIntBuffer(numberOfFaces * 3);
 
-                Vector3f v = vertices[vIndex];
+        for(int faceIndex = 0; faceIndex < numberOfFaces; faceIndex++){
+            int faceNumberOfVertices = getFaceNumberOfVertices(faceIndex);
 
-                int vTextureCordsForVertexIndex = textureCordsForVertices[i + j];
-                Vector2f textureCordsV = textureCords[vTextureCordsForVertexIndex];
-
-                glTexCoord2f(textureCordsV.x, textureCordsV.y);
-                glVertex3f(xMin + v.x, yMin + v.y, zMin + v.z);
+            if(faceNumberOfVertices != 3){
+                System.out.println("Obsługiwane są tylko trójkąty, otrzymano " + faceNumberOfVertices + " wierzchołków");
+                continue;
             }
 
-            glEnd();
+            IntBuffer faceVerticesBuffer = getFaceVerticesBuffer(faceIndex);
+            indicesBuffer.put(faceVerticesBuffer);
         }
+
+        indicesBuffer.flip();
+
+        return indicesBuffer;
     }
 
-    public Vector3f[] getVertices(){
+    private void bindVerticesBuffer(FloatBuffer buffer){
 
-        return vertices;
+        vertexBufferId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
+        glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, STRIDE, 0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, STRIDE, 3 * Float.BYTES);
+        glEnableVertexAttribArray(1);
     }
 
-    public Integer[] getQuads(){
+    private void bindEboBuffer(IntBuffer indicesBuffer){
 
-        return quads;
+        eboId = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
     }
 
-    public Vector2f[] getTextureCords(){
+    @Override
+    public void draw(){
 
-        return textureCords;
+        if(texture != null){
+            Texture.useTexture(texture.getId());
+        }
+        glBindVertexArray(vertexArraysId);
+        glDrawElements(GL_TRIANGLES, getNumberOfFaces() * 3, GL_UNSIGNED_INT, 0);
     }
 
-    public Integer[] getTextureCordsForVertices(){
+    @Override
+    public void clear(){
 
-        return textureCordsForVertices;
+        glDeleteBuffers(vertexBufferId);
+        glDeleteBuffers(eboId);
+        glDeleteVertexArrays(vertexArraysId);
     }
 
+    public abstract int getFaceNumberOfVertices(int faceIndex);
+    public abstract IntBuffer getFaceVerticesBuffer(int faceIndex);
+    public abstract void appendVertices(FloatBuffer buffer);
+    public abstract int getNumberOfVertices();
+    public abstract int getNumberOfFaces();
 }

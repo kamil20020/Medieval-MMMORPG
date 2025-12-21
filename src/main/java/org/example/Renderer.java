@@ -16,7 +16,7 @@ public class Renderer {
     public Renderer(Window window, EventsHandler eventsHandler){
 
         this.window = window;
-        this.camera = new Camera(new Vector3f(0, 0, 0), eventsHandler);
+        this.camera = new Camera(new Vector3f(0, 2, -2), eventsHandler);
         this.chunk = new Chunk();
     }
 
@@ -47,5 +47,10 @@ public class Renderer {
         glUseProgram(shaderProgramId);
 
         chunk.draw();
+    }
+
+    public void clear(){
+
+        chunk.clear();
     }
 }

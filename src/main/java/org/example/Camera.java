@@ -18,15 +18,16 @@ public class Camera {
     private final Vector3f top;
     private final EventsHandler eventsHandler;
 
-    private static final double SENS = 0.2;
+    private static final double ROTATION_SENS = 0.2;
+    private static final double MOVE_SENS = 0.01;
 
     public Camera(Vector3f position, EventsHandler eventsHandler){
 
         this.eventsHandler = eventsHandler;
         this.eye = new Vector3f(position);
-        this.angle = new Vector3f(90, 90, 270);
+        this.angle = new Vector3f(0, 90, 0);
         this.top = new Vector3f(0, 1, 0);
-        this.destination = new Vector3f(0, 0, 10);
+        this.destination = new Vector3f(0, 0, 20);
 
         eventsHandler.addKeyboardCallback(this::moveCallback);
 
@@ -50,7 +51,7 @@ public class Camera {
 
             forward.rotateY((float) Math.toRadians(90));
 
-            moveInDirection(time / 10, forward);
+            moveInDirection(time * MOVE_SENS, forward);
         }
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_E)){
@@ -59,12 +60,12 @@ public class Camera {
 
             forward.rotateY((float) Math.toRadians(90));
 
-            moveInDirection(-time / 10, forward);
+            moveInDirection(-time * MOVE_SENS, forward);
         }
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_UP)){
 
-            angle.x += time * SENS;
+            angle.x += time * ROTATION_SENS;
             angle.x = Math.max(-89, Math.min(89, angle.x));
 
             updateDestination();
@@ -72,7 +73,7 @@ public class Camera {
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_DOWN)){
 
-            angle.x -= time * SENS;
+            angle.x -= time * ROTATION_SENS;
             angle.x = Math.max(-89, Math.min(89, angle.x));
 
             updateDestination();
@@ -80,14 +81,14 @@ public class Camera {
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_SPACE)){
 
-            eye.y += time;
-            destination.y += time;
+            eye.y += time * MOVE_SENS;
+            destination.y += time * MOVE_SENS;
         }
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_Z)){
 
-            eye.y -= time;
-            destination.y -= time;
+            eye.y -= time * MOVE_SENS;
+            destination.y -= time * MOVE_SENS;
         }
     }
 
@@ -97,17 +98,17 @@ public class Camera {
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_W)){
 
-            moveInForward(time / 10);
+            moveInForward(time * MOVE_SENS);
         }
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_S)){
 
-            moveInForward(-time / 10);
+            moveInForward(-time * MOVE_SENS);
         }
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_A)){
 
-            angle.y -= time * SENS;
+            angle.y -= time * ROTATION_SENS;
             angle.y %= 360;
 
             updateDestination();
@@ -115,7 +116,7 @@ public class Camera {
 
         if(pressedKeyboardKeys.contains(GLFW_KEY_D)){
 
-            angle.y += time * SENS;
+            angle.y += time * ROTATION_SENS;
             angle.y %= 360;
 
             updateDestination();

@@ -1,171 +1,75 @@
 package org.example.mesh;
 
-import org.example.JsonFileLoader;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
-import org.lwjgl.stb.STBImage;
-import texture.Texture;
+import texture.GlbTexture;
 
-import java.io.InputStream;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniform1i;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+public class GlbMesh extends Mesh{
 
-public class GlbMesh{
-
-    private final AIVector3D.Buffer vertices;
-    private final AIVector3D.Buffer normals;
-    private final AIVector3D.Buffer texCoords;
+    private AIVector3D.Buffer vertices;
+    private AIVector3D.Buffer normals;
+    private AIFace.Buffer faces;
     private final AIMesh mesh;
-    private int textureId;
 
-    public GlbMesh(String modelPath) {
-        AIScene scene = Assimp.aiImportFile(
-            modelPath,
-            Assimp.aiProcess_Triangulate |
-            Assimp.aiProcess_FlipUVs |
-            Assimp.aiProcess_CalcTangentSpace
-        );
+    public GlbMesh(AIMesh mesh, GlbTexture texture) {
 
-        if (scene == null) {
-            System.err.println("Nie udało się wczytać modelu: " + Assimp.aiGetErrorString());
-        }
+        this.mesh = mesh;
+        this.texture = texture;
 
-        mesh = AIMesh.create(scene.mMeshes().get(0)); // pierwsza siatka
-        vertices = mesh.mVertices();
-        normals = mesh.mNormals();
-        texCoords = mesh.mTextureCoords(0); // pierwszy UV set
-        textureId = loadTexture(scene); //Texture.createTexture("textures/warrior.png");
+        this.vertices = mesh.mVertices();
+        this.normals = mesh.mNormals();
+        this.faces = mesh.mFaces();
     }
 
-    public int loadTexture(AIScene scene){
+    @Override
+    public int getFaceNumberOfVertices(int faceIndex){
 
-        String texturePath = getTexturePath(scene);
+        AIFace foundFace = getFace(faceIndex);
 
-        if(texturePath == null){
-            throw new RuntimeException("Texture was not found " + texturePath);
-        }
-
-        ByteBuffer image = null;
-        IntBuffer width = BufferUtils.createIntBuffer(1);
-        IntBuffer height = BufferUtils.createIntBuffer(1);
-        IntBuffer comp = BufferUtils.createIntBuffer(1);
-
-        if(isTextureEmbedded(texturePath)) {
-            image = extractEmbeddedTexture(scene, texturePath, width, height, comp);
-        }
-        else {
-            image = extractOutsideTexture(texturePath, width, height, comp);
-        }
-
-        if (image == null) {
-            throw new RuntimeException("Failed to load texture: " + STBImage.stbi_failure_reason());
-        }
-
-        // Sprawdzamy rozmiar tekstury
-        System.out.println("Texture loaded with dimensions: " + width.get(0) + "x" + height.get(0));
-
-        int textureId = Texture.createEmptyTexture();
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0), 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        STBImage.stbi_image_free(image);
-
-        return textureId;
+        return foundFace.mNumIndices();
     }
 
-    private String getTexturePath(AIScene scene){
+    @Override
+    public IntBuffer getFaceVerticesBuffer(int faceIndex){
 
-        PointerBuffer materialsPtr = scene.mMaterials();
-        int numMaterials = scene.mNumMaterials();
-        long materialAddress = materialsPtr.get(mesh.mMaterialIndex());
-        AIMaterial material = AIMaterial.create(materialAddress);
+        AIFace foundFace = getFace(faceIndex);
 
-        AIString path = AIString.calloc();
-        int result = Assimp.aiGetMaterialTexture(
-            material,
-            Assimp.aiTextureType_DIFFUSE,
-            0,
-            path,
-            (IntBuffer) null,
-            null,
-            null,
-            null,
-            null,
-            null
-        );
+        return foundFace.mIndices();
+    }
 
-        if (result == Assimp.aiReturn_SUCCESS) {
-            return path.dataString();
+    private AIFace getFace(int faceIndex){
+
+        return faces.get(faceIndex);
+    }
+
+    @Override
+    public void appendVertices(FloatBuffer buffer){
+
+        for(int i = 0; i < mesh.mNumVertices(); i++){
+
+            appendVertex(buffer, i);
+            texture.appendUv(buffer, i);
         }
-
-        path.free();
-
-        return null;
     }
 
-    private boolean isTextureEmbedded(String texturePath){
-        return texturePath.startsWith("*");
+    private void appendVertex(FloatBuffer buffer, int vertexIndex){
+
+        AIVector3D vertex = vertices.get(vertexIndex);
+        buffer.put(vertex.x());
+        buffer.put(vertex.y());
+        buffer.put(vertex.z());
     }
 
-    private ByteBuffer extractEmbeddedTexture(AIScene scene, String texturePath, IntBuffer width, IntBuffer height, IntBuffer comp){
-
-        int index = Integer.parseInt(texturePath.substring(1));
-        long texPtrId = scene.mTextures().get(index);
-        AITexture tex = AITexture.create(texPtrId);
-        ByteBuffer image = tex.pcDataCompressed();
-        STBImage.stbi_set_flip_vertically_on_load(false);
-
-        return STBImage.stbi_load_from_memory(
-            image,
-            width,
-            height,
-            comp,
-            4   // RGBA
-        );
-    }
-
-    private ByteBuffer extractOutsideTexture(String texturePath, IntBuffer width, IntBuffer height, IntBuffer comp){
-
-        STBImage.stbi_set_flip_vertically_on_load(true);
-
-        return STBImage.stbi_load("resources/" + texturePath, width, height, comp, 4);
-    }
-
+    @Override
     public int getNumberOfVertices(){
         return mesh.mNumVertices();
     }
 
+    @Override
     public int getNumberOfFaces(){
         return mesh.mNumFaces();
-    }
-
-    public AIVector3D.Buffer getVertices() {
-        return vertices;
-    }
-
-    public AIVector3D.Buffer getTexCoords() {
-        return texCoords;
-    }
-
-    public AIFace.Buffer getFaces(){
-        return mesh.mFaces();
-    }
-
-    public int getTextureId() {
-        return textureId;
     }
 }

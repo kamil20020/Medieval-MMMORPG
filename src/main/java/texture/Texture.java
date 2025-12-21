@@ -1,5 +1,7 @@
 package texture;
 
+import org.lwjgl.assimp.AIVector3D;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -7,38 +9,84 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 public abstract class Texture {
 
-    public static int createTexture(String textureFileUrl){
+    protected int textureId;
+    protected int width = 0;
+    protected int height = 0;
+    protected String textureFileUrl;
+
+    public Texture(String textureFileUrl){
+        this.textureFileUrl = textureFileUrl;
+        textureId = createNonEmptyTexture();
+    }
+
+    public Texture(){
+        textureId = createEmptyTexture();
+    }
+
+    protected int createNonEmptyTexture(){
+
+        ByteBuffer buffer = loadTextureData();
+
+        return createNonEmptyTexture(buffer);
+    }
+
+    protected ByteBuffer loadTextureData(){
 
         BufferedImage bufferedImage = loadImage(textureFileUrl);
 
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
+        width = bufferedImage.getWidth();
+        height = bufferedImage.getHeight();
 
-        ByteBuffer buffer = loadTextureData(bufferedImage);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(width * height * 4);
+
+        for (int y = height - 1; y >= 0; y--) {
+
+            for (int x = 0; x < width; x++) {
+
+                int pixelARGB = bufferedImage.getRGB(x, y);
+
+                int alpha = (pixelARGB >> 24) & 0xFF;
+                int red   = (pixelARGB >> 16) & 0xFF;
+                int green = (pixelARGB >> 8)  & 0xFF;
+                int blue  = pixelARGB & 0xFF;
+
+                buffer.put((byte) red);
+                buffer.put((byte) green);
+                buffer.put((byte) blue);
+                buffer.put((byte) alpha);
+            }
+        }
+
+        buffer.flip();
+
+        return buffer;
+    }
+
+    protected int createNonEmptyTexture(ByteBuffer buffer){
 
         //generate a texture handle or unique ID for this texture
         int textureId = createEmptyTexture();
 
         //upload our ByteBuffer to GL
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
         return textureId;
     }
 
-    public static int createEmptyTexture(){
+    protected int createEmptyTexture() {
 
-        //generate a texture handle or unique ID for this texture
         int textureId = glGenTextures();
-
-        //bind the texture
         glBindTexture(GL_TEXTURE_2D, textureId);
 
         //use an alignment of 1 to be safe
@@ -57,42 +105,12 @@ public abstract class Texture {
         return textureId;
     }
 
-    public static ByteBuffer loadTextureData(String textureFileUrl){
+    public int getId(){
 
-        BufferedImage bufferedImage = loadImage(textureFileUrl);
-
-        return loadTextureData(bufferedImage);
+        return textureId;
     }
 
-    private static ByteBuffer loadTextureData(BufferedImage bufferedImage){
-
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
-
-        ByteBuffer buffer = ByteBuffer.allocateDirect(width * height * 4);
-
-        for (int y = height - 1; y >= 0; y--) {
-
-            for (int x = 0; x < width; x++) {
-
-                int pixel = bufferedImage.getRGB(x, y); // ARGB
-
-                int alpha = (pixel >> 24) & 0xFF;
-                int red   = (pixel >> 16) & 0xFF;
-                int green = (pixel >> 8)  & 0xFF;
-                int blue  = pixel & 0xFF;
-
-                buffer.put((byte) red);
-                buffer.put((byte) green);
-                buffer.put((byte) blue);
-                buffer.put((byte) alpha);
-            }
-        }
-
-        buffer.flip();
-
-        return buffer;
-    }
+    public abstract void appendUv(FloatBuffer buffer, int uvIndex);
 
     private static BufferedImage loadImage(String filePath){
 
@@ -115,7 +133,6 @@ public abstract class Texture {
 
     public static void useTexture(int textureId){
 
-        //bind the texture
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureId);
     }

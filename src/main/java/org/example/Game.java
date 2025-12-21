@@ -29,6 +29,8 @@ public class Game {
             window.handleEvents();
         }
 
+        renderer.clear();
+
         window.stop();
     }
 }
