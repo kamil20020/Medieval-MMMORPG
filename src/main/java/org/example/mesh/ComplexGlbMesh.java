@@ -1,5 +1,6 @@
 package org.example.mesh;
 
+import org.joml.Vector3f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;

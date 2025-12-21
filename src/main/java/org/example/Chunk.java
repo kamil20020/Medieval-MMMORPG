@@ -4,9 +4,22 @@ import org.example.mesh.*;
 import texture.FileTexture;
 import texture.Texture;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Chunk {
 
-    private Meshable meshable;
+    private List<Meshable> meshables = new ArrayList<>();
+    private int modelId;
+    private final Camera camera;
+    private final EventsHandler eventsHandler;
+
+    public Chunk(int modelId, Camera camera, EventsHandler eventsHandler){
+
+        this.modelId = modelId;
+        this.camera = camera;
+        this.eventsHandler = eventsHandler;
+    }
 
     public void init(){
 
@@ -15,21 +28,32 @@ public class Chunk {
 
     private void uploadToGpu(){
 
-        meshable = new ComplexGlbMesh("models/warrior.glb");
-//        Texture texture = new FileTexture("textures/ground-test.png", Rect.TEXTURE_COORDS);
-//        meshable = new Rect(texture);
-        meshable.uploadToGpu();
+        Texture texture = new FileTexture("textures/grass.png", Rect.TEXTURE_COORDS);
+        Meshable grass = new Rect(texture);
+        meshables.add(grass);
 
+        Meshable player = new Player(camera, modelId, eventsHandler);
+        meshables.add(player);
 
+        for(Meshable meshable : meshables){
+
+            meshable.uploadToGpu();
+        }
     }
 
     public void draw(){
 
-        meshable.draw();
+        for(Meshable meshable : meshables){
+
+            meshable.draw();
+        }
     }
 
     public void clear(){
 
-        meshable.clear();
+        for(Meshable meshable : meshables){
+
+            meshable.clear();
+        }
     }
 }

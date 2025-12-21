@@ -8,21 +8,28 @@ import java.nio.IntBuffer;
 
 public class Rect extends Mesh{
 
-    private static float[][] vertices = {
-        {-0.5f, -0.5f, 0}, //lewy przód,
-        {0.5f, -0.5f, 0}, //prawy przód,
-        {-0.5f, 0.5f, 0}, //lewy tył,
-        {0.5f, 0.5f, 0} //prawy tył,
+    private static final float[][] vertices = {
+        {-100, 0, -100}, // lewy przód,
+        {100, 0, -100},  // prawy przód,
+        {100, 0, 100},   // prawy tył,
+        {-100, 0, 100}   // lewy tył,
     };
-    private static int[][] faces = {
-        {0, 1, 3},// pierwszy trójkąt (lewy przód, prawy przód, prawy tył)
-        {3, 2, 0}  // drugi trójkąt (prawy tył, lewy tył, lewy pr)
+    /*
+   3 ______ 2
+     |   /|
+     |  / |
+     | /  |
+   0 |/___| 1
+     */
+    private static final int[][] faces = {
+        {0, 2, 1}, // pierwszy trójkąt (lewy przód, prawy tył, prawy przód)
+        {3, 2, 0}  // drugi trójkąt (lewy tył, prawy tył, lewy przód)
     };
     public static float[][] TEXTURE_COORDS = new float[][]{
-        {0, 0},
-        {1, 0},
-        {1, 1},
-        {0, 1}
+        {0, 50},
+        {50, 50},
+        {50, 0},
+        {0, 0}
     };
     IntBuffer[] facesVerticesBuffers = new IntBuffer[2];
 
@@ -33,7 +40,9 @@ public class Rect extends Mesh{
         for(int i = 0; i < facesVerticesBuffers.length; i++){
 
             facesVerticesBuffers[i] = BufferUtils.createIntBuffer(faces[i].length);
-            facesVerticesBuffers[i].put(faces[i]);
+            facesVerticesBuffers[i].put(faces[i][0]);
+            facesVerticesBuffers[i].put(faces[i][1]);
+            facesVerticesBuffers[i].put(faces[i][2]);
             facesVerticesBuffers[i].flip();
         }
     }
@@ -58,9 +67,20 @@ public class Rect extends Mesh{
     @Override
     public void appendVertices(FloatBuffer buffer) {
 
-        for (float[] v : vertices) {
-            buffer.put(v);
+        for (int i = 0; i < vertices.length; i++) {
+
+            appendVertex(buffer, i);
+            texture.appendUv(buffer, i);
         }
+    }
+
+    private void appendVertex(FloatBuffer buffer, int vertexIndex){
+
+        float[] vertex = vertices[vertexIndex];
+
+        buffer.put(vertex[0]);
+        buffer.put(vertex[1]);
+        buffer.put(vertex[2]);
     }
 
     @Override

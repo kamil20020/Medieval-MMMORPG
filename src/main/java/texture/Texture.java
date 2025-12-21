@@ -79,7 +79,6 @@ public abstract class Texture {
 
         //upload our ByteBuffer to GL
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-        glGenerateMipmap(GL_TEXTURE_2D);
 
         return textureId;
     }
@@ -99,8 +98,10 @@ public abstract class Texture {
 
         //Setup wrap mode, i.e. how OpenGL will handle pixels outside of the expected range
         //Note: GL_CLAMP_TO_EDGE is part of GL12
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
         return textureId;
     }

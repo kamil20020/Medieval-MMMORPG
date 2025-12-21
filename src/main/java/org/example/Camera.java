@@ -5,9 +5,7 @@ import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
-import java.util.Set;
 
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Camera {
@@ -16,111 +14,92 @@ public class Camera {
     private final Vector3f eye;
     private final Vector3f destination;
     private final Vector3f top;
-    private final EventsHandler eventsHandler;
 
-    private static final double ROTATION_SENS = 0.2;
-    private static final double MOVE_SENS = 0.01;
+    public Camera(Vector3f position){
 
-    public Camera(Vector3f position, EventsHandler eventsHandler){
-
-        this.eventsHandler = eventsHandler;
         this.eye = new Vector3f(position);
-        this.angle = new Vector3f(0, 90, 0);
+        this.angle = new Vector3f(0, 0, 0);
         this.top = new Vector3f(0, 1, 0);
         this.destination = new Vector3f(0, 0, 20);
-
-        eventsHandler.addKeyboardCallback(this::moveCallback);
 
         updateDestination();
     }
 
     public Vector3f getPosition(){
 
-        return eye;
+        return new Vector3f(eye);
     }
 
-    public void moveCallback(Set<Integer> pressedKeyboardKeys){
+    public void moveForward(double speed){
 
-        handleWasd(pressedKeyboardKeys);
-
-        double time = eventsHandler.getTime();
-
-        if(pressedKeyboardKeys.contains(GLFW_KEY_Q)){
-
-            Vector3f forward = getForward();
-
-            forward.rotateY((float) Math.toRadians(90));
-
-            moveInDirection(time * MOVE_SENS, forward);
-        }
-
-        if(pressedKeyboardKeys.contains(GLFW_KEY_E)){
-
-            Vector3f forward = getForward();
-
-            forward.rotateY((float) Math.toRadians(90));
-
-            moveInDirection(-time * MOVE_SENS, forward);
-        }
-
-        if(pressedKeyboardKeys.contains(GLFW_KEY_UP)){
-
-            angle.x += time * ROTATION_SENS;
-            angle.x = Math.max(-89, Math.min(89, angle.x));
-
-            updateDestination();
-        }
-
-        if(pressedKeyboardKeys.contains(GLFW_KEY_DOWN)){
-
-            angle.x -= time * ROTATION_SENS;
-            angle.x = Math.max(-89, Math.min(89, angle.x));
-
-            updateDestination();
-        }
-
-        if(pressedKeyboardKeys.contains(GLFW_KEY_SPACE)){
-
-            eye.y += time * MOVE_SENS;
-            destination.y += time * MOVE_SENS;
-        }
-
-        if(pressedKeyboardKeys.contains(GLFW_KEY_Z)){
-
-            eye.y -= time * MOVE_SENS;
-            destination.y -= time * MOVE_SENS;
-        }
+        moveInForward(speed);
     }
 
-    private void handleWasd(Set<Integer> pressedKeyboardKeys){
+    public void moveBack(double speed){
 
-        double time = eventsHandler.getTime();
+        moveInForward(-speed);
+    }
 
-        if(pressedKeyboardKeys.contains(GLFW_KEY_W)){
+    public void moveTop(double speed){
 
-            moveInForward(time * MOVE_SENS);
-        }
+        eye.y += speed;
+        destination.y += speed;
+    }
 
-        if(pressedKeyboardKeys.contains(GLFW_KEY_S)){
+    public void moveDown(double speed){
 
-            moveInForward(-time * MOVE_SENS);
-        }
+        eye.y -= speed;
+        destination.y -= speed;
+    }
 
-        if(pressedKeyboardKeys.contains(GLFW_KEY_A)){
+    public void moveLeft(double speed){
 
-            angle.y -= time * ROTATION_SENS;
-            angle.y %= 360;
+        Vector3f forward = getForward();
 
-            updateDestination();
-        }
+        forward.rotateY((float) Math.toRadians(90));
 
-        if(pressedKeyboardKeys.contains(GLFW_KEY_D)){
+        moveInDirection(speed, forward);
+    }
 
-            angle.y += time * ROTATION_SENS;
-            angle.y %= 360;
+    public void moveRight(double speed){
 
-            updateDestination();
-        }
+        Vector3f forward = getForward();
+
+        forward.rotateY((float) Math.toRadians(90));
+
+        moveInDirection(-speed, forward);
+    }
+
+    public void rotateLeft(double angle){
+
+        this.angle.y -= angle;
+        this.angle.y %= 360;
+
+        updateDestination();
+    }
+
+    public void rotateRight(double angle){
+
+        this.angle.y += angle;
+        this.angle.y %= 360;
+
+        updateDestination();
+    }
+
+    public void rotateTop(double angle){
+
+        this.angle.x += angle;
+        this.angle.x = Math.max(-89, Math.min(89, this.angle.x));
+
+        updateDestination();
+    }
+
+    public void rotateDown(double angle){
+
+        this.angle.x -= angle;
+        this.angle.x = Math.max(-89, Math.min(89, this.angle.x));
+
+        updateDestination();
     }
 
     private void moveInForward(double scale){
@@ -182,6 +161,15 @@ public class Camera {
         view.get(fb);
 
         glLoadMatrixf(fb);
+    }
+
+    public Matrix4f getMatrixRelativeToCamera(Vector3f offset){
+
+        return new Matrix4f()
+            .identity()
+            .translate(eye)
+            .rotateY((float) -Math.toRadians(angle.y - 90))
+            .translate(offset);
     }
 
 }

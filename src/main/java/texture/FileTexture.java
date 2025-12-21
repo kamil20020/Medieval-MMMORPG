@@ -1,6 +1,5 @@
 package texture;
 
-import java.io.File;
 import java.nio.FloatBuffer;
 
 public class FileTexture extends Texture{
