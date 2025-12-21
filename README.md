@@ -7,6 +7,8 @@ Implemented:
 * Moving player 3d model with camera,
 * Rendering test grass floor.
 
+I used free models and animations from Mixamo (https://www.mixamo.com/)
+
 <p align="center">
     <img src="model.png">
 <p>
