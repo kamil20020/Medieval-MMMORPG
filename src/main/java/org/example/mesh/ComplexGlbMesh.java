@@ -1,18 +1,15 @@
 package org.example.mesh;
 
-import org.joml.Vector3f;
+import org.joml.Matrix4f;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.AIMesh;
-import org.lwjgl.assimp.AIScene;
-import org.lwjgl.assimp.Assimp;
+import org.lwjgl.assimp.*;
 import texture.GlbTexture;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ComplexGlbMesh implements Meshable{
 
-    private final List<GlbMesh> meshes = new ArrayList<>();
+    protected final List<GlbMesh> meshes = new ArrayList<>();
 
     public ComplexGlbMesh(String complexModelFilePath){
 
@@ -32,7 +29,11 @@ public class ComplexGlbMesh implements Meshable{
         }
     }
 
-    private static AIScene loadScene(String modelPath) throws IllegalStateException{
+    public ComplexGlbMesh(){
+
+    }
+
+    public static AIScene loadScene(String modelPath) throws IllegalStateException{
 
         AIScene scene = Assimp.aiImportFile(
             modelPath,
@@ -60,6 +61,7 @@ public class ComplexGlbMesh implements Meshable{
     public void draw() {
 
         for(GlbMesh mesh : meshes){
+
             mesh.draw();
         }
     }
@@ -69,6 +71,23 @@ public class ComplexGlbMesh implements Meshable{
 
         for(GlbMesh mesh : meshes){
             mesh.clear();
+        }
+    }
+
+    @Override
+    public void update(double deltaTimeInSeconds) {
+
+        for(GlbMesh mesh : meshes){
+
+            mesh.update(deltaTimeInSeconds);
+        }
+    }
+
+    @Override
+    public void setModel(Matrix4f model) {
+
+        for(GlbMesh mesh : meshes){
+            mesh.setModel(model);
         }
     }
 }

@@ -16,17 +16,24 @@ public class Renderer {
     private final Camera camera;
     private final Chunk chunk;
     private int shaderProgramId;
-    private int modelId;
+    public static int modelId;
+
+    public static int isAnimatedId;
+    public static int vertexBoneIndicesId;
+    public static int vertexBoneWeightsId;
+    public static int finalBoneMatricesId;
+    public static int viewId;
 
     public Renderer(Window window, EventsHandler eventsHandler){
 
         this.window = window;
         this.camera = new Camera(new Vector3f(0, 2, -2));
-        this.chunk = new Chunk(modelId, camera, eventsHandler);
+        this.chunk = new Chunk(modelId, isAnimatedId, camera, window, eventsHandler);
     }
 
-    public void init(){
+    public void init(int shaderId){
 
+        this.shaderProgramId = shaderId;
         chunk.init();
         initTextures();
     }
@@ -34,9 +41,6 @@ public class Renderer {
     private void initTextures(){
 
         glEnable(GL_TEXTURE_2D);
-
-        shaderProgramId = ShaderUtils.load("shaders/vertex.glsl", "shaders/fragment.glsl");
-        glUseProgram(shaderProgramId);
 
         int texLocation = glGetUniformLocation(shaderProgramId, "texture0");
         glUniform1i(texLocation, 0); // GL_TEXTURE0
@@ -46,18 +50,20 @@ public class Renderer {
         Matrix4f identityMatrix = new Matrix4f().identity();
         FloatBuffer initModelBuffer = identityMatrix.get(buffer);
         glUniformMatrix4fv(modelId, false, initModelBuffer);
+
+        isAnimatedId = glGetUniformLocation(shaderProgramId, "isAnimated");
+        glUniform1i(isAnimatedId, 1);
+
+        finalBoneMatricesId = glGetUniformLocation(shaderProgramId, "finalBoneMatrices");
+
+        viewId = glGetUniformLocation(shaderProgramId, "view");
     }
 
-    public void render(){
+    public void render(double deltaTime){
 
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        camera.update(viewId);
 
-        camera.update();
-
-        glUseProgram(shaderProgramId);
-
-        chunk.draw();
+        chunk.draw(deltaTime);
     }
 
     public void clear(){

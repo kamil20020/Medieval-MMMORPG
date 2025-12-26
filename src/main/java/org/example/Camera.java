@@ -7,6 +7,8 @@ import org.lwjgl.BufferUtils;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public class Camera {
 
@@ -151,7 +153,7 @@ public class Camera {
         destination.set(eye).add(new Vector3f(direction).mul(50));
     }
 
-    public void update(){
+    public void update(int viewId){
 
         Matrix4f view = new Matrix4f().lookAt(
             eye, destination, top
@@ -160,7 +162,7 @@ public class Camera {
         FloatBuffer fb = BufferUtils.createFloatBuffer(16);
         view.get(fb);
 
-        glLoadMatrixf(fb);
+        glUniformMatrix4fv(viewId, false, fb);
     }
 
     public Matrix4f getMatrixRelativeToCamera(Vector3f offset){

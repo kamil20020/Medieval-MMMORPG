@@ -5,14 +5,15 @@ import texture.GlbTexture;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GlbMesh extends Mesh{
 
-    private AIVector3D.Buffer vertices;
+    protected AIVector3D.Buffer vertices;
     private AIVector3D.Buffer normals;
     private AIFace.Buffer faces;
-    private final AIMesh mesh;
+    protected final AIMesh mesh;
 
     public GlbMesh(AIMesh mesh, GlbTexture texture) {
 
@@ -55,7 +56,7 @@ public class GlbMesh extends Mesh{
         }
     }
 
-    private void appendVertex(FloatBuffer buffer, int vertexIndex){
+    protected void appendVertex(FloatBuffer buffer, int vertexIndex){
 
         AIVector3D vertex = vertices.get(vertexIndex);
         buffer.put(vertex.x());

@@ -7,18 +7,24 @@ import texture.Texture;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.lwjgl.opengl.GL20.glUniform1i;
+
 public class Chunk {
 
     private List<Meshable> meshables = new ArrayList<>();
     private int modelId;
+    public static int finalBoneMatricesId;
     private final Camera camera;
     private final EventsHandler eventsHandler;
+    private final Window window;
 
-    public Chunk(int modelId, Camera camera, EventsHandler eventsHandler){
+    public Chunk(int modelId, int finalBoneMatricesId, Camera camera, Window window, EventsHandler eventsHandler){
 
         this.modelId = modelId;
+        Chunk.finalBoneMatricesId = finalBoneMatricesId;
         this.camera = camera;
         this.eventsHandler = eventsHandler;
+        this.window = window;
     }
 
     public void init(){
@@ -32,7 +38,7 @@ public class Chunk {
         Meshable grass = new Rect(texture);
         meshables.add(grass);
 
-        Meshable player = new Player(camera, modelId, eventsHandler);
+        Meshable player = new Player(camera, eventsHandler);
         meshables.add(player);
 
         for(Meshable meshable : meshables){
@@ -41,14 +47,14 @@ public class Chunk {
         }
     }
 
-    public void draw(){
+    public void draw(double deltaTime){
 
         for(Meshable meshable : meshables){
 
+            meshable.update(deltaTime);
             meshable.draw();
         }
     }
-
     public void clear(){
 
         for(Meshable meshable : meshables){

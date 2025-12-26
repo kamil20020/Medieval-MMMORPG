@@ -1,5 +1,7 @@
 package org.example.mesh;
 
+import org.example.Renderer;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -27,6 +29,9 @@ public abstract class Mesh implements Meshable{
     protected int numberOfVertices;
     protected int numberOfFaces;
     protected Texture texture;
+    protected Matrix4f model = new Matrix4f().identity();
+    private final FloatBuffer modelBuffer = BufferUtils.createFloatBuffer(16);
+    protected double deltaTime;
 
     private static final int STRIDE = 5 * Float.BYTES;
 
@@ -44,6 +49,8 @@ public abstract class Mesh implements Meshable{
 
         bindVerticesBuffer(buffer);
         bindEboBuffer(indicesBuffer);
+
+        model.get(modelBuffer);
     }
 
     private FloatBuffer loadVerticesBuffer(){
@@ -105,8 +112,15 @@ public abstract class Mesh implements Meshable{
         if(texture != null){
             Texture.useTexture(texture.getId());
         }
+        glUniformMatrix4fv(Renderer.modelId, false, model.get(modelBuffer));
         glBindVertexArray(vertexArraysId);
         glDrawElements(GL_TRIANGLES, getNumberOfFaces() * 3, GL_UNSIGNED_INT, 0);
+    }
+
+    @Override
+    public void update(double deltaTimeInSeconds){
+
+        deltaTime = deltaTimeInSeconds;
     }
 
     @Override
@@ -115,6 +129,12 @@ public abstract class Mesh implements Meshable{
         glDeleteBuffers(vertexBufferId);
         glDeleteBuffers(eboId);
         glDeleteVertexArrays(vertexArraysId);
+    }
+
+    @Override
+    public void setModel(Matrix4f model){
+
+        this.model = model;
     }
 
     public abstract int getFaceNumberOfVertices(int faceIndex);

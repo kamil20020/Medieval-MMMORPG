@@ -1,12 +1,18 @@
 package org.example;
 
+import org.example.shaders.ShaderUtils;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 
+import java.nio.FloatBuffer;
 import java.util.function.BiConsumer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
@@ -14,6 +20,7 @@ public class Window {
     private final long windowId;
     private int width;
     private int height;
+    private int shaderProgramId;
 
     public Window(int width, int height){
 
@@ -26,7 +33,8 @@ public class Window {
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+//        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
@@ -58,6 +66,12 @@ public class Window {
         glFrontFace(GL_CCW);
         glClearColor(0f, 0f, 0f, 1.0f);
 
+        shaderProgramId = ShaderUtils.load("shaders/vertex.glsl", "shaders/fragment.glsl");
+        glUseProgram(shaderProgramId);
+
+        int projectionId = glGetUniformLocation(shaderProgramId, "projection");
+        Perspective.setProjectionId(projectionId);
+
         updateViewPort(width, height);
     }
 
@@ -85,17 +99,12 @@ public class Window {
 
     public void handleEvents(){
 
-        glfwWaitEvents();
+        glfwPollEvents();
     }
 
     public boolean isWindowClosed(){
 
         return glfwWindowShouldClose(windowId);
-    }
-
-    public double getTime(){
-
-        return glfwGetTime();
     }
 
     public void setKeyboardCallback(BiConsumer<Integer, Integer> callback){
@@ -113,7 +122,7 @@ public class Window {
         glfwSetMouseButtonCallback(windowId, (windowId, button, action, mode) -> callback.accept(button, action));
     }
 
-    private  void updateViewPort(int newWidth, int newHeight){
+    private void updateViewPort(int newWidth, int newHeight){
 
         this.width = newWidth;
         this.height = newHeight;
@@ -121,8 +130,10 @@ public class Window {
         Perspective.init(width, height);
 
         glViewport(0, 0, width, height);
+    }
 
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+    public int getShaderId(){
+
+        return shaderProgramId;
     }
 }
