@@ -23,8 +23,8 @@ import static org.lwjgl.opengl.GL30.*;
 
 public abstract class Mesh implements Meshable{
 
-    private int vertexArraysId;
-    private int vertexBufferId;
+    protected int vertexArraysId;
+    protected int vertexBufferId;
     private int eboId;
     protected int numberOfVertices;
     protected int numberOfFaces;

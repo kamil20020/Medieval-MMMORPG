@@ -34,6 +34,8 @@ public class Game {
 
             window.refreshScreen();
             window.handleEvents();
+
+//            break;
         }
 
         renderer.clear();

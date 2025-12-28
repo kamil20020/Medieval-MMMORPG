@@ -415,7 +415,7 @@ CodeHeap 'non-nmethods': size=5760Kb used=1726Kb max_used=1755Kb free=4033Kb
  full_count=0
 
 Compilation events (20 events):
-Event: 1.319 Thread 0x00000202d25dd880 1081       4       org.example.mesh.GlbMesh::appendVertex (40 bytes)
+Event: 1.319 Thread 0x00000202d25dd880 1081       4       org.example.mesh.AssimpGlbMesh::appendVertex (40 bytes)
 Event: 1.319 Thread 0x00000202c8c5f950 nmethod 1090 0x00000202b52cc590 code [0x00000202b52cc740, 0x00000202b52ccb58]
 Event: 1.321 Thread 0x00000202d25dd370 nmethod 1093 0x00000202b52cd110 code [0x00000202b52cd2a0, 0x00000202b52cd498]
 Event: 1.322 Thread 0x00000202d25dd880 nmethod 1081 0x00000202b52cd810 code [0x00000202b52cd9a0, 0x00000202b52cdc18]

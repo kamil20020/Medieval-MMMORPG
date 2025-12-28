@@ -11,12 +11,12 @@ import static org.lwjgl.opengl.GL20.glUniform1i;
 
 public class Chunk {
 
-    private List<Meshable> meshables = new ArrayList<>();
-    private int modelId;
+    protected List<Meshable> meshables = new ArrayList<>();
+    protected int modelId;
     public static int finalBoneMatricesId;
-    private final Camera camera;
-    private final EventsHandler eventsHandler;
-    private final Window window;
+    protected final Camera camera;
+    protected final EventsHandler eventsHandler;
+    protected final Window window;
 
     public Chunk(int modelId, int finalBoneMatricesId, Camera camera, Window window, EventsHandler eventsHandler){
 

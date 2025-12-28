@@ -1,12 +1,8 @@
 package org.example;
 
 import org.example.shaders.ShaderUtils;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 
-import java.nio.FloatBuffer;
 import java.util.function.BiConsumer;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -66,7 +62,7 @@ public class Window {
         glFrontFace(GL_CCW);
         glClearColor(0f, 0f, 0f, 1.0f);
 
-        shaderProgramId = ShaderUtils.load("shaders/vertex.glsl", "shaders/fragment.glsl");
+        shaderProgramId = ShaderUtils.load("shaders/vertex.vert", "shaders/fragment.frag");
         glUseProgram(shaderProgramId);
 
         int projectionId = glGetUniformLocation(shaderProgramId, "projection");

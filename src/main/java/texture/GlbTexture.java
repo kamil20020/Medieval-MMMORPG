@@ -60,6 +60,19 @@ public class GlbTexture extends Texture{
         long materialAddress = materialsPtr.get(mesh.mMaterialIndex());
         AIMaterial material = AIMaterial.create(materialAddress);
 
+        PointerBuffer textures = scene.mTextures();
+
+        for(int i = 0; i < scene.mNumTextures(); i++){
+
+            long texAddress = textures.get(i);
+            AITexture texture = AITexture.create(texAddress);
+
+            if(texture.mHeight() == 0){
+
+                return "*" + i;
+            }
+        }
+
         AIString path = AIString.calloc();
         int result = Assimp.aiGetMaterialTexture(
             material,

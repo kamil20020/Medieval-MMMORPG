@@ -1,14 +1,10 @@
 package org.example;
 
-import org.example.mesh.AnimatedComplexGlbMesh;
-import org.example.mesh.ComplexGlbMesh;
-import org.example.mesh.Mesh;
+import org.example.mesh.ComplexAssimpGlbMesh;
 import org.example.mesh.Meshable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 
-import java.nio.FloatBuffer;
 import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -29,7 +25,19 @@ public class Player implements Meshable {
     private static final double MOVE_SENS = 0.1;
 
     public Player(Camera camera, EventsHandler eventsHandler){
-        mesh = new AnimatedComplexGlbMesh("animations/warrior-sword-fight.glb");
+//        mesh = new ComplexGlbMesh("models/warrior-sword.glb");
+        mesh = new ComplexAssimpGlbMesh("animations/warrior-sword-fight.glb");
+//        mesh = new ComplexGlbMesh("animations/archer.glb");
+//        mesh = new ComplexGlbMesh("animations/lecimy1.glb");
+//        mesh = new ComplexGlbMesh("animations/test.fbx");
+//        mesh = new ComplexGlbMesh("animations/fox.glb");
+//        mesh = new ComplexGlbMesh("animations/human.glb");
+//        mesh = new ComplexGlbMesh("animations/warrior1-fight.glb");
+//        mesh = new AnimatedComplexGlbMesh("animations/test1.glb");
+//        mesh = new AnimatedComplexGlbMesh("animations/warrior-standing-sword.glb");
+//        mesh = new ComplexGlbMesh("animations/dragon.glb");
+//        mesh = new ComplexGlbMesh("animations/testowe.glb");
+//        mesh = new AnimatedComplexGlbMesh("animations/dragon1.glb");
         this.camera = camera;
         this.eventsHandler = eventsHandler;
 
@@ -88,6 +96,7 @@ public class Player implements Meshable {
     }
 
     private void updatePositionForCamera(){
+
 //        position = camera.getPosition().add(CAMERA_OFFSET);
 //        mesh.setModel(camera.getMatrixRelativeToCamera(CAMERA_OFFSET));
     }

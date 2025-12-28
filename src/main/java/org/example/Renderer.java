@@ -15,7 +15,7 @@ public class Renderer {
     private final Window window;
     private final Camera camera;
     private final Chunk chunk;
-    private int shaderProgramId;
+    public static int shaderProgramId;
     public static int modelId;
 
     public static int isAnimatedId;
@@ -23,6 +23,8 @@ public class Renderer {
     public static int vertexBoneWeightsId;
     public static int finalBoneMatricesId;
     public static int viewId;
+    public static int useOutsideColorId;
+    public static int outsideColorId;
 
     public Renderer(Window window, EventsHandler eventsHandler){
 
@@ -33,7 +35,7 @@ public class Renderer {
 
     public void init(int shaderId){
 
-        this.shaderProgramId = shaderId;
+        shaderProgramId = shaderId;
         chunk.init();
         initTextures();
     }
@@ -57,6 +59,10 @@ public class Renderer {
         finalBoneMatricesId = glGetUniformLocation(shaderProgramId, "finalBoneMatrices");
 
         viewId = glGetUniformLocation(shaderProgramId, "view");
+
+        useOutsideColorId = glGetUniformLocation(shaderProgramId, "useOutsideColor");
+
+        outsideColorId = glGetUniformLocation(shaderProgramId, "outsideColor");
     }
 
     public void render(double deltaTime){
