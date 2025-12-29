@@ -9,12 +9,12 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class GlbTexture extends Texture{
+public class AssimpTexture extends Texture{
 
     private final AIScene scene;
     private final AIVector3D.Buffer coords;
 
-    public GlbTexture(AIScene scene, AIMesh mesh){
+    public AssimpTexture(AIScene scene, AIMesh mesh){
 
         this.scene = scene;
         this.textureFileUrl = getTexturePath(scene, mesh);
@@ -22,6 +22,7 @@ public class GlbTexture extends Texture{
 
         ByteBuffer textureData = loadTextureData();
         this.textureId = createNonEmptyTexture(textureData);
+
         STBImage.stbi_image_free(textureData);
     }
 

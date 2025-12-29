@@ -2,7 +2,7 @@ package org.example.mesh;
 
 import org.joml.Vector3f;
 import org.lwjgl.assimp.*;
-import texture.GlbTexture;
+import texture.AssimpTexture;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -17,7 +17,7 @@ public class AssimpGlbMesh extends Mesh{
     protected final AIMesh mesh;
     public List<Vector3f> realVertices = new ArrayList<>();
 
-    public AssimpGlbMesh(AIMesh mesh, GlbTexture texture) {
+    public AssimpGlbMesh(AIMesh mesh, AssimpTexture texture) {
 
         this.mesh = mesh;
         this.texture = texture;

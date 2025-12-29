@@ -2,6 +2,8 @@ package org.example.mesh;
 
 import org.example.Renderer;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -166,6 +168,28 @@ public abstract class AnimatedGlbMesh extends Mesh{
     public int getNumberOfFaces() {
 
         return additionalMesh.getNumberOfFaces();
+    }
+
+    public static Vector3f getInterpolated(Vector3f lessTimeVec, double lessTime, Vector3f moreTimeVec, double moreTime, double actualTimeInTicks){
+
+        double timeDiff = moreTime - lessTime;
+
+        double factor = (actualTimeInTicks - lessTime) / timeDiff;
+
+        return new Vector3f(lessTimeVec).lerp(new Vector3f(moreTimeVec), (float) factor);
+    }
+
+    public static Quaternionf getInterpolated(Quaternionf lessTimeQuaternion, double lessTime, Quaternionf moreTimeQuaternion, double moreTime, double actualTimeInTicks){
+
+        double timeDiff = moreTime - lessTime;
+
+        double factor = (actualTimeInTicks - lessTime) / timeDiff;
+
+        Quaternionf result = new Quaternionf(lessTimeQuaternion).slerp(new Quaternionf(moreTimeQuaternion), (float) factor);
+
+        result.normalize();
+
+        return result;
     }
 
     private void printFinal(){

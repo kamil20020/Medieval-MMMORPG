@@ -2,13 +2,7 @@ package org.example.mesh;
 
 import org.example.Renderer;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.assimp.AIFace;
-import org.lwjgl.assimp.AIMesh;
-import org.lwjgl.assimp.AIVector3D;
-import texture.GlbTexture;
 import texture.Texture;
 
 import java.nio.FloatBuffer;

@@ -41,6 +41,9 @@ public class Chunk {
         Meshable player = new Player(camera, eventsHandler);
         meshables.add(player);
 
+        Meshable newModel = new ComplexJgltfGlbMesh("animations/warrior-sword-fight.glb");
+        meshables.add(newModel);
+
         for(Meshable meshable : meshables){
 
             meshable.uploadToGpu();

@@ -6,10 +6,8 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
-import texture.GlbTexture;
+import texture.AssimpTexture;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.*;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -20,7 +18,7 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
     private AINode rootNode;
     private final AIMesh mesh;
 
-    public AnimatedAssimpGlbMesh(AIMesh mesh, GlbTexture texture){
+    public AnimatedAssimpGlbMesh(AIMesh mesh, AssimpTexture texture){
         super(new AssimpGlbMesh(mesh, texture));
 
         this.mesh = mesh;
@@ -199,11 +197,7 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
         Vector3f moreTimeVec = new Vector3f(moreTimeRawVec.x(), moreTimeRawVec.y(), moreTimeRawVec.z());
         double moreTime = moreTimeKey.mTime();
 
-        double timeDiff = moreTime - lessTime;
-
-        double factor = (actualTimeInTicks - lessTime) / timeDiff;
-
-        return new Vector3f(lessTimeVec).lerp(new Vector3f(moreTimeVec), (float) factor);
+       return AnimatedGlbMesh.getInterpolated(lessTimeVec, lessTime, moreTimeVec, moreTime, actualTimeInTicks);
     }
 
     private Quaternionf getRotationInterpolated(AINodeAnim nodeAnim, double actualTimeInTicks){
@@ -241,16 +235,7 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
 
         double moreTime = moreTimeKey.mTime();
 
-        double timeDiff = moreTime - lessTime;
-
-        double factor = (actualTimeInTicks - lessTime) / timeDiff;
-
-        Quaternionf result = new Quaternionf(lessTimeQuaternion).slerp(new Quaternionf(moreTimeQuaternion), (float) factor);
-
-        result.normalize();
-
-        return result;
-
+        return AnimatedGlbMesh.getInterpolated(lessTimeQuaternion, lessTime, moreTimeQuaternion, moreTime, actualTimeInTicks);
     }
 
     private int getInterpolatedTimeIndex(AIQuatKey.Buffer keys, int numberOfKeys, double actualTimeInTicks){
@@ -337,8 +322,11 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
     }
 
     private Map<String, Vector3f> getBoneWorldPositions() {
+
         Map<String, Vector3f> bonePositions = new LinkedHashMap<>();
+
         for (var entry : bonesNamesIndices.entrySet()) {
+
             String name = entry.getKey();
             int index = entry.getValue();
 
@@ -346,6 +334,7 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
             boneFinalTransformations[index].getTranslation(pos);
             bonePositions.put(name, pos);
         }
+
         return bonePositions;
     }
 
@@ -362,16 +351,21 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
     }
 
     private void drawNodeLines(AINode node, Map<String, Vector3f> bonePositions) {
+
         String nodeName = node.mName().dataString();
         Vector3f parentPos = bonePositions.get(nodeName);
 
         PointerBuffer children = node.mChildren();
+
         for (int i = 0; i < node.mNumChildren(); i++) {
+
             long childId = children.get(i);
             AINode child = AINode.create(childId);
 
             Vector3f childPos = bonePositions.get(child.mName().dataString());
+
             if (parentPos != null && childPos != null) {
+
                 glVertex3f(parentPos.x, parentPos.y, parentPos.z);
                 glVertex3f(childPos.x, childPos.y, childPos.z);
             }
@@ -381,12 +375,15 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
     }
 
     private Map<String, Vector3f> getStaticBonePositions() {
+
         Map<String, Vector3f> positions = new LinkedHashMap<>();
         addStaticNodePositions(rootNode, new Matrix4f().identity(), positions);
+
         return positions;
     }
 
     private void addStaticNodePositions(AINode node, Matrix4f parentTransform, Map<String, Vector3f> positions) {
+
         String nodeName = node.mName().dataString();
         Matrix4f nodeTransform = convert(node.mTransformation());
         Matrix4f globalTransform = new Matrix4f(parentTransform).mul(nodeTransform);
@@ -397,7 +394,9 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
         positions.put(nodeName, pos);
 
         PointerBuffer children = node.mChildren();
+
         for (int i = 0; i < node.mNumChildren(); i++) {
+
             long childId = children.get(i);
             AINode child = AINode.create(childId);
             addStaticNodePositions(child, globalTransform, positions);
@@ -405,6 +404,7 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
     }
 
     public void drawStaticBones() {
+
         Map<String, Vector3f> bonePositions = getStaticBonePositions();
 
         glLineWidth(5.0f);
@@ -416,16 +416,21 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
     }
 
     private void drawStaticNodeLines(AINode node, Map<String, Vector3f> positions) {
+
         String nodeName = node.mName().dataString();
         Vector3f parentPos = positions.get(nodeName);
 
         PointerBuffer children = node.mChildren();
+
         for (int i = 0; i < node.mNumChildren(); i++) {
+
             long childId = children.get(i);
             AINode child = AINode.create(childId);
 
             Vector3f childPos = positions.get(child.mName().dataString());
+
             if (parentPos != null && childPos != null) {
+
                 glVertex3f(parentPos.x, parentPos.y, parentPos.z);
                 glVertex3f(childPos.x, childPos.y, childPos.z);
             }

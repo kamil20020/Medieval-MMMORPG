@@ -3,6 +3,7 @@ package org.example;
 import de.javagl.jgltf.impl.v2.*;
 import de.javagl.jgltf.model.*;
 import de.javagl.jgltf.model.io.GltfModelReader;
+import org.example.mesh.ComplexJgltfGlbMesh;
 
 import java.io.File;
 import java.io.IOException;
