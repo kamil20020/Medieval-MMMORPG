@@ -8,6 +8,7 @@ import org.example.mesh.Mesh;
 import org.lwjgl.BufferUtils;
 import texture.JgltfTexture;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -44,13 +45,34 @@ public class JgltfGlbMesh extends Mesh {
         AccessorData indicesData = indicesAccessor.getAccessorData();
 
         this.numberOfFaces = indicesData.getNumElements() / 3;
-        ShortBuffer shortBuffer = indicesData.createByteBuffer().asShortBuffer();
 
-        indices = BufferUtils.createIntBuffer(shortBuffer.remaining());
+        Class<?> indicesDataType = indicesData.getComponentType();
 
-        while (shortBuffer.hasRemaining()) {
+        ByteBuffer externalBuffer = indicesData.createByteBuffer();
 
-            int unsignedValue = shortBuffer.get() & 0xFFFF;
+        if(indicesDataType == int.class || indicesDataType == Integer.class){
+
+            IntBuffer externalIntBuffer = externalBuffer.asIntBuffer();
+
+            indices = BufferUtils.createIntBuffer(externalIntBuffer.remaining());
+
+            while(externalIntBuffer.hasRemaining()){
+
+                indices.put(externalIntBuffer.get());
+            }
+
+            indices.flip();
+
+            return;
+        }
+
+        ShortBuffer externalShortBuffer = externalBuffer.asShortBuffer();
+
+        indices = BufferUtils.createIntBuffer(externalShortBuffer.remaining());
+
+        while (externalShortBuffer.hasRemaining()) {
+
+            int unsignedValue = Short.toUnsignedInt(externalShortBuffer.get());
             indices.put(unsignedValue);
         }
 

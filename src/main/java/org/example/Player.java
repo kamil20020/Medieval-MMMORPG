@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.mesh.Meshable;
+import org.example.mesh.libraries.assimp.animation.AnimatedComplexAssimpGlbModel;
 import org.example.mesh.libraries.jgltf.animation.AnimatedComplexJgltfGlbMesh;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -29,6 +30,10 @@ public class Player implements Meshable {
             "animations/warrior-sword-fight.glb",
             "animations/warrior-sword-fight.glb"
         );
+//        mesh = new AnimatedComplexJgltfGlbMesh(
+//            "animations/dragon1.glb",
+//            "animations/dragon1.glb"
+//        );
 //        mesh = new ComplexGlbMesh("animations/archer.glb");
 //        mesh = new ComplexGlbMesh("animations/lecimy1.glb");
 //        mesh = new ComplexGlbMesh("animations/test.fbx");

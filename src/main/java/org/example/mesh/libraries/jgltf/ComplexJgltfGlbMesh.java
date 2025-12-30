@@ -30,7 +30,7 @@ public class ComplexJgltfGlbMesh extends ComplexGlbMesh {
 
         List<MeshModel> rawMeshes =  model.getMeshModels();
 
-        for(int i = 2; i < rawMeshes.size(); i++){
+        for(int i = 0; i < rawMeshes.size(); i++){
 
             MeshModel rawMesh = rawMeshes.get(i);
 

@@ -40,8 +40,11 @@ public class Chunk {
 
         Meshable player = new Player(camera, eventsHandler);
         meshables.add(player);
-//
-//        Meshable newModel = new AnimatedComplexAssimpGlbModel("animations/warrior-sword-fight.glb", "animations/warrior-sword-fight.glb");
+
+//        Meshable newModel = new AnimatedComplexJgltfGlbMesh(
+//            "animations/dragon1.glb",
+//            "animations/dragon1.glb"
+//        );
 //        meshables.add(newModel);
 //
 //        Meshable newModel1 = new AnimatedComplexAssimpGlbModel("animations/warrior-sword-fight.glb", "animations/warrior-sword-fight.glb");

@@ -66,9 +66,16 @@ public class AnimatedJgltfGlbMesh extends AnimatedGlbMesh {
 
         for(var node : model.getNodeModels()){
 
-            String nodeName = node.getName();
+            List<MeshModel> nodeMeshModels = node.getMeshModels();
 
-            if(Objects.equals(nodeName, meshName)){
+            if(nodeMeshModels == null || nodeMeshModels.isEmpty()){
+                continue;
+            }
+
+            MeshModel firstMeshModel = nodeMeshModels.get(0);
+            String nodeMeshName = firstMeshModel.getName();
+
+            if(Objects.equals(nodeMeshName, meshName)){
 
                 return node;
             }
@@ -90,6 +97,7 @@ public class AnimatedJgltfGlbMesh extends AnimatedGlbMesh {
 
         AccessorData bonesIndicesDataAccessor = meshPrimitiveModel.getAttributes().get("JOINTS_0").getAccessorData();
         ByteBuffer bonesIndicesData = bonesIndicesDataAccessor.createByteBuffer();
+        Class<?> bonedIndicesDataType = bonesIndicesDataAccessor.getComponentType();
 
         AccessorData bonesWeightsDataAccessor = meshPrimitiveModel.getAttributes().get("WEIGHTS_0").getAccessorData();
         FloatBuffer bonesWeightsData = bonesWeightsDataAccessor.createByteBuffer().asFloatBuffer();
@@ -100,10 +108,10 @@ public class AnimatedJgltfGlbMesh extends AnimatedGlbMesh {
 
                 int boneIndex = 0;
 
-                if (bonesIndicesDataAccessor.getComponentType() == Byte.class) {
+                if (bonedIndicesDataType == Byte.class || bonedIndicesDataType == byte.class) {
                     boneIndex = Byte.toUnsignedInt(bonesIndicesData.get());
                 }
-                else if (bonesIndicesDataAccessor.getComponentType() == Short.class) {
+                else if (bonedIndicesDataType == Short.class || bonedIndicesDataType == short.class) {
                     boneIndex = Short.toUnsignedInt(bonesIndicesData.getShort());
                 }
                 else{
@@ -119,8 +127,18 @@ public class AnimatedJgltfGlbMesh extends AnimatedGlbMesh {
 
         bonesIndicesData.flip();
         bonesWeightsData.flip();
+    }
 
-        System.out.println(verticesBonesIndices);
+    public static boolean isAnimated(MeshModel mesh){
+
+        for (MeshPrimitiveModel primitive : mesh.getMeshPrimitiveModels()) {
+
+            if (primitive.getAttributes().containsKey("JOINTS_0")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void loadBonesInverses(){
@@ -213,16 +231,40 @@ public class AnimatedJgltfGlbMesh extends AnimatedGlbMesh {
 
             NodeChannels foundNodeOrderedChannels = getNodeOrderedChannels(foundNodeChannels);
 
+            Vector3f translate = new Vector3f();
+            float[] translateData = node.getTranslation();
             AnimationModel.Channel translateChannel = foundNodeOrderedChannels.translateChannel;
-            Vector3f translate = getInterpolatedVectorData(translateChannel, animationTime);
+            if(translateChannel != null){
+
+                translate = getInterpolatedVectorData(translateChannel, animationTime);
+            }
+            else if(translateData != null){
+                translate = new Vector3f(node.getTranslation());
+            }
             Matrix4f translation = new Matrix4f().translation(translate);
 
+            Quaternionf rotate = new Quaternionf();
+            float[] rotateData = node.getRotation();
             AnimationModel.Channel rotationChannel = foundNodeOrderedChannels.rotationChannel;
-            Quaternionf rotate = getRotationInterpolated(rotationChannel, animationTime);
+            if(rotationChannel != null){
+
+                rotate = getRotationInterpolated(rotationChannel, animationTime);
+            }
+            else if(rotateData != null){
+                rotate = new Quaternionf(rotateData[0], rotateData[1], rotateData[2], rotateData[3]);
+            }
             Matrix4f rotation = new Matrix4f().rotation(rotate);
 
+            Vector3f scale = new Vector3f(1, 1, 1);
+            float[] scaleData = node.getScale();
             AnimationModel.Channel scaleChannel = foundNodeOrderedChannels.scaleChannel;
-            Vector3f scale = getInterpolatedVectorData(scaleChannel, animationTime);
+            if(scaleChannel != null){
+
+                scale = getInterpolatedVectorData(scaleChannel, animationTime);
+            }
+            else if(scaleData != null){
+                scale = new Vector3f(node.getScale());
+            }
             Matrix4f scaling = new Matrix4f().scaling(scale);
 
             nodeTransformation = new Matrix4f(translation)

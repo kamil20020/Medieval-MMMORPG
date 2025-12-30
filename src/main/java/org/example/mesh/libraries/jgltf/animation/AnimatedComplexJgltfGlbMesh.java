@@ -5,6 +5,7 @@ import de.javagl.jgltf.model.MeshModel;
 import org.example.mesh.Meshable;
 import org.example.mesh.animation.Skeleton;
 import org.example.mesh.libraries.jgltf.ComplexJgltfGlbMesh;
+import org.example.mesh.libraries.jgltf.JgltfGlbMesh;
 import texture.JgltfTexture;
 
 import java.util.List;
@@ -29,10 +30,22 @@ public class AnimatedComplexJgltfGlbMesh extends ComplexJgltfGlbMesh {
 
         List<MeshModel> rawMeshes = model.getMeshModels();
 
-        for (MeshModel rawMesh : rawMeshes) {
+        for (int i = 0; i < rawMeshes.size(); i++) {
+
+            MeshModel rawMesh = rawMeshes.get(i);
 
             JgltfTexture texture = new JgltfTexture(rawMesh);
-            Meshable mesh = new AnimatedJgltfGlbMesh(animatedModel, rawMesh, texture, skeleton);
+
+            Meshable mesh = null;
+
+            if(AnimatedJgltfGlbMesh.isAnimated(rawMesh)){
+
+                mesh = new AnimatedJgltfGlbMesh(animatedModel, rawMesh, texture, skeleton);
+            }
+            else{
+
+                mesh = new JgltfGlbMesh(rawMesh, texture);
+            }
 
             meshes.add(mesh);
         }

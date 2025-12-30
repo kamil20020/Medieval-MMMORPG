@@ -36,7 +36,7 @@ public abstract class AnimatedGlbMesh extends Mesh {
     protected final List<List<Float>> verticesBonesWeights;
     protected final List<List<Integer>> verticesBonesIndices;
 
-    private final Mesh additionalMesh;
+    protected final Mesh additionalMesh;
     protected final Skeleton skeleton;
 
     private int vboBoneIndices;
