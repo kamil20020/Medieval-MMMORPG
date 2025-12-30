@@ -47,11 +47,6 @@ public class Rect extends Mesh{
         }
     }
 
-    public Rect(){
-
-        this(null);
-    }
-
     @Override
     public int getFaceNumberOfVertices(int faceIndex) {
 

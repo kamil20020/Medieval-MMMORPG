@@ -29,7 +29,7 @@ void main() {
             int boneIndex = vertexBoneIndices[i];
             float weight = vertexBoneWeights[i];
 
-            skinnedPos += weight * finalBoneMatrices[boneIndex] * vec4(position, 1.0);
+            skinnedPos += weight * (finalBoneMatrices[boneIndex] * vec4(position, 1.0));
         }
     }
 

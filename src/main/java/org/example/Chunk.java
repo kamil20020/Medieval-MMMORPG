@@ -1,13 +1,13 @@
 package org.example;
 
+import org.example.mesh.libraries.assimp.animation.AnimatedComplexAssimpGlbModel;
+import org.example.mesh.libraries.jgltf.animation.AnimatedComplexJgltfGlbMesh;
 import org.example.mesh.*;
 import texture.FileTexture;
 import texture.Texture;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.lwjgl.opengl.GL20.glUniform1i;
 
 public class Chunk {
 
@@ -40,9 +40,12 @@ public class Chunk {
 
         Meshable player = new Player(camera, eventsHandler);
         meshables.add(player);
-
-        Meshable newModel = new ComplexJgltfGlbMesh("animations/warrior-sword-fight.glb");
-        meshables.add(newModel);
+//
+//        Meshable newModel = new AnimatedComplexAssimpGlbModel("animations/warrior-sword-fight.glb", "animations/warrior-sword-fight.glb");
+//        meshables.add(newModel);
+//
+//        Meshable newModel1 = new AnimatedComplexAssimpGlbModel("animations/warrior-sword-fight.glb", "animations/warrior-sword-fight.glb");
+//        meshables.add(newModel1);
 
         for(Meshable meshable : meshables){
 

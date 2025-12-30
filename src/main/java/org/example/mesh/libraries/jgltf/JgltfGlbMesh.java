@@ -1,9 +1,10 @@
-package org.example.mesh;
+package org.example.mesh.libraries.jgltf;
 
 import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import org.example.mesh.Mesh;
 import org.lwjgl.BufferUtils;
 import texture.JgltfTexture;
 
@@ -11,7 +12,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-public class JgltfGlbMesh extends Mesh{
+public class JgltfGlbMesh extends Mesh {
 
     private final MeshModel mesh;
     private IntBuffer indices;

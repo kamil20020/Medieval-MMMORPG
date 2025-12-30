@@ -1,14 +1,20 @@
-package org.example.mesh;
+package org.example.mesh.libraries.assimp;
 
+import org.example.mesh.ComplexGlbMesh;
+import org.example.mesh.Meshable;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 import texture.AssimpTexture;
 
-public class ComplexAssimpGlbMesh extends ComplexGlbMesh{
+public class ComplexAssimpGlbMesh extends ComplexGlbMesh {
 
     public ComplexAssimpGlbMesh(String complexModelFilePath){
 
         super(complexModelFilePath);
+    }
+
+    protected ComplexAssimpGlbMesh(){
+
     }
 
     @Override
@@ -18,13 +24,13 @@ public class ComplexAssimpGlbMesh extends ComplexGlbMesh{
 
         PointerBuffer meshesBuffer = aiScene.mMeshes();
 
-        for(int i = 2; i < aiScene.mNumMeshes(); i ++){
+        for(int i = 0; i < aiScene.mNumMeshes(); i ++){
 
             long meshId = meshesBuffer.get(i);
             AIMesh aiMesh = AIMesh.create(meshId);
 
             AssimpTexture texture = new AssimpTexture(aiScene, aiMesh);
-            Meshable mesh = new AnimatedAssimpGlbMesh(aiMesh, texture);
+            Meshable mesh = new AssimpGlbMesh(aiMesh, texture);
 
             meshes.add(mesh);
         }

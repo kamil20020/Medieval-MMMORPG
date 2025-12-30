@@ -1,5 +1,6 @@
-package org.example.mesh;
+package org.example.mesh.libraries.assimp;
 
+import org.example.mesh.Mesh;
 import org.joml.Vector3f;
 import org.lwjgl.assimp.*;
 import texture.AssimpTexture;
@@ -9,11 +10,11 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AssimpGlbMesh extends Mesh{
+public class AssimpGlbMesh extends Mesh {
 
     protected AIVector3D.Buffer vertices;
     private AIVector3D.Buffer normals;
-    private AIFace.Buffer faces;
+    private final AIFace.Buffer faces;
     protected final AIMesh mesh;
     public List<Vector3f> realVertices = new ArrayList<>();
 
@@ -71,11 +72,13 @@ public class AssimpGlbMesh extends Mesh{
 
     @Override
     public int getNumberOfVertices(){
+
         return mesh.mNumVertices();
     }
 
     @Override
     public int getNumberOfFaces(){
+
         return mesh.mNumFaces();
     }
 }

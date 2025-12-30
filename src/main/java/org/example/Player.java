@@ -1,7 +1,7 @@
 package org.example;
 
-import org.example.mesh.ComplexAssimpGlbMesh;
 import org.example.mesh.Meshable;
+import org.example.mesh.libraries.jgltf.animation.AnimatedComplexJgltfGlbMesh;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -9,12 +9,11 @@ import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 
 public class Player implements Meshable {
 
     private Vector3f position;
-    private final Meshable mesh;
+    private Meshable mesh;
 
     private final Camera camera;
     private final EventsHandler eventsHandler;
@@ -26,7 +25,10 @@ public class Player implements Meshable {
 
     public Player(Camera camera, EventsHandler eventsHandler){
 //        mesh = new ComplexGlbMesh("models/warrior-sword.glb");
-        mesh = new ComplexAssimpGlbMesh("animations/warrior-sword-fight.glb");
+        mesh = new AnimatedComplexJgltfGlbMesh(
+            "animations/warrior-sword-fight.glb",
+            "animations/warrior-sword-fight.glb"
+        );
 //        mesh = new ComplexGlbMesh("animations/archer.glb");
 //        mesh = new ComplexGlbMesh("animations/lecimy1.glb");
 //        mesh = new ComplexGlbMesh("animations/test.fbx");
@@ -109,6 +111,7 @@ public class Player implements Meshable {
 
     @Override
     public void setModel(Matrix4f model) {
+
         mesh.setModel(model);
     }
 

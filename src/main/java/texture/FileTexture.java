@@ -4,7 +4,7 @@ import java.nio.FloatBuffer;
 
 public class FileTexture extends Texture{
 
-    private float[][] textureCoords;
+    private final float[][] textureCoords;
 
     public FileTexture(String textureFileUrl, float[][] textureCoords){
         super(textureFileUrl);

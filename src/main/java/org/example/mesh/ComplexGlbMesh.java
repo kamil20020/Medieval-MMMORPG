@@ -13,6 +13,10 @@ public abstract class ComplexGlbMesh implements Meshable{
         loadModel(complexModelFilePath);
     }
 
+    protected ComplexGlbMesh(){
+
+    }
+
     @Override
     public void uploadToGpu(){
 

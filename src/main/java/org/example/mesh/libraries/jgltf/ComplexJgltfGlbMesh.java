@@ -1,19 +1,26 @@
-package org.example.mesh;
+package org.example.mesh.libraries.jgltf;
 
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.io.GltfModelReader;
+import org.example.mesh.ComplexGlbMesh;
+import org.example.mesh.Meshable;
 import texture.JgltfTexture;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class ComplexJgltfGlbMesh extends ComplexGlbMesh{
+public class ComplexJgltfGlbMesh extends ComplexGlbMesh {
 
     public ComplexJgltfGlbMesh(String complexModelFilePath) {
 
         super(complexModelFilePath);
+    }
+
+    protected ComplexJgltfGlbMesh(){
+
+
     }
 
     @Override
@@ -23,7 +30,7 @@ public class ComplexJgltfGlbMesh extends ComplexGlbMesh{
 
         List<MeshModel> rawMeshes =  model.getMeshModels();
 
-        for(int i = 0; i < rawMeshes.size(); i++){
+        for(int i = 2; i < rawMeshes.size(); i++){
 
             MeshModel rawMesh = rawMeshes.get(i);
 

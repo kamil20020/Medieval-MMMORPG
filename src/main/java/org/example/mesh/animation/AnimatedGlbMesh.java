@@ -1,6 +1,7 @@
-package org.example.mesh;
+package org.example.mesh.animation;
 
 import org.example.Renderer;
+import org.example.mesh.Mesh;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -17,12 +18,12 @@ import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL20.glUniform1i;
 import static org.lwjgl.opengl.GL20C.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glVertexAttribIPointer;
 
-public abstract class AnimatedGlbMesh extends Mesh{
+public abstract class AnimatedGlbMesh extends Mesh {
 
-    protected final List<Matrix4f> bonesInverses = new ArrayList<>();
-    protected final Map<String, Integer> bonesNamesIndices = new LinkedHashMap<>();
+    protected final List<Matrix4f> bonesInverses;
     protected final Matrix4f[] boneFinalTransformations;
 
     private double animationTime;
@@ -35,18 +36,28 @@ public abstract class AnimatedGlbMesh extends Mesh{
     protected final List<List<Float>> verticesBonesWeights;
     protected final List<List<Integer>> verticesBonesIndices;
 
-    protected int numberOfBones;
-
     private final Mesh additionalMesh;
+    protected final Skeleton skeleton;
+
+    private int vboBoneIndices;
+    private int vboBoneWeights;
 
     protected static final Integer MAX_NUMBER_OF_BONES = 200;
     protected static final Integer MAX_NUMBER_OF_BONS_PER_VERTEX = 4;
 
-    public AnimatedGlbMesh(Mesh additionalMesh){
+    public AnimatedGlbMesh(Mesh additionalMesh, Skeleton skeleton){
 
         this.additionalMesh = additionalMesh;
-        this.numberOfVertices = additionalMesh.numberOfVertices;
-        this.texture = additionalMesh.texture;
+        this.skeleton = skeleton;
+        this.numberOfVertices = additionalMesh.getNumberOfVertices();
+        this.texture = additionalMesh.getTexture();
+
+        this.bonesInverses = new ArrayList<>();
+
+        for(int i = 0; i < skeleton.getNumberOfBones(); i++){
+
+            bonesInverses.add(new Matrix4f().identity());
+        }
 
         verticesBonesWeights = new ArrayList<>();
         verticesBonesIndices = new ArrayList<>();
@@ -83,10 +94,28 @@ public abstract class AnimatedGlbMesh extends Mesh{
         loadFinalTransformation(animationTime);
     }
 
-    @Override
-    public void appendVertices(FloatBuffer buffer){
+    protected Matrix4f getGlobalTransformation(Matrix4f parentTransformation, Matrix4f nodeTransformation){
 
-        additionalMesh.appendVertices(buffer);
+        return new Matrix4f(parentTransformation).mul(nodeTransformation);
+    }
+
+    protected void loadFinalTransformation(String nodeName, Matrix4f globalTransformation){
+
+        if(skeleton.containsBone(nodeName)){
+
+            int boneIndex = skeleton.getBoneIndex(nodeName);
+            Matrix4f boneInverse = bonesInverses.get(boneIndex);
+
+            boneFinalTransformations[boneIndex] = new Matrix4f(rootNodeGlobalInverseTransform)
+                .mul(new Matrix4f(globalTransformation))
+                .mul(boneInverse);
+        }
+    }
+
+    @Override
+    public void uploadToGpu() {
+
+        super.uploadToGpu();
 
         IntBuffer boneIndicesBuffer = BufferUtils.createIntBuffer(numberOfVertices * MAX_NUMBER_OF_BONS_PER_VERTEX);
         FloatBuffer boneWeightsBuffer = BufferUtils.createFloatBuffer(numberOfVertices * MAX_NUMBER_OF_BONS_PER_VERTEX);
@@ -106,17 +135,25 @@ public abstract class AnimatedGlbMesh extends Mesh{
         boneIndicesBuffer.flip();
         boneWeightsBuffer.flip();
 
-        int vboBoneIndices = glGenBuffers();
+        vboBoneIndices = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboBoneIndices);
         glBufferData(GL_ARRAY_BUFFER, boneIndicesBuffer, GL_STATIC_DRAW);
         glVertexAttribIPointer(2, MAX_NUMBER_OF_BONS_PER_VERTEX, GL_INT, MAX_NUMBER_OF_BONS_PER_VERTEX * Integer.BYTES, 0);
         glEnableVertexAttribArray(2);
 
-        int vboBoneWeights = glGenBuffers();
+        vboBoneWeights = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboBoneWeights);
         glBufferData(GL_ARRAY_BUFFER, boneWeightsBuffer, GL_STATIC_DRAW);
         glVertexAttribPointer(3, MAX_NUMBER_OF_BONS_PER_VERTEX, GL_FLOAT, false, MAX_NUMBER_OF_BONS_PER_VERTEX * Float.BYTES, 0);
         glEnableVertexAttribArray(3);
+
+        glBindVertexArray(0);
+    }
+
+    @Override
+    public void appendVertices(FloatBuffer buffer){
+
+        additionalMesh.appendVertices(buffer);
     }
 
     @Override
@@ -124,14 +161,21 @@ public abstract class AnimatedGlbMesh extends Mesh{
 
         glUniform1i(Renderer.isAnimatedId, 1);
 
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(16 * MAX_NUMBER_OF_BONES);
+        // 1. Używamy tablicy floatów, co jest bezpieczniejsze i szybsze w JOML do uniformów
+        float[] matricesData = new float[16 * MAX_NUMBER_OF_BONES];
 
         for (int i = 0; i < MAX_NUMBER_OF_BONES; i++) {
+            // Jeśli kość nie została obliczona, używamy macierzy jednostkowej
+            Matrix4f mat = (i < boneFinalTransformations.length && boneFinalTransformations[i] != null)
+                    ? boneFinalTransformations[i]
+                    : new Matrix4f();
 
-            boneFinalTransformations[i].get(16 * i, buffer);
+            // Kopiujemy macierz do tablicy pod odpowiedni offset
+            mat.get(matricesData, i * 16);
         }
 
-        glUniformMatrix4fv(Renderer.finalBoneMatricesId, false, buffer);
+        // 2. Przesyłamy całą tablicę naraz
+        glUniformMatrix4fv(Renderer.finalBoneMatricesId, false, matricesData);
 
         super.draw();
 
@@ -173,8 +217,12 @@ public abstract class AnimatedGlbMesh extends Mesh{
     public static Vector3f getInterpolated(Vector3f lessTimeVec, double lessTime, Vector3f moreTimeVec, double moreTime, double actualTimeInTicks){
 
         double timeDiff = moreTime - lessTime;
+        if (timeDiff <= 0.000001) {
+            return new Vector3f(lessTimeVec);
+        }
 
         double factor = (actualTimeInTicks - lessTime) / timeDiff;
+        factor = Math.max(0.0f, Math.min(1.0f, factor));
 
         return new Vector3f(lessTimeVec).lerp(new Vector3f(moreTimeVec), (float) factor);
     }
@@ -182,8 +230,12 @@ public abstract class AnimatedGlbMesh extends Mesh{
     public static Quaternionf getInterpolated(Quaternionf lessTimeQuaternion, double lessTime, Quaternionf moreTimeQuaternion, double moreTime, double actualTimeInTicks){
 
         double timeDiff = moreTime - lessTime;
+        if (timeDiff <= 0.000001) {
+            return new Quaternionf(lessTimeQuaternion);
+        }
 
         double factor = (actualTimeInTicks - lessTime) / timeDiff;
+        factor = Math.max(0.0f, Math.min(1.0f, factor));
 
         Quaternionf result = new Quaternionf(lessTimeQuaternion).slerp(new Quaternionf(moreTimeQuaternion), (float) factor);
 
@@ -196,11 +248,11 @@ public abstract class AnimatedGlbMesh extends Mesh{
 
         System.out.println("Submesh boneFinalTransformations:");
 
-        for(int i = 0; i < numberOfBones; i++){
+        for(int i = 0; i < skeleton.getNumberOfBones(); i++){
 
             String name = "";
 
-            for(var m : bonesNamesIndices.entrySet()){
+            for(var m : skeleton.getEntrySet()){
 
                 if(i == m.getValue()){
 
@@ -304,7 +356,24 @@ public abstract class AnimatedGlbMesh extends Mesh{
         }
     }
 
-    protected abstract void loadBones();
+    protected Map<String, Vector3f> getAnimatedBonesPositions() {
+
+        Map<String, Vector3f> bonePositions = new LinkedHashMap<>();
+
+        for (var entry : skeleton.getEntrySet()) {
+
+            String name = entry.getKey();
+            int index = entry.getValue();
+
+            Vector3f pos = new Vector3f();
+            boneFinalTransformations[index].getTranslation(pos);
+            bonePositions.put(name, pos);
+        }
+
+        return bonePositions;
+    }
+
+    protected abstract void loadBonesData();
     protected abstract void loadAnimationData();
     protected abstract void loadFinalTransformation(double deltaTimeInSeconds);
 }

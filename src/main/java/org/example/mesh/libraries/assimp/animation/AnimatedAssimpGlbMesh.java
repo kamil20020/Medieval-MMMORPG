@@ -1,5 +1,8 @@
-package org.example.mesh;
+package org.example.mesh.libraries.assimp.animation;
 
+import org.example.mesh.animation.AnimatedGlbMesh;
+import org.example.mesh.animation.Skeleton;
+import org.example.mesh.libraries.assimp.AssimpGlbMesh;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -12,40 +15,46 @@ import java.util.*;
 
 import static org.lwjgl.opengl.GL15.*;
 
-public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
+public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh {
 
     private AIAnimation animation;
     private AINode rootNode;
     private final AIMesh mesh;
+    private final AIScene animatedScene;
 
-    public AnimatedAssimpGlbMesh(AIMesh mesh, AssimpTexture texture){
-        super(new AssimpGlbMesh(mesh, texture));
+    public AnimatedAssimpGlbMesh(AIScene animatedScene, AIMesh mesh, AssimpTexture texture, Skeleton skeleton){
+        super(new AssimpGlbMesh(mesh, texture), skeleton);
 
+        this.animatedScene = animatedScene;
         this.mesh = mesh;
-        this.numberOfBones = mesh.mNumBones();
 
-        loadBones();
+        loadBonesData();
 //        sortVerticesBones();
         normalizeVerticesWeightsAndIndices();
         initAnimation();
+
+//        for(int i = 0; i < 100; i++){
+//
+//            System.out.println(verticesBonesWeights.get(i));
+//        }
     }
 
     @Override
-    protected void loadBones(){
+    protected void loadBonesData(){
 
         PointerBuffer bones = mesh.mBones();
 
-        for(int boneIndex = 0; boneIndex < mesh.mNumBones(); boneIndex++){
+        for(int i = 0; i < mesh.mNumBones(); i++){
 
-            long boneId = bones.get(boneIndex);
+            long boneId = bones.get(i);
             AIBone bone = AIBone.create(boneId);
             String boneName = bone.mName().dataString();
 
-            bonesNamesIndices.put(boneName, boneIndex);
+            int boneIndex = skeleton.getBoneIndex(boneName);
 
             AIMatrix4x4 rawBoneOffset = bone.mOffsetMatrix();
             Matrix4f boneOffset = convert(rawBoneOffset);
-            bonesInverses.add(boneOffset);
+            bonesInverses.set(boneIndex, boneOffset);
 
             AIVertexWeight.Buffer boneVerticesWeights = bone.mWeights();
 
@@ -64,25 +73,14 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
     @Override
     protected void loadAnimationData(){
 
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/warrior1-fight.glb");
-        AIScene aiScene = ComplexAssimpGlbMesh.loadScene("animations/warrior-sword-fight.glb");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/elo-animacja.glb");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/elo-animacja-1.glb");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/archer.glb");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/lecimy1.glb");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/test.fbx");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/fox.glb");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/human.glb");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/dragon.glb");
-//        AIScene aiScene = ComplexGlbMesh.loadScene("animations/testowe.glb");
-
-        PointerBuffer animations = aiScene.mAnimations();
+        PointerBuffer animations = animatedScene.mAnimations();
         long animationId = animations.get(0);
         animation = AIAnimation.create(animationId);
 
-        rootNode = aiScene.mRootNode();
-        Matrix4f rootGlobalTransformation = convert(rootNode.mTransformation());
-        rootNodeGlobalInverseTransform = rootGlobalTransformation.invert();
+        rootNode = animatedScene.mRootNode();
+//        Matrix4f rootGlobalTransformation = convert(rootNode.mTransformation());
+//        rootNodeGlobalInverseTransform = rootGlobalTransformation.invert();
+        rootNodeGlobalInverseTransform = new Matrix4f().identity();
         rootNodeParentNodeTransformation = new Matrix4f().identity();
 
         animationTicksPerSecond = animation.mTicksPerSecond();
@@ -99,37 +97,10 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
 
         String nodeName = node.mName().dataString();
 
-        AINodeAnim foundNodeAnim = findNodeAnim(nodeName);
-        Matrix4f nodeTransformation = convert(node.mTransformation());
+        Matrix4f nodeTransformation = getNodeTransformation(node, animationTime);
+        Matrix4f globalNodeTransformation = super.getGlobalTransformation(parentTransformation, nodeTransformation);
 
-        if (foundNodeAnim != null){
-
-            Vector3f translate = getTranslateInterpolated(foundNodeAnim, animationTime);
-            Matrix4f translation = new Matrix4f().translation(translate);
-
-            Quaternionf rotate = getRotationInterpolated(foundNodeAnim, animationTime);
-            Matrix4f rotation = new Matrix4f().rotation(rotate);
-
-            Vector3f scale = getScaleInterpolated(foundNodeAnim, animationTime);
-            Matrix4f scaling = new Matrix4f().scaling(scale);
-
-            nodeTransformation = translation
-                .mul(rotation)
-                .mul(scaling);
-        }
-
-        Matrix4f globalNodeTransformation = new Matrix4f(parentTransformation).mul(nodeTransformation);
-
-        if (bonesNamesIndices.containsKey(nodeName)) {
-
-            int boneIndex = bonesNamesIndices.get(nodeName);
-
-            Matrix4f boneInverse = bonesInverses.get(boneIndex);
-
-            boneFinalTransformations[boneIndex] =
-                new Matrix4f(globalNodeTransformation)
-                .mul(boneInverse);
-        }
+        super.loadFinalTransformation(nodeName, globalNodeTransformation);
 
         PointerBuffer nodeChildren = node.mChildren();
 
@@ -142,7 +113,35 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
         }
     }
 
-    private AINodeAnim findNodeAnim(String boneName){
+    private Matrix4f getNodeTransformation(AINode node, double animationTime){
+
+        String nodeName = node.mName().dataString();
+
+        Optional<AINodeAnim> foundNodeAnimOpt = findNodeAnim(nodeName);
+        Matrix4f nodeTransformation = convert(node.mTransformation());
+
+        if (foundNodeAnimOpt.isPresent()){
+
+            AINodeAnim foundNodeAnim = foundNodeAnimOpt.get();
+
+            Vector3f translate = getTranslateInterpolated(foundNodeAnim, animationTime);
+            Matrix4f translation = new Matrix4f().translation(translate);
+
+            Quaternionf rotate = getRotationInterpolated(foundNodeAnim, animationTime);
+            Matrix4f rotation = new Matrix4f().rotation(rotate);
+
+            Vector3f scale = getScaleInterpolated(foundNodeAnim, animationTime);
+            Matrix4f scaling = new Matrix4f().scaling(scale);
+
+            nodeTransformation = new Matrix4f(translation)
+                .mul(rotation)
+                .mul(scaling);
+        }
+
+        return nodeTransformation;
+    }
+
+    private Optional<AINodeAnim> findNodeAnim(String boneName){
 
         PointerBuffer channels = animation.mChannels();
 
@@ -153,11 +152,12 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
             String nodeAnimName = nodeAnim.mNodeName().dataString();
 
             if(Objects.equals(nodeAnimName, boneName)){
-                return nodeAnim;
+
+                return Optional.of(nodeAnim);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     private Vector3f getTranslateInterpolated(AINodeAnim nodeAnim, double actualTimeInTicks){
@@ -273,17 +273,19 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
 
         super.draw();
 
-        drawDebugBones();
-        drawStaticBones();
+//        printVerticesAfterFinal();
+
+//        drawDebugBones();
+//        drawStaticBones();
     }
 
     private Matrix4f convert(AIMatrix4x4 ai){
 
         return new Matrix4f(
-            ai.a1(), ai.b1(), ai.c1(), ai.d1(),
-            ai.a2(), ai.b2(), ai.c2(), ai.d2(),
-            ai.a3(), ai.b3(), ai.c3(), ai.d3(),
-            ai.a4(), ai.b4(), ai.c4(), ai.d4());
+                ai.a1(), ai.b1(), ai.c1(), ai.d1(),
+                ai.a2(), ai.b2(), ai.c2(), ai.d2(),
+                ai.a3(), ai.b3(), ai.c3(), ai.d3(),
+                ai.a4(), ai.b4(), ai.c4(), ai.d4());
     }
 
     private void printVerticesAfterFinal(){
@@ -297,7 +299,7 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
             vertexPositions.add(new Vector3f(v.x(), v.y(), v.z()));
         }
 
-        for (int i = 0; i < numberOfVertices; i++) {
+        for (int i = 0; i < 10; i++) {
 
             Vector4f pos = new Vector4f(vertexPositions.get(i), 1.0f); // Twoja lista pozycji wierzchołków
             Vector4f animatedPos = new Vector4f(0, 0, 0, 0);
@@ -313,7 +315,8 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
 
                 Vector4f transformed = new Vector4f();
                 boneMatrix.transform(pos, transformed);
-//                transformed.mul(weight);
+                transformed.mul(weight);
+
                 animatedPos.add(transformed);
             }
 
@@ -321,26 +324,9 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
         }
     }
 
-    private Map<String, Vector3f> getBoneWorldPositions() {
-
-        Map<String, Vector3f> bonePositions = new LinkedHashMap<>();
-
-        for (var entry : bonesNamesIndices.entrySet()) {
-
-            String name = entry.getKey();
-            int index = entry.getValue();
-
-            Vector3f pos = new Vector3f();
-            boneFinalTransformations[index].getTranslation(pos);
-            bonePositions.put(name, pos);
-        }
-
-        return bonePositions;
-    }
-
     public void drawDebugBones() {
 
-        Map<String, Vector3f> bonePositions = getBoneWorldPositions();
+        Map<String, Vector3f> bonePositions = getAnimatedBonesPositions();
 
         glLineWidth(6.0f);
         glBegin(GL_LINES);
@@ -374,6 +360,18 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
         }
     }
 
+    public void drawStaticBones() {
+
+        Map<String, Vector3f> bonePositions = getStaticBonePositions();
+
+        glLineWidth(5.0f);
+        glBegin(GL_LINES);
+
+        drawNodeLines(rootNode, bonePositions);
+
+        glEnd();
+    }
+
     private Map<String, Vector3f> getStaticBonePositions() {
 
         Map<String, Vector3f> positions = new LinkedHashMap<>();
@@ -400,42 +398,6 @@ public class AnimatedAssimpGlbMesh extends AnimatedGlbMesh{
             long childId = children.get(i);
             AINode child = AINode.create(childId);
             addStaticNodePositions(child, globalTransform, positions);
-        }
-    }
-
-    public void drawStaticBones() {
-
-        Map<String, Vector3f> bonePositions = getStaticBonePositions();
-
-        glLineWidth(5.0f);
-        glBegin(GL_LINES);
-
-        drawStaticNodeLines(rootNode, bonePositions);
-
-        glEnd();
-    }
-
-    private void drawStaticNodeLines(AINode node, Map<String, Vector3f> positions) {
-
-        String nodeName = node.mName().dataString();
-        Vector3f parentPos = positions.get(nodeName);
-
-        PointerBuffer children = node.mChildren();
-
-        for (int i = 0; i < node.mNumChildren(); i++) {
-
-            long childId = children.get(i);
-            AINode child = AINode.create(childId);
-
-            Vector3f childPos = positions.get(child.mName().dataString());
-
-            if (parentPos != null && childPos != null) {
-
-                glVertex3f(parentPos.x, parentPos.y, parentPos.z);
-                glVertex3f(childPos.x, childPos.y, childPos.z);
-            }
-
-            drawStaticNodeLines(child, positions);
         }
     }
 }
