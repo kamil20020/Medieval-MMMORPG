@@ -1,8 +1,6 @@
 package pl.engine.mmorpg;
 
-import pl.engine.mmorpg.mesh.Meshable;
-import pl.engine.mmorpg.mesh.libraries.jgltf.animation.AnimatedComplexJgltfGlbMesh;
-import org.joml.Matrix4f;
+import pl.engine.mmorpg.mesh.Entity;
 import org.joml.Vector3f;
 
 import java.util.Set;
@@ -10,40 +8,17 @@ import java.util.Set;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 
-public class Player implements Meshable {
+public class Player extends Entity {
 
     private Vector3f position;
-    private Meshable mesh;
 
     private final Camera camera;
     private final EventsHandler eventsHandler;
 
     private static final Vector3f CAMERA_OFFSET = new Vector3f(0, -2, 2.5f);
 
-    private static final double ROTATION_SENS = 2;
-    private static final double MOVE_SENS = 0.1;
-
     public Player(Camera camera, EventsHandler eventsHandler){
-//        mesh = new ComplexGlbMesh("models/warrior-sword.glb");
-        mesh = new AnimatedComplexJgltfGlbMesh(
-            "animations/warrior-sword-fight.glb",
-            "animations/warrior-sword-fight.glb"
-        );
-//        mesh = new AnimatedComplexJgltfGlbMesh(
-//            "animations/dragon1.glb",
-//            "animations/dragon1.glb"
-//        );
-//        mesh = new ComplexGlbMesh("animations/archer.glb");
-//        mesh = new ComplexGlbMesh("animations/lecimy1.glb");
-//        mesh = new ComplexGlbMesh("animations/test.fbx");
-//        mesh = new ComplexGlbMesh("animations/fox.glb");
-//        mesh = new ComplexGlbMesh("animations/human.glb");
-//        mesh = new ComplexGlbMesh("animations/warrior1-fight.glb");
-//        mesh = new AnimatedComplexGlbMesh("animations/test1.glb");
-//        mesh = new AnimatedComplexGlbMesh("animations/warrior-standing-sword.glb");
-//        mesh = new ComplexGlbMesh("animations/dragon.glb");
-//        mesh = new ComplexGlbMesh("animations/testowe.glb");
-//        mesh = new AnimatedComplexGlbMesh("animations/dragon1.glb");
+
         this.camera = camera;
         this.eventsHandler = eventsHandler;
 
@@ -79,7 +54,7 @@ public class Player implements Meshable {
             camera.moveDown(MOVE_SENS);
         }
 
-        updatePositionForCamera();
+//        updatePositionForCamera();
     }
 
     private void handleWasd(Set<Integer> pressedKeyboardKeys){
@@ -103,37 +78,7 @@ public class Player implements Meshable {
 
     private void updatePositionForCamera(){
 
-//        position = camera.getPosition().add(CAMERA_OFFSET);
-//        mesh.setModel(camera.getMatrixRelativeToCamera(CAMERA_OFFSET));
-    }
-
-    @Override
-    public void uploadToGpu() {
-
-        mesh.uploadToGpu();
-    }
-
-    @Override
-    public void setModel(Matrix4f model) {
-
-        mesh.setModel(model);
-    }
-
-    @Override
-    public void draw() {
-
-        mesh.draw();
-    }
-
-    @Override
-    public void clear() {
-
-        mesh.clear();
-    }
-
-    @Override
-    public void update(double deltaTimeInSeconds) {
-
-        mesh.update(deltaTimeInSeconds);
+        position = camera.getPosition().add(CAMERA_OFFSET);
+        mesh.setModel(camera.getMatrixRelativeToCamera(CAMERA_OFFSET));
     }
 }

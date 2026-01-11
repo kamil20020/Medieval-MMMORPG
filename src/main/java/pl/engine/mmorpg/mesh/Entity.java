@@ -1,0 +1,66 @@
+package pl.engine.mmorpg.mesh;
+
+import org.joml.Matrix4f;
+import pl.engine.mmorpg.mesh.libraries.jgltf.animation.AnimatedComplexJgltfGlbMesh;
+
+public class Entity implements Meshable {
+
+    protected Meshable mesh;
+
+    protected static final double ROTATION_SENS = 2;
+    protected static final double MOVE_SENS = 0.1;
+
+    public Entity(){
+
+//        mesh = new ComplexGlbMesh("models/warrior-sword.glb");
+        mesh = new AnimatedComplexJgltfGlbMesh(
+            "animations/warrior-sword-fight.glb",
+            "animations/warrior-sword-fight.glb"
+        );
+//        mesh = new AnimatedComplexJgltfGlbMesh(
+//            "animations/dragon1.glb",
+//            "animations/dragon1.glb"
+//        );
+//        mesh = new ComplexGlbMesh("animations/archer.glb");
+//        mesh = new ComplexGlbMesh("animations/lecimy1.glb");
+//        mesh = new ComplexGlbMesh("animations/test.fbx");
+//        mesh = new ComplexGlbMesh("animations/fox.glb");
+//        mesh = new ComplexGlbMesh("animations/human.glb");
+//        mesh = new ComplexGlbMesh("animations/warrior1-fight.glb");
+//        mesh = new AnimatedComplexGlbMesh("animations/test1.glb");
+//        mesh = new AnimatedComplexGlbMesh("animations/warrior-standing-sword.glb");
+//        mesh = new ComplexGlbMesh("animations/dragon.glb");
+//        mesh = new ComplexGlbMesh("animations/testowe.glb");
+//        mesh = new AnimatedComplexGlbMesh("animations/dragon1.glb");
+    }
+
+    @Override
+    public void uploadToGpu() {
+
+        mesh.uploadToGpu();
+    }
+
+    @Override
+    public void setModel(Matrix4f model) {
+
+        mesh.setModel(model);
+    }
+
+    @Override
+    public void draw() {
+
+        mesh.draw();
+    }
+
+    @Override
+    public void clear() {
+
+        mesh.clear();
+    }
+
+    @Override
+    public void update(double deltaTimeInSeconds) {
+
+        mesh.update(deltaTimeInSeconds);
+    }
+}

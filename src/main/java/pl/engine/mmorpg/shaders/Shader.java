@@ -14,8 +14,9 @@ import java.util.Map;
 public class Shader {
 
     private final int shaderProgramId;
-    private static volatile Shader INSTANCE;
     private final Map<ShaderProps, Integer> shaderPropsIds = new HashMap<>();
+
+    private static volatile Shader INSTANCE;
 
     private Shader(String vertexPath, String fragmentPath){
 
