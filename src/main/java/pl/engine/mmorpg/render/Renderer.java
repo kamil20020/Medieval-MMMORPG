@@ -4,6 +4,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.Camera;
 import pl.engine.mmorpg.EventsHandler;
+import pl.engine.mmorpg.mesh.MeshAbstractFactory;
+import pl.engine.mmorpg.mesh.libraries.jgltf.JgltfMeshAbstractFactory;
 import pl.engine.mmorpg.shaders.Shader;
 import pl.engine.mmorpg.shaders.ShaderProps;
 
@@ -13,13 +15,15 @@ public class Renderer {
 
     private final Window window;
     private final Camera camera;
+    private final MeshAbstractFactory meshFactory;
     private final Chunk chunk;
 
     public Renderer(Window window, EventsHandler eventsHandler){
 
         this.window = window;
         this.camera = new Camera(new Vector3f(0, 2, -2));
-        this.chunk = new Chunk(camera, window, eventsHandler);
+        this.meshFactory = new JgltfMeshAbstractFactory();
+        this.chunk = new Chunk(camera, window, eventsHandler, meshFactory);
     }
 
     public void init(){

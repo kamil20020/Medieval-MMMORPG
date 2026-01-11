@@ -2,8 +2,8 @@ package pl.engine.mmorpg.entity;
 
 import pl.engine.mmorpg.Camera;
 import pl.engine.mmorpg.EventsHandler;
-import pl.engine.mmorpg.entity.Entity;
 import org.joml.Vector3f;
+import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 
 import java.util.Set;
 
@@ -19,7 +19,11 @@ public class Player extends Entity {
 
     private static final Vector3f CAMERA_OFFSET = new Vector3f(0, -2, 2.5f);
 
-    public Player(Camera camera, EventsHandler eventsHandler){
+    public Player(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
+        super("animations/warrior-sword-fight.glb", meshFactory);
+//        super("animations/warrior-standing.glb", meshFactory);
+//        super("animations/warrior-standing-weapon.glb", meshFactory);
+//        super("animations/warrior-standing-combat.glb", meshFactory);
 
         this.camera = camera;
         this.eventsHandler = eventsHandler;
