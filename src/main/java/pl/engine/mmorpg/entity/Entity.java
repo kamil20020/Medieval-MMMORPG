@@ -1,7 +1,8 @@
-package pl.engine.mmorpg.mesh;
+package pl.engine.mmorpg.entity;
 
 import org.joml.Matrix4f;
-import pl.engine.mmorpg.mesh.libraries.jgltf.animation.AnimatedComplexJgltfGlbMesh;
+import pl.engine.mmorpg.mesh.Meshable;
+import pl.engine.mmorpg.entity.animation.libraries.jgltf.AnimatedComplexJgltfGlbMesh;
 
 public class Entity implements Meshable {
 
@@ -14,7 +15,6 @@ public class Entity implements Meshable {
 
 //        mesh = new ComplexGlbMesh("models/warrior-sword.glb");
         mesh = new AnimatedComplexJgltfGlbMesh(
-            "animations/warrior-sword-fight.glb",
             "animations/warrior-sword-fight.glb"
         );
 //        mesh = new AnimatedComplexJgltfGlbMesh(

@@ -1,6 +1,5 @@
-package pl.engine.mmorpg.mesh.animation;
+package pl.engine.mmorpg.entity.animation;
 
-import pl.engine.mmorpg.Renderer;
 import pl.engine.mmorpg.mesh.Mesh;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -18,7 +17,6 @@ import static org.lwjgl.opengl.GL11.GL_INT;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL20.glUniform1i;
 import static org.lwjgl.opengl.GL20C.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glVertexAttribIPointer;

@@ -1,7 +1,7 @@
-package pl.engine.mmorpg.mesh.libraries.assimp.animation;
+package pl.engine.mmorpg.entity.animation.libraries.assimp;
 
-import pl.engine.mmorpg.mesh.animation.AnimatedGlbMesh;
-import pl.engine.mmorpg.mesh.animation.Skeleton;
+import pl.engine.mmorpg.entity.animation.AnimatedGlbMesh;
+import pl.engine.mmorpg.entity.animation.Skeleton;
 import pl.engine.mmorpg.mesh.libraries.assimp.AssimpGlbMesh;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;

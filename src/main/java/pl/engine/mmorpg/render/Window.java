@@ -1,4 +1,4 @@
-package pl.engine.mmorpg;
+package pl.engine.mmorpg.render;
 
 import pl.engine.mmorpg.shaders.Shader;
 import org.lwjgl.opengl.GL;

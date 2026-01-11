@@ -1,6 +1,8 @@
-package pl.engine.mmorpg;
+package pl.engine.mmorpg.entity;
 
-import pl.engine.mmorpg.mesh.Entity;
+import pl.engine.mmorpg.Camera;
+import pl.engine.mmorpg.EventsHandler;
+import pl.engine.mmorpg.entity.Entity;
 import org.joml.Vector3f;
 
 import java.util.Set;

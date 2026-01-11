@@ -1,9 +1,7 @@
 package pl.engine.mmorpg.mesh;
 
-import pl.engine.mmorpg.Renderer;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL20;
 import pl.engine.mmorpg.shaders.Shader;
 import pl.engine.mmorpg.shaders.ShaderProps;
 import pl.engine.mmorpg.texture.Texture;

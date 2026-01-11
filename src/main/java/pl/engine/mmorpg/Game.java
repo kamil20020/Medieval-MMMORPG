@@ -1,6 +1,7 @@
 package pl.engine.mmorpg;
 
-import pl.engine.mmorpg.shaders.Shader;
+import pl.engine.mmorpg.render.Renderer;
+import pl.engine.mmorpg.render.Window;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 

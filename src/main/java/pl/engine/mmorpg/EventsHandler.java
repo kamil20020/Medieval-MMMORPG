@@ -1,6 +1,7 @@
 package pl.engine.mmorpg;
 
 import org.lwjgl.glfw.GLFW;
+import pl.engine.mmorpg.render.Window;
 
 import java.util.ArrayList;
 import java.util.HashSet;

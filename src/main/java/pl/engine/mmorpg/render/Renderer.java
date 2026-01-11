@@ -1,15 +1,13 @@
-package pl.engine.mmorpg;
+package pl.engine.mmorpg.render;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
+import pl.engine.mmorpg.Camera;
+import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.shaders.Shader;
 import pl.engine.mmorpg.shaders.ShaderProps;
 
-import java.nio.FloatBuffer;
-
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
 
 public class Renderer {
 

@@ -1,5 +1,8 @@
-package pl.engine.mmorpg;
+package pl.engine.mmorpg.render;
 
+import pl.engine.mmorpg.Camera;
+import pl.engine.mmorpg.EventsHandler;
+import pl.engine.mmorpg.entity.Player;
 import pl.engine.mmorpg.mesh.Meshable;
 import pl.engine.mmorpg.mesh.Rect;
 import pl.engine.mmorpg.texture.FileTexture;

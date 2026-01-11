@@ -1,4 +1,4 @@
-package pl.engine.mmorpg.mesh.animation;
+package pl.engine.mmorpg.entity.animation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
