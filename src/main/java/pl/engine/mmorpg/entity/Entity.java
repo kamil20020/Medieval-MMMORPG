@@ -1,12 +1,15 @@
 package pl.engine.mmorpg.entity;
 
 import org.joml.Matrix4f;
+import pl.engine.mmorpg.animation.AnimatedMeshable;
+import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
 
 public class Entity implements Meshable {
 
-    protected Meshable mesh;
+    protected AnimatedMeshable mesh;
+    protected Skeleton skeleton;
 
     protected static final double ROTATION_SENS = 2;
     protected static final double MOVE_SENS = 0.1;
@@ -14,7 +17,8 @@ public class Entity implements Meshable {
     public Entity(String modelPath, MeshAbstractFactory meshFactory){
 
 //        mesh = new ComplexGlbMesh("models/warrior-sword.glb");
-        mesh = meshFactory.createComplexAnimatedMesh(modelPath);
+        this.mesh = meshFactory.createComplexAnimatedMesh(modelPath);
+        this.skeleton = mesh.getSkeleton();
 //        mesh = new AnimatedComplexJgltfGlbMesh(
 //            "animations/dragon1.glb",
 //            "animations/dragon1.glb"

@@ -1,5 +1,6 @@
 package pl.engine.mmorpg.animation.libraries.assimp;
 
+import pl.engine.mmorpg.animation.AnimatedMeshable;
 import pl.engine.mmorpg.mesh.Meshable;
 import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.mesh.libraries.assimp.ComplexAssimpMesh;
@@ -8,10 +9,18 @@ import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
 import pl.engine.mmorpg.texture.AssimpTexture;
 
-public class AnimatedComplexAssimpModel extends ComplexAssimpMesh {
+public class AnimatedComplexAssimpModel extends ComplexAssimpMesh implements AnimatedMeshable {
 
     private final AIScene animatedScene;
     private final Skeleton skeleton;
+
+    public AnimatedComplexAssimpModel(String animatedComplexModelFilePath, Skeleton skeleton) {
+
+        this.animatedScene = loadScene(animatedComplexModelFilePath);
+        this.skeleton = skeleton;
+
+        loadModel(animatedComplexModelFilePath);
+    }
 
     public AnimatedComplexAssimpModel(String animatedComplexModelFilePath) {
 
@@ -36,5 +45,11 @@ public class AnimatedComplexAssimpModel extends ComplexAssimpMesh {
 
             meshes.add(mesh);
         }
+    }
+
+    @Override
+    public Skeleton getSkeleton() {
+
+        return skeleton;
     }
 }

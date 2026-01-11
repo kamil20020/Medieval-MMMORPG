@@ -2,6 +2,7 @@ package pl.engine.mmorpg.animation.libraries.jgltf;
 
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MeshModel;
+import pl.engine.mmorpg.animation.AnimatedMeshable;
 import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.mesh.Meshable;
 import pl.engine.mmorpg.mesh.libraries.jgltf.ComplexJgltfMesh;
@@ -10,10 +11,18 @@ import pl.engine.mmorpg.texture.JgltfTexture;
 
 import java.util.List;
 
-public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh {
+public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh implements AnimatedMeshable {
 
     private final Skeleton skeleton;
     private final GltfModel animatedModel;
+
+    public AnimatedComplexJgltfMesh(String animatedComplexModelFilePath, Skeleton skeleton) {
+
+        this.animatedModel = ComplexJgltfMesh.load(animatedComplexModelFilePath);
+        this.skeleton = skeleton;
+
+        loadModel(null);
+    }
 
     public AnimatedComplexJgltfMesh(String animatedComplexModelFilePath) {
 
@@ -47,6 +56,11 @@ public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh {
 
             meshes.add(mesh);
         }
+    }
+
+    public Skeleton getSkeleton(){
+
+        return skeleton;
     }
 }
 
