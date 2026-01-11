@@ -1,6 +1,6 @@
 package pl.engine.mmorpg.entity;
 
-import pl.engine.mmorpg.Camera;
+import pl.engine.mmorpg.render.Camera;
 import pl.engine.mmorpg.EventsHandler;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;

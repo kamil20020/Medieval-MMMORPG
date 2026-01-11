@@ -19,7 +19,7 @@ public class Game {
         renderer = new Renderer(window, eventsHandler);
     }
 
-    public void loop(){
+    private void loop(){
 
         window.start();
 
@@ -44,5 +44,17 @@ public class Game {
         renderer.clear();
 
         window.stop();
+    }
+
+    public void run(){
+
+        loop();
+    }
+
+    public static void main(String[] args){
+
+        System.out.println("Hello World! :D");
+
+        new Game().run();
     }
 }

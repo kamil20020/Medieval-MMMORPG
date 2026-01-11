@@ -1,7 +1,7 @@
 package pl.engine.mmorpg.mesh.libraries.jgltf;
 
 import de.javagl.jgltf.model.MeshModel;
-import pl.engine.mmorpg.entity.animation.libraries.jgltf.AnimatedComplexJgltfMesh;
+import pl.engine.mmorpg.animation.libraries.jgltf.AnimatedComplexJgltfMesh;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.Mesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;

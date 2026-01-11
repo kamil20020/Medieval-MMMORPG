@@ -1,9 +1,9 @@
-package pl.engine.mmorpg.entity.animation.libraries.jgltf;
+package pl.engine.mmorpg.animation.libraries.jgltf;
 
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.NodeModel;
 import de.javagl.jgltf.model.SkinModel;
-import pl.engine.mmorpg.entity.animation.Skeleton;
+import pl.engine.mmorpg.animation.Skeleton;
 
 import java.util.List;
 

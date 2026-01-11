@@ -1,7 +1,7 @@
-package pl.engine.mmorpg.entity.animation.libraries.assimp;
+package pl.engine.mmorpg.animation.libraries.assimp;
 
 import pl.engine.mmorpg.mesh.Meshable;
-import pl.engine.mmorpg.entity.animation.Skeleton;
+import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.mesh.libraries.assimp.ComplexAssimpMesh;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIMesh;

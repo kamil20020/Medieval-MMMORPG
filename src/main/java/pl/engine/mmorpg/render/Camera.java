@@ -1,4 +1,4 @@
-package pl.engine.mmorpg;
+package pl.engine.mmorpg.render;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

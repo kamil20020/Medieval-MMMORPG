@@ -1,7 +1,7 @@
 package pl.engine.mmorpg.mesh.libraries.assimp;
 
 import org.lwjgl.assimp.AIMesh;
-import pl.engine.mmorpg.entity.animation.libraries.assimp.AnimatedComplexAssimpModel;
+import pl.engine.mmorpg.animation.libraries.assimp.AnimatedComplexAssimpModel;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.Mesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;

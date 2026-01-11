@@ -2,7 +2,6 @@ package pl.engine.mmorpg.render;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import pl.engine.mmorpg.Camera;
 import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.libraries.jgltf.JgltfMeshAbstractFactory;

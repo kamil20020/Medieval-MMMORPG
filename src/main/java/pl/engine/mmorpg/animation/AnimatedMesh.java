@@ -1,4 +1,4 @@
-package pl.engine.mmorpg.entity.animation;
+package pl.engine.mmorpg.animation;
 
 import pl.engine.mmorpg.mesh.Mesh;
 import org.joml.Matrix4f;
