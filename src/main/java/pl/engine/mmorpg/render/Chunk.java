@@ -60,14 +60,22 @@ public class Chunk {
         }
     }
 
-    public void draw(double deltaTime){
+    public void update(double deltaTime){
 
         for(Meshable meshable : meshables){
 
             meshable.update(deltaTime);
+        }
+    }
+
+    public void draw(){
+
+        for(Meshable meshable : meshables){
+
             meshable.draw();
         }
     }
+
     public void clear(){
 
         for(Meshable meshable : meshables){

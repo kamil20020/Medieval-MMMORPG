@@ -32,10 +32,11 @@ public class Game {
             lastFrameTime = currentFrameTime;
 
             window.handleEvents();
+            renderer.update(deltaTime);
 
             window.clearScreen();
 
-            renderer.render(deltaTime);
+            renderer.render();
 
             window.refreshScreen();
         }

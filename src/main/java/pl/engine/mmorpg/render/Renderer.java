@@ -45,11 +45,15 @@ public class Renderer {
         shader.setPropertyValue(ShaderProps.IS_ANIMATED, Boolean.TRUE);
     }
 
-    public void render(double deltaTime){
+    public void update(double deltaTime){
 
+        chunk.update(deltaTime);
         camera.update();
+    }
 
-        chunk.draw(deltaTime);
+    public void render(){
+
+        chunk.draw();
     }
 
     public void clear(){

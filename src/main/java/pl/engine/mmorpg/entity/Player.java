@@ -1,19 +1,15 @@
 package pl.engine.mmorpg.entity;
 
-import org.joml.Matrix4f;
-import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.render.Camera;
 import pl.engine.mmorpg.EventsHandler;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
-import pl.engine.mmorpg.render.Window;
-import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
 
 import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static pl.engine.mmorpg.entity.CombinedAnimationController.*;
 
 public class Player extends Entity {
 
@@ -21,27 +17,22 @@ public class Player extends Entity {
 
     private final Camera camera;
     private final EventsHandler eventsHandler;
-    private MoveDirectionState moveDirectionState = MoveDirectionState.FRONT;
-    private MoveState moveState = MoveState.STANDING;
-    private CombatState combatState = CombatState.NO_WEAPON;
     private boolean isSprinting = true;
-    private boolean isPressedButton = false;
-    private double fightStartTime = 0;
-    private double moveStopTime = 0;
     private boolean isMoving = false;
-    private double mouseXDiff = 0;
+
+    private static final String MODEL_PATH = "models/warrior.glb";
+    private static final String FIRST_ANIMATION_NAME = getKey(MoveState.STANDING);
+
     private static final double RUN_SENS = 6;
 
     private static final Vector3f CAMERA_OFFSET = new Vector3f(0, -2, 2.5f);
 
+
     public Player(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
-        super("models/warrior.glb", getAnimationNamesPathsMappings(), MoveState.STANDING.name(), meshFactory);
+        super(MODEL_PATH, getAnimationNamesPathsMappings(), meshFactory, FIRST_ANIMATION_NAME);
 
         this.camera = camera;
         this.eventsHandler = eventsHandler;
-
-//        eventsHandler.addMousePosCallback(this::mosePosCallback);
-        eventsHandler.addMouseClickCallback(this::mouseClickCallback);
 
         updatePositionForCamera();
     }
@@ -68,34 +59,7 @@ public class Player extends Entity {
         return result;
     }
 
-    private static String getKey(MoveState moveState){
-
-        return moveState.name();
-    }
-
-    private static String getKey(MoveDirectionState moveDirectionState){
-
-        return moveDirectionState.name();
-    }
-
-    private static String getKey(CombatState combatState){
-
-        return combatState.name();
-    }
-
-    private static String getKey(MoveState moveState, MoveDirectionState moveDirectionState){
-
-        return moveState.name() + "_" + moveDirectionState.name();
-    }
-
     private void handleMove(){
-
-        if(combatState == CombatState.FIGHTING){
-            return;
-        }
-
-        actualAnimationName = getKey(MoveState.STANDING);
-        moveState = MoveState.STANDING;
 
         handleMoveWasd();
 
@@ -123,16 +87,12 @@ public class Player extends Entity {
 
             isSprinting = !isSprinting;
         }
-
-        updatePositionForCamera();
     }
 
     private void handleMoveWasd(){
 
         double moveMultiplier = isSprinting ? RUN_SENS : MOVE_SENS;
         double moveValue = deltaTimeInSeconds * moveMultiplier;
-        isMoving = false;
-        isPressedButton = false;
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_W)){
             camera.moveForward(moveValue);
@@ -168,32 +128,28 @@ public class Player extends Entity {
         else{
             moveState = MoveState.WALK;
         }
-
-        updatePositionForCamera();
     }
 
-    private void mosePosCallback(){
+    private void handleMouseRotate(){
 
-        if(eventsHandler.isMouseIdle()){
+        double mouseXPosForWindowWidth = eventsHandler.getMouseXPosForWindowWidth();
+
+        if(mouseXPosForWindowWidth == 0){
             return;
         }
 
-        double xScaleForWindow = eventsHandler.getMouseXScaleForWindowWidth();
+        double moveValue = Math.abs(mouseXPosForWindowWidth) * ROTATION_SENS * deltaTimeInSeconds;
 
-        if(xScaleForWindow == 0){
-            return;
-        }
+        if(mouseXPosForWindowWidth > 0){
 
-        if(xScaleForWindow > 0){
-
-            camera.rotateRight(Math.abs(xScaleForWindow) * ROTATION_SENS);
+            camera.rotateRight(moveValue);
         }
         else{
 
-            camera.rotateLeft(Math.abs(xScaleForWindow) * ROTATION_SENS);
+            camera.rotateLeft(moveValue);
         }
 
-        mouseXDiff = xScaleForWindow;
+        eventsHandler.resetMouseMove();
     }
 
     private void updatePositionForCamera() {
@@ -202,22 +158,21 @@ public class Player extends Entity {
         mesh.setModel(camera.getMatrixRelativeToCamera(CAMERA_OFFSET));
     }
 
-    private void mouseClickCallback(int button, int action){
+    private void handleAttack(){
 
-        if(button == GLFW_MOUSE_BUTTON_1){
+        int eventButtonId = eventsHandler.getEventButtonId();
+        int buttonEventId = eventsHandler.getButtonEventId();
 
-            if(action == GLFW_PRESS){
+        if(eventButtonId == GLFW_MOUSE_BUTTON_1){
 
-                isPressedButton = true;
+            if(buttonEventId == GLFW_PRESS){
 
                 moveState = MoveState.STANDING;
                 combatState = CombatState.FIGHTING;
-                actualAnimationName = getKey(combatState);
             }
-            else if(action == GLFW_RELEASE){
+            else if(buttonEventId == GLFW_RELEASE){
 
-                isPressedButton = false;
-                fightStartTime = actualAnimation.getAnimationCompletion();
+                combatState = CombatState.NO_WEAPON;
             }
         }
     }
@@ -225,70 +180,17 @@ public class Player extends Entity {
     @Override
     public void update(double deltaTimeInSeconds){
 
+        moveState = MoveState.STANDING;
+        moveDirectionState = MoveDirectionState.FRONT;
+        combatState = CombatState.NO_WEAPON;
+        isMoving = false;
+
         handleMove();
-        mosePosCallback();
+        handleMouseRotate();
+        handleAttack();
 
-        if(combatState != CombatState.FIGHTING){
-
-            if(moveState != MoveState.STANDING){
-
-                actualAnimationName = getKey(moveState, moveDirectionState);
-            }
-            else {
-                if(moveDirectionState == MoveDirectionState.JUMP){
-                    actualAnimationName = getKey(moveDirectionState);
-                }
-                else{
-                    actualAnimationName = getKey(moveState);
-                }
-            }
-        }
-
-//        if(!Objects.equals(actualAnimationName, nextAnimationName)){
-//
-//            if(!isBlending){
-//
-//                isBlending = true;
-//                blendTime = glfwGetTime();
-//            }
-//            else{
-//
-//                double time = glfwGetTime();
-//                double diff = time - blendTime;
-//
-//                double t = Math.min(diff / BLEND_DURATION, 1.0);
-//                blend((float) t);
-//
-//                if(t >= 1.0){
-//
-//                    isBlending = false;
-//                    actualAnimationName = nextAnimationName;
-//                    blendTime = 0;
-//                }
-//            }
-//        }
+        updatePositionForCamera();
 
         super.update(deltaTimeInSeconds);
-    }
-
-    private void blend(float t){
-
-        List<Matrix4f[]> actualFinals = actualAnimation.getFinalBones();
-        List<Matrix4f[]> nextFinals = nextAnimation.getFinalBones();
-
-        for(int i = 0; i < actualFinals.size(); i++){
-
-            Matrix4f[] actualFinal = actualFinals.get(i);
-            Matrix4f[] nextFinal = nextFinals.get(i);
-            Matrix4f[] finals = new Matrix4f[actualFinal.length];
-
-            for(int j = 0; j < actualFinal.length; j++){
-
-                finals[j] = actualFinal[j].lerp(nextFinal[j], t);
-            }
-
-            AnimatedMesh actual = actualAnimation.getAnimatedMesh(i);
-            actual.setFinals(finals);
-        }
     }
 }
