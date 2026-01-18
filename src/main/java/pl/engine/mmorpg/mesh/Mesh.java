@@ -139,6 +139,11 @@ public abstract class Mesh implements Meshable{
         return texture;
     }
 
+    public int getVertexArraysId(){
+
+        return vertexArraysId;
+    }
+
     public abstract int getFaceNumberOfVertices(int faceIndex);
     public abstract IntBuffer getFaceVerticesBuffer(int faceIndex);
     public abstract void appendVertices(FloatBuffer buffer);

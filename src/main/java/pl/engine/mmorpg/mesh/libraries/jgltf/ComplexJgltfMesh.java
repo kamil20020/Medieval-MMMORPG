@@ -13,9 +13,11 @@ import java.util.List;
 
 public class ComplexJgltfMesh extends ComplexMesh {
 
+    private GltfModel model = null;
+
     public ComplexJgltfMesh(String complexModelFilePath) {
 
-        super(complexModelFilePath);
+        loadModel(complexModelFilePath);
     }
 
     protected ComplexJgltfMesh(){
@@ -26,9 +28,9 @@ public class ComplexJgltfMesh extends ComplexMesh {
     @Override
     protected void loadModel(String complexModelFilePath) {
 
-        GltfModel model = load(complexModelFilePath);
+        model = load(complexModelFilePath);
 
-        List<MeshModel> rawMeshes =  model.getMeshModels();
+        List<MeshModel> rawMeshes = model.getMeshModels();
 
         for(int i = 0; i < rawMeshes.size(); i++){
 
@@ -39,6 +41,12 @@ public class ComplexJgltfMesh extends ComplexMesh {
 
             meshes.add(mesh);
         }
+    }
+
+    @Override
+    public Object getData() {
+
+        return model;
     }
 
     public static GltfModel load(String modelPath) throws IllegalStateException{

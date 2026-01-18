@@ -21,6 +21,7 @@ public abstract class ComplexMesh implements Meshable{
     public void uploadToGpu(){
 
         for(Meshable mesh : meshes){
+
             mesh.uploadToGpu();
         }
     }
@@ -38,6 +39,7 @@ public abstract class ComplexMesh implements Meshable{
     public void clear() {
 
         for(Meshable mesh : meshes){
+
             mesh.clear();
         }
     }
@@ -60,5 +62,6 @@ public abstract class ComplexMesh implements Meshable{
         }
     }
 
-     protected abstract void loadModel(String complexModelFilePath);
+    protected abstract void loadModel(String complexModelFilePath);
+    public abstract Object getData();
 }

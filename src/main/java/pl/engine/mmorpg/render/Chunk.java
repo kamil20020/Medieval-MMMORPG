@@ -5,6 +5,7 @@ import pl.engine.mmorpg.entity.Player;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
 import pl.engine.mmorpg.mesh.Rect;
+import pl.engine.mmorpg.mesh.libraries.jgltf.ComplexJgltfMesh;
 import pl.engine.mmorpg.texture.FileTexture;
 import pl.engine.mmorpg.texture.Texture;
 
@@ -38,8 +39,11 @@ public class Chunk {
         Meshable grass = new Rect(texture);
         meshables.add(grass);
 
-        Meshable player = new Player(camera, eventsHandler, meshFactory);
+        Meshable player = new Player(camera, eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
         meshables.add(player);
+
+        Meshable model = new ComplexJgltfMesh("animations/dragon1.glb"); //new Player(camera, eventsHandler, meshFactory);
+        meshables.add(model);
 
 //        Meshable newModel = new AnimatedComplexJgltfGlbMesh(
 //            "animations/dragon1.glb",

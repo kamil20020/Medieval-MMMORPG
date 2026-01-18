@@ -8,6 +8,8 @@ import pl.engine.mmorpg.texture.AssimpTexture;
 
 public class ComplexAssimpMesh extends ComplexMesh {
 
+    private AIScene aiScene = null;
+
     public ComplexAssimpMesh(String complexModelFilePath){
 
         super(complexModelFilePath);
@@ -20,7 +22,7 @@ public class ComplexAssimpMesh extends ComplexMesh {
     @Override
     protected void loadModel(String complexModelFilePath){
 
-        AIScene aiScene = loadScene(complexModelFilePath);
+        aiScene = loadScene(complexModelFilePath);
 
         PointerBuffer meshesBuffer = aiScene.mMeshes();
 
@@ -34,6 +36,12 @@ public class ComplexAssimpMesh extends ComplexMesh {
 
             meshes.add(mesh);
         }
+    }
+
+    @Override
+    public Object getData() {
+
+        return aiScene;
     }
 
     public static AIScene loadScene(String modelPath) throws IllegalStateException{

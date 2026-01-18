@@ -1,45 +1,69 @@
 package pl.engine.mmorpg.entity;
 
 import org.joml.Matrix4f;
+import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
 import pl.engine.mmorpg.animation.Skeleton;
+import pl.engine.mmorpg.mesh.ComplexMesh;
+import pl.engine.mmorpg.mesh.Mesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
 
+import java.util.*;
+
 public class Entity implements Meshable {
 
-    protected AnimatedMeshable mesh;
+    protected ComplexMesh mesh;
     protected Skeleton skeleton;
+    protected String actualAnimationName = null;
+    protected String oldAnimationName = null;
+    protected AnimatedMeshable actualAnimation = null;
+    protected Map<String, AnimatedMeshable> animations = new HashMap<>();
+    protected double deltaTimeInSeconds = 0;
 
-    protected static final double ROTATION_SENS = 2;
-    protected static final double MOVE_SENS = 0.1;
+    protected static final double ROTATION_SENS = 100;
+    protected static final double MOVE_SENS = 2;
 
-    public Entity(String modelPath, MeshAbstractFactory meshFactory){
+    public Entity(String modelPath, Map<String, String> animationsKeysPathsMappings, String startingAnimationKey, MeshAbstractFactory meshFactory){
 
-//        mesh = new ComplexGlbMesh("models/warrior-sword.glb");
-        this.mesh = meshFactory.createComplexAnimatedMesh(modelPath);
-        this.skeleton = mesh.getSkeleton();
-//        mesh = new AnimatedComplexJgltfGlbMesh(
-//            "animations/dragon1.glb",
-//            "animations/dragon1.glb"
-//        );
-//        mesh = new ComplexGlbMesh("animations/archer.glb");
-//        mesh = new ComplexGlbMesh("animations/lecimy1.glb");
-//        mesh = new ComplexGlbMesh("animations/test.fbx");
-//        mesh = new ComplexGlbMesh("animations/fox.glb");
-//        mesh = new ComplexGlbMesh("animations/human.glb");
-//        mesh = new ComplexGlbMesh("animations/warrior1-fight.glb");
-//        mesh = new AnimatedComplexGlbMesh("animations/test1.glb");
-//        mesh = new AnimatedComplexGlbMesh("animations/warrior-standing-sword.glb");
-//        mesh = new ComplexGlbMesh("animations/dragon.glb");
-//        mesh = new ComplexGlbMesh("animations/testowe.glb");
-//        mesh = new AnimatedComplexGlbMesh("animations/dragon1.glb");
+        mesh = meshFactory.createComplexMesh(modelPath);
+        this.skeleton = meshFactory.createSkeleton(mesh.getData());
+
+        for(Map.Entry<String, String> animationNamePathMapping : animationsKeysPathsMappings.entrySet()){
+
+            String animationKey = animationNamePathMapping.getKey();
+            String animationPath = animationNamePathMapping.getValue();
+
+            AnimatedMeshable animation = meshFactory.createComplexAnimatedMesh(mesh, animationPath);
+            animations.put(animationKey, animation);
+        }
+
+        actualAnimationName = startingAnimationKey;
+        oldAnimationName = actualAnimationName;
+        actualAnimation = animations.get(actualAnimationName);
     }
 
     @Override
     public void uploadToGpu() {
 
         mesh.uploadToGpu();
+
+        for(AnimatedMeshable animatedMeshable : animations.values()){
+            animatedMeshable.uploadToGpu();
+        }
+    }
+
+    protected void setAnimation(String animationName){
+
+        if(Objects.equals(oldAnimationName, actualAnimationName)){
+           return;
+        }
+
+        oldAnimationName = animationName;
+        actualAnimationName = animationName;
+
+        actualAnimation.reset();
+        actualAnimation = animations.get(animationName);
     }
 
     @Override
@@ -51,18 +75,21 @@ public class Entity implements Meshable {
     @Override
     public void draw() {
 
-        mesh.draw();
+        actualAnimation.draw();
     }
 
     @Override
     public void clear() {
 
         mesh.clear();
+        actualAnimation.clear();
     }
 
     @Override
     public void update(double deltaTimeInSeconds) {
 
-        mesh.update(deltaTimeInSeconds);
+        setAnimation(actualAnimationName);
+        actualAnimation.update(deltaTimeInSeconds);
+        this.deltaTimeInSeconds = deltaTimeInSeconds;
     }
 }

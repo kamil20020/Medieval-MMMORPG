@@ -2,8 +2,10 @@ package pl.engine.mmorpg.animation.libraries.jgltf;
 
 import de.javagl.jgltf.model.GltfModel;
 import de.javagl.jgltf.model.MeshModel;
+import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
 import pl.engine.mmorpg.animation.Skeleton;
+import pl.engine.mmorpg.mesh.Mesh;
 import pl.engine.mmorpg.mesh.Meshable;
 import pl.engine.mmorpg.mesh.libraries.jgltf.ComplexJgltfMesh;
 import pl.engine.mmorpg.mesh.libraries.jgltf.JgltfGlbMesh;
@@ -13,19 +15,22 @@ import java.util.List;
 
 public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh implements AnimatedMeshable {
 
+    private final ComplexJgltfMesh model;
     private final Skeleton skeleton;
     private final GltfModel animatedModel;
 
-    public AnimatedComplexJgltfMesh(String animatedComplexModelFilePath, Skeleton skeleton) {
+    public AnimatedComplexJgltfMesh(ComplexJgltfMesh complexMesh, String animatedComplexModelFilePath, Skeleton skeleton) {
 
+        this.model = complexMesh;
         this.animatedModel = ComplexJgltfMesh.load(animatedComplexModelFilePath);
         this.skeleton = skeleton;
 
         loadModel(null);
     }
 
-    public AnimatedComplexJgltfMesh(String animatedComplexModelFilePath) {
+    public AnimatedComplexJgltfMesh(ComplexJgltfMesh complexMesh, String animatedComplexModelFilePath) {
 
+        this.model = complexMesh;
         this.animatedModel = ComplexJgltfMesh.load(animatedComplexModelFilePath);
         this.skeleton = new JgltfGlbSkeleton(animatedModel);
 
@@ -35,32 +40,58 @@ public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh implements Animat
     @Override
     protected void loadModel(String complexModelFilePath) {
 
-        List<MeshModel> rawMeshes = animatedModel.getMeshModels();
+        GltfModel modelData = (GltfModel) model.getData();
+        List<MeshModel> rawMeshes = modelData.getMeshModels();
 
         for (int i = 0; i < rawMeshes.size(); i++) {
 
+            Mesh mesh = (Mesh) model.meshes.get(i);
             MeshModel rawMesh = rawMeshes.get(i);
 
             JgltfTexture texture = new JgltfTexture(rawMesh);
 
-            Meshable mesh = null;
+            Meshable animatedMesh = null;
 
             if(AnimatedJgltfMesh.isAnimated(rawMesh)){
 
-                mesh = new AnimatedJgltfMesh(rawMesh, animatedModel, texture, skeleton);
+                animatedMesh = new AnimatedJgltfMesh(mesh, rawMesh, animatedModel, skeleton);
             }
             else{
 
-                mesh = new JgltfGlbMesh(rawMesh, texture);
+                animatedMesh = new JgltfGlbMesh(rawMesh, texture);
             }
 
-            meshes.add(mesh);
+            meshes.add(animatedMesh);
         }
     }
 
     public Skeleton getSkeleton(){
 
         return skeleton;
+    }
+
+    @Override
+    public Object getData() {
+
+        return model.getData();
+    }
+
+    @Override
+    public void reset() {
+
+        for(Meshable mesh : meshes){
+
+            AnimatedMesh animatedMesh = (AnimatedMesh) mesh;
+            animatedMesh.reset();
+        }
+    }
+
+    @Override
+    public double getAnimationCompletion() {
+
+        AnimatedMesh animatedMesh = (AnimatedMesh) meshes.get(0);
+
+        return animatedMesh.getAnimationCompletion();
     }
 }
 

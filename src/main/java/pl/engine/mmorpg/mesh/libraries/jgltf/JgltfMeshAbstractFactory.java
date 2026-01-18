@@ -27,14 +27,20 @@ public class JgltfMeshAbstractFactory extends MeshAbstractFactory {
     }
 
     @Override
-    public AnimatedMeshable createComplexAnimatedMesh(String complexModelFilePath, Skeleton skeleton) {
+    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh model, String animatedModelPath, Skeleton skeleton) {
 
-        return new AnimatedComplexJgltfMesh(complexModelFilePath, skeleton);
+        return new AnimatedComplexJgltfMesh((ComplexJgltfMesh) model, animatedModelPath, skeleton);
     }
 
     @Override
-    public AnimatedMeshable createComplexAnimatedMesh(String complexModelFilePath) {
+    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh model, String animatedModelPath) {
 
-        return new AnimatedComplexJgltfMesh(complexModelFilePath);
+        return new AnimatedComplexJgltfMesh((ComplexJgltfMesh) model, animatedModelPath);
+    }
+
+    @Override
+    public Skeleton createSkeleton(Object data) {
+
+        return new JgltfGlbSkeleton((GltfModel) data);
     }
 }

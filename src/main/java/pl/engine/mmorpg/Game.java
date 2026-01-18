@@ -14,7 +14,7 @@ public class Game {
 
     public Game(){
 
-        window = new Window(1200, 1200);
+        window = new Window(1400, 1200);
         eventsHandler = new EventsHandler(window);
         renderer = new Renderer(window, eventsHandler);
     }

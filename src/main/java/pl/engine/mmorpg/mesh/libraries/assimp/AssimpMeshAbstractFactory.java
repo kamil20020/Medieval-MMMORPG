@@ -27,14 +27,20 @@ public class AssimpMeshAbstractFactory extends MeshAbstractFactory {
     }
 
     @Override
-    public AnimatedMeshable createComplexAnimatedMesh(String complexModelFilePath) {
+    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh complexMesh, String complexModelFilePath) {
 
         return new AnimatedComplexAssimpModel(complexModelFilePath);
     }
 
     @Override
-    public AnimatedMeshable createComplexAnimatedMesh(String complexModelFilePath, Skeleton skeleton) {
+    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh complexMesh, String complexModelFilePath, Skeleton skeleton) {
 
         return new AnimatedComplexAssimpModel(complexModelFilePath, skeleton);
+    }
+
+    @Override
+    public Skeleton createSkeleton(Object data) {
+
+        return new AssimpGlbSkeleton((AIScene) data);
     }
 }

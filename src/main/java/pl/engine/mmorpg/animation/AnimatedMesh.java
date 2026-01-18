@@ -18,8 +18,7 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL20C.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glVertexAttribIPointer;
+import static org.lwjgl.opengl.GL30.*;
 
 public abstract class AnimatedMesh extends Mesh {
 
@@ -115,7 +114,7 @@ public abstract class AnimatedMesh extends Mesh {
     @Override
     public void uploadToGpu() {
 
-        super.uploadToGpu();
+        glBindVertexArray(additionalMesh.getVertexArraysId());
 
         IntBuffer boneIndicesBuffer = BufferUtils.createIntBuffer(numberOfVertices * MAX_NUMBER_OF_BONS_PER_VERTEX);
         FloatBuffer boneWeightsBuffer = BufferUtils.createFloatBuffer(numberOfVertices * MAX_NUMBER_OF_BONS_PER_VERTEX);
@@ -165,7 +164,7 @@ public abstract class AnimatedMesh extends Mesh {
 
         shader.setPropertyValue(ShaderProps.FINAL_BONE_MATRICES, boneFinalTransformations);
 
-        super.draw();
+        additionalMesh.draw();
 
         shader.setPropertyValue(ShaderProps.IS_ANIMATED, Boolean.FALSE);
     }
@@ -200,6 +199,23 @@ public abstract class AnimatedMesh extends Mesh {
     public int getNumberOfFaces() {
 
         return additionalMesh.getNumberOfFaces();
+    }
+
+    @Override
+    public void clear(){
+
+        glDeleteBuffers(vboBoneIndices);
+        glDeleteBuffers(vboBoneWeights);;
+    }
+
+    public void reset(){
+
+        animationTime = 0;
+    }
+
+    public double getAnimationCompletion(){
+
+        return animationTime / animationDurationInTicksPerSeconds;
     }
 
     public static Vector3f getInterpolated(Vector3f lessTimeVec, double lessTime, Vector3f moreTimeVec, double moreTime, double actualTimeInTicks){

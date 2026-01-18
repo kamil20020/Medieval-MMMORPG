@@ -3,6 +3,8 @@ package pl.engine.mmorpg.animation.libraries.jgltf;
 import de.javagl.jgltf.model.*;
 import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.Skeleton;
+import pl.engine.mmorpg.mesh.Mesh;
+import pl.engine.mmorpg.mesh.Meshable;
 import pl.engine.mmorpg.mesh.libraries.jgltf.JgltfGlbMesh;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -49,12 +51,12 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
         public AnimationModel.Channel scaleChannel;
     }
 
-    public AnimatedJgltfMesh(MeshModel mesh, GltfModel animatedModel, JgltfTexture texture, Skeleton skeleton) {
-        super(new JgltfGlbMesh(mesh, texture), skeleton);
+    public AnimatedJgltfMesh(Mesh mesh, MeshModel meshData, GltfModel animatedModel, Skeleton skeleton) {
+        super(mesh, skeleton);
 
-        this.mesh = mesh;
+        this.mesh = meshData;
         this.animatedModel = animatedModel;
-        this.meshNode = findMeshNodeModel(animatedModel, mesh.getName());
+        this.meshNode = findMeshNodeModel(animatedModel, meshData.getName());
 
         loadBonesData();
 //        sortVerticesBones();
@@ -166,10 +168,6 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
         SceneModel firstSceneModel = animatedModel.getSceneModels().get(0);
         rootNode = firstSceneModel.getNodeModels().get(0);
         rootNodeParentNodeTransformation = new Matrix4f().identity();
-
-//        float[] rootGlobalData = new float[16];
-//        rootNode.computeGlobalTransform(rootGlobalData);
-//        rootNodeGlobalInverseTransform = new Matrix4f().set(rootGlobalData).invert();
         rootNodeGlobalInverseTransform = new Matrix4f().identity();
 
         animation = animatedModel.getAnimationModels().get(0);

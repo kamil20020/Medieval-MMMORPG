@@ -34,6 +34,12 @@ public class Camera {
         return new Vector3f(eye);
     }
 
+    public void setPosition(Vector3f vec){
+
+        eye.x = vec.x;
+        eye.z = vec.z;
+    }
+
     public void moveForward(double speed){
 
         moveInForward(speed);
@@ -141,14 +147,16 @@ public class Camera {
 
         Vector3f direction = new Vector3f();
 
-        direction.x = (float) (Math.cos(Math.toRadians(angle.x)) * Math.cos(Math.toRadians(angle.y)));
-        direction.y = (float) (Math.sin(Math.toRadians(angle.x)));
-        direction.z = (float) (Math.cos(Math.toRadians(angle.x)) * Math.sin(Math.toRadians(angle.y)));
+        direction.x = (float) (Math.cos(Math.toRadians(angle.x)) * Math.cos(Math.toRadians(angle.y))) * 10;
+        direction.y = (float) (Math.sin(Math.toRadians(angle.x))) * 10;
+        direction.z = (float) (Math.cos(Math.toRadians(angle.x)) * Math.sin(Math.toRadians(angle.y))) * 10;
 
         if (direction.lengthSquared() < 1e-6f) {
 
             direction.set(0, 0, -1);
         }
+
+        Vector3f CAMERA_OFFSET = new Vector3f(0, -2, 2.5f);
 
         direction.normalize();
 

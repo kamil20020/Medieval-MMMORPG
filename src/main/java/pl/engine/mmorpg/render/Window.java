@@ -1,5 +1,6 @@
 package pl.engine.mmorpg.render;
 
+import org.lwjgl.glfw.GLFWVidMode;
 import pl.engine.mmorpg.shaders.Shader;
 import org.lwjgl.opengl.GL;
 
@@ -18,9 +19,6 @@ public class Window {
 
     public Window(int width, int height){
 
-        this.width = width;
-        this.height = height;
-
         if(!glfwInit()){
             throw new IllegalStateException("Could now init glfw");
         }
@@ -34,7 +32,15 @@ public class Window {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
-        windowId = glfwCreateWindow(width, height, "Engine 3d - OpenGL from lwjgl", NULL, NULL);
+        // Pobranie trybu wideo monitora (rozdzielczość)
+        long primaryMonitor = glfwGetPrimaryMonitor();
+        GLFWVidMode vidMode = glfwGetVideoMode(primaryMonitor);
+
+        this.width = vidMode.width();
+        this.height = vidMode.height();
+
+//        windowId = glfwCreateWindow(width, height, "Engine 3d - OpenGL from lwjgl", NULL, NULL);
+        windowId = glfwCreateWindow(this.width, this.height, "Engine 3d - OpenGL from lwjgl", primaryMonitor, 0);
 
         if(windowId == NULL){
 
@@ -44,8 +50,10 @@ public class Window {
         }
 
         glfwMakeContextCurrent(windowId);
-        glfwSetFramebufferSizeCallback(windowId, (windowId, newWidth, newHeight) -> updateViewPort(width, height));
+        glfwSetFramebufferSizeCallback(windowId, (windowId, newWidth, newHeight) -> updateViewPort(this.width, this.height));
         glfwSwapInterval(1); // vertical sync
+        glfwSetInputMode(windowId, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(windowId, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
     }
 
     public void start(){
@@ -121,5 +129,15 @@ public class Window {
         Perspective.init(width, height);
 
         glViewport(0, 0, width, height);
+    }
+
+    public int getWidth(){
+
+        return width;
+    }
+
+    public int getHeight(){
+
+        return height;
     }
 }

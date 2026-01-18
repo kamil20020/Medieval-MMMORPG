@@ -1,5 +1,6 @@
 package pl.engine.mmorpg.animation.libraries.assimp;
 
+import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
 import pl.engine.mmorpg.mesh.Meshable;
 import pl.engine.mmorpg.animation.Skeleton;
@@ -51,5 +52,23 @@ public class AnimatedComplexAssimpModel extends ComplexAssimpMesh implements Ani
     public Skeleton getSkeleton() {
 
         return skeleton;
+    }
+
+    @Override
+    public void reset() {
+
+        for(Meshable mesh : meshes){
+
+            AnimatedMesh animatedMesh = (AnimatedMesh) mesh;
+            animatedMesh.reset();
+        }
+    }
+
+    @Override
+    public double getAnimationCompletion() {
+
+        AnimatedMesh animatedMesh = (AnimatedMesh) meshes.get(0);
+
+        return animatedMesh.getAnimationCompletion();
     }
 }
