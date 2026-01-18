@@ -31,14 +31,13 @@ public class Game {
             double deltaTime = currentFrameTime - lastFrameTime;
             lastFrameTime = currentFrameTime;
 
+            window.handleEvents();
+
             window.clearScreen();
 
             renderer.render(deltaTime);
 
             window.refreshScreen();
-            window.handleEvents();
-
-//            break;
         }
 
         renderer.clear();

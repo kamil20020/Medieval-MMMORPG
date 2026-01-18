@@ -130,7 +130,12 @@ public class Camera {
 
     private Vector3f getForward(){
 
-        Vector3f forward = new Vector3f(destination).sub(eye);
+        float yawRad = (float)Math.toRadians(angle.y);
+        Vector3f forward = new Vector3f(
+            (float)Math.cos(yawRad),
+            0,
+            (float)Math.sin(yawRad)
+        ).normalize();
 
         if (forward.lengthSquared() < 1e-6f) {
 
@@ -156,8 +161,6 @@ public class Camera {
             direction.set(0, 0, -1);
         }
 
-        Vector3f CAMERA_OFFSET = new Vector3f(0, -2, 2.5f);
-
         direction.normalize();
 
         destination.set(eye).add(new Vector3f(direction).mul(50));
@@ -182,5 +185,4 @@ public class Camera {
             .rotateY((float) -Math.toRadians(angle.y - 90))
             .translate(offset);
     }
-
 }

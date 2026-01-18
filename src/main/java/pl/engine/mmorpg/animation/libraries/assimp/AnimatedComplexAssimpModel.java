@@ -1,5 +1,6 @@
 package pl.engine.mmorpg.animation.libraries.assimp;
 
+import org.joml.Matrix4f;
 import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
 import pl.engine.mmorpg.mesh.Meshable;
@@ -9,6 +10,8 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
 import pl.engine.mmorpg.texture.AssimpTexture;
+
+import java.util.List;
 
 public class AnimatedComplexAssimpModel extends ComplexAssimpMesh implements AnimatedMeshable {
 
@@ -70,5 +73,15 @@ public class AnimatedComplexAssimpModel extends ComplexAssimpMesh implements Ani
         AnimatedMesh animatedMesh = (AnimatedMesh) meshes.get(0);
 
         return animatedMesh.getAnimationCompletion();
+    }
+
+    @Override
+    public AnimatedMesh getAnimatedMesh(int index) {
+        return null;
+    }
+
+    @Override
+    public List<Matrix4f[]> getFinalBones() {
+        return null;
     }
 }

@@ -1,14 +1,16 @@
 package pl.engine.mmorpg.entity;
 
+import org.joml.Matrix4f;
+import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.render.Camera;
 import pl.engine.mmorpg.EventsHandler;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.render.Window;
+import pl.engine.mmorpg.shaders.Shader;
+import pl.engine.mmorpg.shaders.ShaderProps;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
@@ -184,11 +186,11 @@ public class Player extends Entity {
 
         if(xScaleForWindow > 0){
 
-            camera.rotateRight(Math.abs(xScaleForWindow) * 360);
+            camera.rotateRight(Math.abs(xScaleForWindow) * ROTATION_SENS);
         }
         else{
 
-            camera.rotateLeft(Math.abs(xScaleForWindow) * 360);
+            camera.rotateLeft(Math.abs(xScaleForWindow) * ROTATION_SENS);
         }
 
         mouseXDiff = xScaleForWindow;
@@ -241,17 +243,52 @@ public class Player extends Entity {
                 }
             }
         }
-        else if(!isPressedButton){
 
-            double animationCompletion = actualAnimation.getAnimationCompletion();
-
-            if(Math.abs(animationCompletion - fightStartTime) > 0.3){
-
-                combatState = CombatState.NO_WEAPON;
-                actualAnimationName = getKey(MoveState.STANDING);
-            }
-        }
+//        if(!Objects.equals(actualAnimationName, nextAnimationName)){
+//
+//            if(!isBlending){
+//
+//                isBlending = true;
+//                blendTime = glfwGetTime();
+//            }
+//            else{
+//
+//                double time = glfwGetTime();
+//                double diff = time - blendTime;
+//
+//                double t = Math.min(diff / BLEND_DURATION, 1.0);
+//                blend((float) t);
+//
+//                if(t >= 1.0){
+//
+//                    isBlending = false;
+//                    actualAnimationName = nextAnimationName;
+//                    blendTime = 0;
+//                }
+//            }
+//        }
 
         super.update(deltaTimeInSeconds);
+    }
+
+    private void blend(float t){
+
+        List<Matrix4f[]> actualFinals = actualAnimation.getFinalBones();
+        List<Matrix4f[]> nextFinals = nextAnimation.getFinalBones();
+
+        for(int i = 0; i < actualFinals.size(); i++){
+
+            Matrix4f[] actualFinal = actualFinals.get(i);
+            Matrix4f[] nextFinal = nextFinals.get(i);
+            Matrix4f[] finals = new Matrix4f[actualFinal.length];
+
+            for(int j = 0; j < actualFinal.length; j++){
+
+                finals[j] = actualFinal[j].lerp(nextFinal[j], t);
+            }
+
+            AnimatedMesh actual = actualAnimation.getAnimatedMesh(i);
+            actual.setFinals(finals);
+        }
     }
 }

@@ -23,7 +23,7 @@ import static org.lwjgl.opengl.GL30.*;
 public abstract class AnimatedMesh extends Mesh {
 
     protected final List<Matrix4f> bonesInverses;
-    protected final Matrix4f[] boneFinalTransformations;
+    protected Matrix4f[] boneFinalTransformations;
 
     private double animationTime;
     protected double animationTicksPerSecond;
@@ -216,6 +216,16 @@ public abstract class AnimatedMesh extends Mesh {
     public double getAnimationCompletion(){
 
         return animationTime / animationDurationInTicksPerSeconds;
+    }
+
+    public Matrix4f[] getBoneFinalTransformations(){
+
+        return boneFinalTransformations;
+    }
+
+    public void setFinals(Matrix4f[] finals){
+
+        boneFinalTransformations = finals;
     }
 
     public static Vector3f getInterpolated(Vector3f lessTimeVec, double lessTime, Vector3f moreTimeVec, double moreTime, double actualTimeInTicks){
