@@ -45,14 +45,8 @@ public class Chunk {
         Meshable model = new ComplexJgltfMesh("animations/dragon1.glb"); //new Player(camera, eventsHandler, meshFactory);
         meshables.add(model);
 
-//        Meshable newModel = new AnimatedComplexJgltfGlbMesh(
-//            "animations/dragon1.glb",
-//            "animations/dragon1.glb"
-//        );
-//        meshables.add(newModel);
-//
-//        Meshable newModel1 = new AnimatedComplexAssimpGlbModel("animations/warrior-sword-fight.glb", "animations/warrior-sword-fight.glb");
-//        meshables.add(newModel1);
+//        Meshable terrain = new ComplexJgltfMesh("models/terrain.glb"); //new Player(camera, eventsHandler, meshFactory);
+//        meshables.add(terrain);
 
         for(Meshable meshable : meshables){
 

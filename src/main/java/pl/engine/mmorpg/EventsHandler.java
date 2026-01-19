@@ -55,6 +55,15 @@ public class EventsHandler {
         }
     }
 
+    public void resetKey(int keyCode){
+
+        if(!pressedKeyboardKeys.contains(keyCode)){
+            return;
+        }
+
+        pressedKeyboardKeys.remove(keyCode);
+    }
+
     private void handleMousePos(double x, double y){
 
         if(mouseX == -1){

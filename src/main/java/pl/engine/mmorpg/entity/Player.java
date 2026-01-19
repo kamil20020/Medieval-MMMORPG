@@ -86,6 +86,7 @@ public class Player extends Entity {
         if(eventsHandler.isKeyPressed(GLFW_KEY_V)){
 
             isSprinting = !isSprinting;
+            eventsHandler.resetKey(GLFW_KEY_V);
         }
     }
 
