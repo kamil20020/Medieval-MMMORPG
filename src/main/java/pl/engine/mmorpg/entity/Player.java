@@ -27,7 +27,6 @@ public class Player extends Entity {
 
     private static final Vector3f CAMERA_OFFSET = new Vector3f(0, -2, 2.5f);
 
-
     public Player(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
         super(MODEL_PATH, getAnimationNamesPathsMappings(), meshFactory, FIRST_ANIMATION_NAME);
 
@@ -155,8 +154,8 @@ public class Player extends Entity {
 
     private void updatePositionForCamera() {
 
-        position = camera.getPosition().add(CAMERA_OFFSET);
-        mesh.setModel(camera.getMatrixRelativeToCamera(CAMERA_OFFSET));
+        position = camera.getRootPosition();
+        mesh.setModel(camera.getMatrixRelativeToCamera());
     }
 
     private void handleAttack(){

@@ -18,6 +18,11 @@ public class Camera {
     private final Vector3f eye;
     private final Vector3f destination;
     private final Vector3f top;
+    private final Vector3f middle;
+
+    private static final Vector3f CAMERA_OFFSET = new Vector3f(0, 2, 0);
+    private static final float DESTINATION_SCALE = 50;
+    private static final float EYE_DIRECTION_SCALE = 2.5f;
 
     public Camera(Vector3f position){
 
@@ -25,19 +30,14 @@ public class Camera {
         this.angle = new Vector3f(0, 0, 0);
         this.top = new Vector3f(0, 1, 0);
         this.destination = new Vector3f(0, 0, 20);
+        this.middle = new Vector3f(position);
 
-        updateDestination();
+        updateDestinationAndEye();
     }
 
-    public Vector3f getPosition(){
+    public Vector3f getRootPosition(){
 
-        return new Vector3f(eye);
-    }
-
-    public void setPosition(Vector3f vec){
-
-        eye.x = vec.x;
-        eye.z = vec.z;
+        return new Vector3f(middle);
     }
 
     public void moveForward(double speed){
@@ -52,13 +52,15 @@ public class Camera {
 
     public void moveTop(double speed){
 
-        eye.y += speed;
+        middle.y += speed;
+        eye.y = middle.y;
         destination.y += speed;
     }
 
     public void moveDown(double speed){
 
-        eye.y -= speed;
+        middle.y -= speed;
+        eye.y = middle.y;
         destination.y -= speed;
     }
 
@@ -85,7 +87,7 @@ public class Camera {
         this.angle.y -= angle;
         this.angle.y %= 360;
 
-        updateDestination();
+        updateDestinationAndEye();
     }
 
     public void rotateRight(double angle){
@@ -93,7 +95,7 @@ public class Camera {
         this.angle.y += angle;
         this.angle.y %= 360;
 
-        updateDestination();
+        updateDestinationAndEye();
     }
 
     public void rotateTop(double angle){
@@ -101,7 +103,7 @@ public class Camera {
         this.angle.x += angle;
         this.angle.x = Math.max(-89, Math.min(89, this.angle.x));
 
-        updateDestination();
+        updateDestinationAndEye();
     }
 
     public void rotateDown(double angle){
@@ -109,7 +111,7 @@ public class Camera {
         this.angle.x -= angle;
         this.angle.x = Math.max(-89, Math.min(89, this.angle.x));
 
-        updateDestination();
+        updateDestinationAndEye();
     }
 
     private void moveInForward(double scale){
@@ -121,11 +123,11 @@ public class Camera {
 
     private void moveInDirection(double scale, Vector3f dir){
 
-        eye.x += scale * dir.x;
-        eye.y += scale * dir.y;
-        eye.z += scale * dir.z;
+        middle.x += scale * dir.x;
+        middle.y += scale * dir.y;
+        middle.z += scale * dir.z;
 
-        updateDestination();
+        updateDestinationAndEye();
     }
 
     private Vector3f getForward(){
@@ -148,22 +150,32 @@ public class Camera {
         return forward;
     }
 
-    private void updateDestination(){
+    private void updateDestinationAndEye(){
+
+        Vector3f direction = getDirection();
+        Vector3f destinationScale = new Vector3f(direction).mul(DESTINATION_SCALE);
+        Vector3f newDestination = new Vector3f(middle).add(destinationScale);
+        destination.set(newDestination);
+
+        Vector3f scaledDirection = new Vector3f(direction).mul(EYE_DIRECTION_SCALE);
+        Vector3f newEye = new Vector3f(middle).sub(scaledDirection).add(CAMERA_OFFSET);
+        eye.set(newEye);
+    }
+
+    private Vector3f getDirection(){
 
         Vector3f direction = new Vector3f();
 
-        direction.x = (float) (Math.cos(Math.toRadians(angle.x)) * Math.cos(Math.toRadians(angle.y))) * 10;
-        direction.y = (float) (Math.sin(Math.toRadians(angle.x))) * 10;
-        direction.z = (float) (Math.cos(Math.toRadians(angle.x)) * Math.sin(Math.toRadians(angle.y))) * 10;
+        direction.x = (float) (Math.cos(Math.toRadians(angle.x)) * Math.cos(Math.toRadians(angle.y)));
+        direction.y = (float) (Math.sin(Math.toRadians(angle.x)));
+        direction.z = (float) (Math.cos(Math.toRadians(angle.x)) * Math.sin(Math.toRadians(angle.y)));
 
         if (direction.lengthSquared() < 1e-6f) {
 
             direction.set(0, 0, -1);
         }
 
-        direction.normalize();
-
-        destination.set(eye).add(new Vector3f(direction).mul(50));
+        return direction.normalize();
     }
 
     public void update(){
@@ -177,12 +189,11 @@ public class Camera {
         shader.setPropertyValue(ShaderProps.CAMERA, view);
     }
 
-    public Matrix4f getMatrixRelativeToCamera(Vector3f offset){
+    public Matrix4f getMatrixRelativeToCamera(){
 
         return new Matrix4f()
             .identity()
-            .translate(eye)
-            .rotateY((float) -Math.toRadians(angle.y - 90))
-            .translate(offset);
+            .translate(middle)
+            .rotateY((float) -Math.toRadians(angle.y - 90));
     }
 }
