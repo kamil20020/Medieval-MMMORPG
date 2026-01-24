@@ -53,14 +53,14 @@ public class Camera {
     public void moveTop(double speed){
 
         middle.y += speed;
-        eye.y = middle.y;
+        eye.y += speed;
         destination.y += speed;
     }
 
     public void moveDown(double speed){
 
         middle.y -= speed;
-        eye.y = middle.y;
+        eye.y -= speed;
         destination.y -= speed;
     }
 
