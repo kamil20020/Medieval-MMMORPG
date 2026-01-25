@@ -89,4 +89,42 @@ public class Rect extends Mesh{
 
         return faces.length;
     }
+
+    @Override
+    public float[] getVertices() {
+
+        float[] flattedVertices = new float[vertices.length * 3];
+
+        int resultIndex = 0;
+
+        for(float[] vertex : vertices){
+
+            flattedVertices[resultIndex] = vertex[0];
+            flattedVertices[resultIndex + 1] = vertex[1];
+            flattedVertices[resultIndex + 2] = vertex[2];
+
+            resultIndex += 3;
+        }
+
+        return flattedVertices;
+    }
+
+    @Override
+    public int[] getFaces() {
+
+        int[] flattedFaces = new int[faces.length * 3];
+
+        int resultIndex = 0;
+
+        for(int[] face : faces){
+
+            flattedFaces[resultIndex] = face[0];
+            flattedFaces[resultIndex + 1] = face[1];
+            flattedFaces[resultIndex + 2] = face[2];
+
+            resultIndex += 3;
+        }
+
+        return flattedFaces;
+    }
 }

@@ -279,6 +279,16 @@ public class AnimatedAssimpMesh extends AnimatedMesh {
 //        drawStaticBones();
     }
 
+    @Override
+    public float[] getVertices() {
+        return new float[0];
+    }
+
+    @Override
+    public int[] getFaces() {
+        return new int[0];
+    }
+
     private Matrix4f convert(AIMatrix4x4 ai){
 
         return new Matrix4f(

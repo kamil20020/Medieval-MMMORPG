@@ -81,4 +81,16 @@ public class AssimpGlbMesh extends Mesh {
 
         return mesh.mNumFaces();
     }
+
+    @Override
+    public float[] getVertices() {
+
+        return null;
+    }
+
+    @Override
+    public int[] getFaces() {
+
+        return null;
+    }
 }

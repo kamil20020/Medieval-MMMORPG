@@ -21,7 +21,7 @@ public class JgltfGlbSkeleton extends Skeleton {
     @Override
     protected void loadBonesNamesIndices() {
 
-        SkinModel firstSkinModel =  model.getSkinModels().get(0);
+        SkinModel firstSkinModel = model.getSkinModels().get(0);
 
         List<NodeModel> bones = firstSkinModel.getJoints();
 

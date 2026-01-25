@@ -5,10 +5,7 @@ import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.entity.Player;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
-import pl.engine.mmorpg.mesh.Rect;
-import pl.engine.mmorpg.mesh.libraries.jgltf.ComplexJgltfMesh;
-import pl.engine.mmorpg.texture.FileTexture;
-import pl.engine.mmorpg.texture.Texture;
+import pl.engine.mmorpg.mesh.TerrainMesh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +47,9 @@ public class Chunk {
 //        terrain.setModel(new Matrix4f().identity().rotateX(-90));
 //        meshables.add(terrain);
 
-        Meshable terrain = new ComplexJgltfMesh("models/cs.glb"); //new Player(camera, eventsHandler, meshFactory);
+        TerrainMesh terrain = new TerrainMesh("models/cs.glb", meshFactory);
+        terrain.generateHeightMap();
+        //new Player(camera, eventsHandler, meshFactory);
 //        terrain.setModel(new Matrix4f().identity().rotateX((float) Math.toRadians(-60)));
         terrain.setModel(new Matrix4f().identity().scaling(0.02f).rotateX((float) Math.toRadians(180)));
         meshables.add(terrain);

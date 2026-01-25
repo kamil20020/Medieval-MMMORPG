@@ -41,7 +41,7 @@ public class Window {
         this.height = vidMode.height();
 
 //        windowId = glfwCreateWindow(width, height, "Engine 3d - OpenGL from lwjgl", NULL, NULL);
-        windowId = glfwCreateWindow(this.width, this.height, "Engine 3d - OpenGL from lwjgl", 0, 0);
+        windowId = glfwCreateWindow(this.width, this.height, "Engine 3d - OpenGL from lwjgl", primaryMonitor, 0);
 
         if(windowId == NULL){
 

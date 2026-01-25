@@ -4,6 +4,7 @@ import de.javagl.jgltf.model.AccessorData;
 import de.javagl.jgltf.model.AccessorModel;
 import de.javagl.jgltf.model.MeshModel;
 import de.javagl.jgltf.model.MeshPrimitiveModel;
+import org.joml.Vector3f;
 import pl.engine.mmorpg.mesh.Mesh;
 import org.lwjgl.BufferUtils;
 import pl.engine.mmorpg.texture.JgltfTexture;
@@ -133,5 +134,31 @@ public class JgltfGlbMesh extends Mesh {
     public int getNumberOfFaces() {
 
         return numberOfFaces;
+    }
+
+    @Override
+    public float[] getVertices() {
+
+        float[] result = new float[numberOfVertices * 3];
+
+        for(int i = 0; i < result.length; i++){
+
+            result[i] = vertices.get(i);
+        }
+
+        return result;
+    }
+
+    @Override
+    public int[] getFaces() {
+
+        int[] result = new int[numberOfFaces * 3];
+
+        for(int i = 0; i < result.length; i += 3){
+
+            result[i] = indices.get(i);
+        }
+
+        return result;
     }
 }

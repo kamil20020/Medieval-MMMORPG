@@ -1,6 +1,7 @@
 package pl.engine.mmorpg.mesh;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import pl.engine.mmorpg.shaders.Shader;
 import pl.engine.mmorpg.shaders.ShaderProps;
@@ -147,6 +148,4 @@ public abstract class Mesh implements Meshable{
     public abstract int getFaceNumberOfVertices(int faceIndex);
     public abstract IntBuffer getFaceVerticesBuffer(int faceIndex);
     public abstract void appendVertices(FloatBuffer buffer);
-    public abstract int getNumberOfVertices();
-    public abstract int getNumberOfFaces();
 }

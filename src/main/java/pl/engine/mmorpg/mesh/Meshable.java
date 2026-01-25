@@ -9,4 +9,8 @@ public interface Meshable {
     void draw();
     void clear();
     void update(double deltaTimeInSeconds);
+    int getNumberOfVertices();
+    int getNumberOfFaces();
+    float[] getVertices();
+    int[] getFaces();
 }

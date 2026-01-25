@@ -74,6 +74,29 @@ public class Entity implements Meshable {
         this.deltaTimeInSeconds = deltaTimeInSeconds;
     }
 
+    @Override
+    public int getNumberOfVertices() {
+        return mesh.getNumberOfVertices();
+    }
+
+    @Override
+    public int getNumberOfFaces() {
+
+        return mesh.getNumberOfFaces();
+    }
+
+    @Override
+    public float[] getVertices() {
+
+        return mesh.getVertices();
+    }
+
+    @Override
+    public int[] getFaces() {
+
+        return mesh.getFaces();
+    }
+
     public ComplexMesh getComplexMesh(){
 
         return mesh;

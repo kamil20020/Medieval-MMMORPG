@@ -507,6 +507,18 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
 //        drawStaticBones();
     }
 
+    @Override
+    public float[] getVertices() {
+
+        return additionalMesh.getVertices();
+    }
+
+    @Override
+    public int[] getFaces() {
+
+        return additionalMesh.getFaces();
+    }
+
     public void drawDebugBones() {
 
         Map<String, Vector3f> bonePositions = getAnimatedBonesPositions();

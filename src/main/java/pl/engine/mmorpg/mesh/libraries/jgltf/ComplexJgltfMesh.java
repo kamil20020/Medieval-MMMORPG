@@ -18,6 +18,7 @@ public class ComplexJgltfMesh extends ComplexMesh {
     public ComplexJgltfMesh(String complexModelFilePath) {
 
         loadModel(complexModelFilePath);
+        initMeshesInfo();
     }
 
     protected ComplexJgltfMesh(){
