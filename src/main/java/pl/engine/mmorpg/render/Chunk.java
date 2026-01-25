@@ -48,7 +48,7 @@ public class Chunk {
 //        meshables.add(terrain);
 
         TerrainMesh terrain = new TerrainMesh("models/cs.glb", meshFactory);
-        terrain.generateHeightMap();
+//        terrain.generateHeightMap();
         //new Player(camera, eventsHandler, meshFactory);
 //        terrain.setModel(new Matrix4f().identity().rotateX((float) Math.toRadians(-60)));
         terrain.setModel(new Matrix4f().identity().scaling(0.02f).rotateX((float) Math.toRadians(180)));
