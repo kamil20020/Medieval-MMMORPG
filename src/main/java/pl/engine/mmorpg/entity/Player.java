@@ -41,7 +41,7 @@ public class Player extends Entity {
         Map<String, String> result = new HashMap<>();
 
         result.put(getKey(MoveState.STANDING), "animations/warrior/idle.glb");
-        result.put(getKey(MoveDirectionState.JUMP), "animations/warrior/move/jump.glb");
+        result.put(getKey(MoveState.JUMP), "animations/warrior/move/jump.glb");
 
         result.put(getKey(MoveState.WALK, MoveDirectionState.FRONT), "animations/warrior/move/walk/front.glb");
         result.put(getKey(MoveState.WALK, MoveDirectionState.LEFT), "animations/warrior/move/walk/left.glb");
@@ -75,7 +75,7 @@ public class Player extends Entity {
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE)){
             camera.moveTop(moveValue);
-            moveDirectionState = MoveDirectionState.JUMP;
+            moveState = MoveState.JUMP;
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_Z)){
