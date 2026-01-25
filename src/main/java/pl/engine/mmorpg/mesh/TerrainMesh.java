@@ -70,7 +70,7 @@ public class TerrainMesh implements Meshable{
         return mesh.getFaces();
     }
 
-    public final float[][] generateHeightMap(){
+    public float[][] generateHeightMap(){
 
         Vector3f[] minAndMaxCoords = getMinAndMaxCoords();
         Vector3f minCoords = minAndMaxCoords[0];
