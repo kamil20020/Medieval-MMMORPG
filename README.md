@@ -16,7 +16,10 @@ I used free models and animations from Mixamo (https://www.mixamo.com/)
     <img src="movement.gif">
 <p>
 
-
 <p align="center">
     <img src="skeletional-animations.png">
+<p>
+
+<p align="center">
+    <img src="cs.png">
 <p>
