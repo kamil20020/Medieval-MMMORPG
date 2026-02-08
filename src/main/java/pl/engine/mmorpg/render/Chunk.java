@@ -1,14 +1,19 @@
 package pl.engine.mmorpg.render;
 
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.entity.Player;
-import pl.engine.mmorpg.mesh.MeshAbstractFactory;
-import pl.engine.mmorpg.mesh.Meshable;
-import pl.engine.mmorpg.mesh.TerrainMesh;
+import pl.engine.mmorpg.mesh.*;
+import pl.engine.mmorpg.terrain.HeightMapVisualizeMesh;
+import pl.engine.mmorpg.terrain.TerrainMesh;
+import pl.engine.mmorpg.terrain.TerrainMeshHeightMapGenerator;
+import pl.engine.mmorpg.texture.FileTexture;
+import pl.engine.mmorpg.texture.Texture;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Chunk {
 
@@ -33,8 +38,8 @@ public class Chunk {
 
     private void uploadToGpu(){
 
-//        Texture texture = new FileTexture("textures/grass.png", Rect.TEXTURE_COORDS);
-//        Meshable grass = new Rect(texture);
+        Texture texture = new FileTexture("textures/grass.png", Rect.TEXTURE_COORDS);
+        Meshable grass = new Rect(texture);
 //        meshables.add(grass);
 
         Meshable player = new Player(camera, eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
@@ -46,13 +51,27 @@ public class Chunk {
 //        Meshable terrain = new ComplexJgltfMesh("models/ruines.glb"); //new Player(camera, eventsHandler, meshFactory);
 //        terrain.setModel(new Matrix4f().identity().rotateX(-90));
 //        meshables.add(terrain);
+//        ComplexMesh s = meshFactory.createComplexMesh("models/s.glb");
+//        meshables.add(s);
+//
+//        Texture texture1 = new FileTexture("textures/wood.png", Cube.TEXTURE_COORDS);
+//        Meshable wood = new Cube(texture1);
+//        meshables.add(wood);
 
-        TerrainMesh terrain = new TerrainMesh("models/cs.glb", meshFactory);
-        terrain.generateHeightMap();
+        TerrainMesh terrain = new TerrainMesh("models/snow1.glb", meshFactory);
+        Map<String, Float> heightMap = terrain.generateHeightMap();
         //new Player(camera, eventsHandler, meshFactory);
-//        terrain.setModel(new Matrix4f().identity().rotateX((float) Math.toRadians(-60)));
-        terrain.setModel(new Matrix4f().identity().scaling(0.02f).rotateX((float) Math.toRadians(180)));
+//        terrain.setModel(new Matrix4f().identity().scaling(0.01f).rotateX((float) Math.toRadians(-90)));
+//        terrain.setModel(new Matrix4f().identity().rotateX((float) Math.toRadians(-90)));
+//        terrain.setModel(new Matrix4f().identity().scaling(0.02f).rotateX((float) Math.toRadians(180)));
+//        terrain.setModel(new Matrix4f().identity().scaling(50f));
+       HeightMapVisualizeMesh heightMapVisualizeMesh = new HeightMapVisualizeMesh(-250, -250, heightMap);
+//        heightMapVisualizeMesh.setModel(new Matrix4f().identity().scaling(0.01f).rotateX((float) Math.toRadians(-90)));
+//        VisualizeMesh visualizeMesh = new VisualizeMesh(terrain.getVertices(), new Vector4f(0, 0, 1, 1));
+//        meshables.add(visualizeMesh);
         meshables.add(terrain);
+        meshables.add(heightMapVisualizeMesh);
+//        TerrainMeshHeightMapGenerator.saveToCsv(heightMap, "");
 
         for(Meshable meshable : meshables){
 

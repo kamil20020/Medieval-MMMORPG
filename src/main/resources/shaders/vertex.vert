@@ -13,6 +13,7 @@ uniform mat4 view;
 uniform mat4 model;
 uniform int isAnimated;
 uniform mat4 finalBoneMatrices[MAX_BONES];
+uniform int isGivenColor;
 
 out vec2 vTexCoord;
 

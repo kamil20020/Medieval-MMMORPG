@@ -154,7 +154,7 @@ public class JgltfGlbMesh extends Mesh {
 
         int[] result = new int[numberOfFaces * 3];
 
-        for(int i = 0; i < result.length; i += 3){
+        for(int i = 0; i < result.length; i++){
 
             result[i] = indices.get(i);
         }

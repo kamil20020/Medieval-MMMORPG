@@ -59,7 +59,7 @@ public class Window {
 
     public void start(){
 
-//        glfwShowWindow(windowId);
+        glfwShowWindow(windowId);
 
         GL.createCapabilities(); // collaboration between lwjgl, opengl and glfw
 

@@ -1,12 +1,12 @@
 package pl.engine.mmorpg.shaders;
 
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
-import static org.lwjgl.opengl.GL20.glUniform1i;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.*;
 
 public enum ShaderPropsTypes {
 
@@ -65,7 +65,19 @@ public enum ShaderPropsTypes {
 
             validateShaderPropertyValue(Integer.class, value);
 
-            glUniform1i(locationId, 0); // GL_TEXTURE0
+            glUniform1i(locationId, (Integer) value); // GL_TEXTURE0
+        }
+    },
+    VECTOR4F{
+
+        @Override
+        public void setValue(int locationId, Object value) {
+
+            validateShaderPropertyValue(Vector4f.class, value);
+
+            Vector4f vec = (Vector4f) value;
+
+            glUniform4f(locationId, vec.x, vec.y, vec.z, vec.w); // GL_TEXTURE0
         }
     };
 

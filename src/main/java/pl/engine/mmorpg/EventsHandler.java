@@ -66,6 +66,14 @@ public class EventsHandler {
 
     private void handleMousePos(double x, double y){
 
+        handleMouseXPos(x);
+        handleMouseYPos(y);
+
+        lastMouseMoveTime = System.currentTimeMillis();
+    }
+
+    private void handleMouseXPos(double x){
+
         if(mouseX == -1){
             mouseX = x;
             return;
@@ -73,7 +81,17 @@ public class EventsHandler {
 
         mouseXDiff = x - mouseX;
         mouseX = x;
-        lastMouseMoveTime = System.currentTimeMillis();
+    }
+
+    private void handleMouseYPos(double y){
+
+        if(mouseY == -1){
+            mouseY = y;
+            return;
+        }
+
+        mouseYDiff = y - mouseY;
+        mouseY = y;
     }
 
     public boolean isMouseIdle(){
@@ -97,9 +115,9 @@ public class EventsHandler {
         return mouseXDiff / window.getWidth();
     }
 
-    public double getMouseYForWindowHeight(){
+    public double getMouseYPosForWindowHeight(){
 
-        return mouseY / window.getHeight();
+        return mouseYDiff / window.getHeight();
     }
 
     public int getEventButtonId(){

@@ -9,7 +9,10 @@ public enum ShaderProps {
     TEXTURE0("texture0", ShaderPropsTypes.INTEGER),
 
     IS_ANIMATED("isAnimated", ShaderPropsTypes.BOOLEAN),
-    FINAL_BONE_MATRICES("finalBoneMatrices", ShaderPropsTypes.MATRIX4f_ARRAY);
+    FINAL_BONE_MATRICES("finalBoneMatrices", ShaderPropsTypes.MATRIX4f_ARRAY),
+
+    IS_GIVEN_COLOR("isGivenColor", ShaderPropsTypes.BOOLEAN),
+    COLOR("color", ShaderPropsTypes.VECTOR4F);
 
     private final String key;
     private final ShaderPropsTypes type;

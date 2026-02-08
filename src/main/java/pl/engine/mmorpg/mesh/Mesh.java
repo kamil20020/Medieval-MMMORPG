@@ -49,7 +49,7 @@ public abstract class Mesh implements Meshable{
         model.get(modelBuffer);
     }
 
-    private FloatBuffer loadVerticesBuffer(){
+    protected FloatBuffer loadVerticesBuffer(){
 
         //3 - x, y, z, 2 - uv texture, 3 - normals
         FloatBuffer buffer = BufferUtils.createFloatBuffer(numberOfVertices * 5);
@@ -61,7 +61,7 @@ public abstract class Mesh implements Meshable{
         return buffer;
     }
 
-    private IntBuffer initIndicesBuffer(){
+    protected IntBuffer initIndicesBuffer(){
 
         IntBuffer indicesBuffer = BufferUtils.createIntBuffer(numberOfFaces * 3);
 
@@ -82,7 +82,7 @@ public abstract class Mesh implements Meshable{
         return indicesBuffer;
     }
 
-    private void bindVerticesBuffer(FloatBuffer buffer){
+    protected void bindVerticesBuffer(FloatBuffer buffer){
 
         vertexBufferId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);

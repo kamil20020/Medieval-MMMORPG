@@ -6,6 +6,7 @@ Implemented:
 * Moving camera,
 * Skeletal animation (Rigging) with jgltf (for assimp almost works but is a little 
   bugged, for example head of person is in other place),
+* Simple generating height map for gravity - it needs few fixes,
 * Moving player 3d model with camera,
 * Basic animations of players movement,
 * Rendering test grass floor.
@@ -18,6 +19,10 @@ I used free models and animations from Mixamo (https://www.mixamo.com/)
 
 <p align="center">
     <img src="skeletional-animations.png">
+<p>
+
+<p align="center">
+    <img src="height-map.png">
 <p>
 
 <p align="center">

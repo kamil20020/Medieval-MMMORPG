@@ -19,6 +19,7 @@ public class Player extends Entity {
     private final EventsHandler eventsHandler;
     private boolean isSprinting = true;
     private boolean isMoving = false;
+    private boolean isVerticalCameraUnlocked = false;
 
     private static final String MODEL_PATH = "models/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(MoveState.STANDING);
@@ -58,6 +59,15 @@ public class Player extends Entity {
         return result;
     }
 
+    private void handleKeyboard(){
+
+        handleMove();
+
+        if(eventsHandler.isKeyPressed(GLFW_KEY_R)){
+            isVerticalCameraUnlocked = !isVerticalCameraUnlocked;
+        }
+    }
+
     private void handleMove(){
 
         handleMoveWasd();
@@ -95,6 +105,7 @@ public class Player extends Entity {
         double moveValue = deltaTimeInSeconds * moveMultiplier;
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_W)){
+
             camera.moveForward(moveValue);
             moveDirectionState = MoveDirectionState.FRONT;
             isMoving = true;
@@ -132,6 +143,18 @@ public class Player extends Entity {
 
     private void handleMouseRotate(){
 
+        handleHorizontalRotate();
+
+        if(isVerticalCameraUnlocked){
+
+            handleVerticalRotate();
+        }
+
+        eventsHandler.resetMouseMove();
+    }
+
+    private void handleHorizontalRotate(){
+
         double mouseXPosForWindowWidth = eventsHandler.getMouseXPosForWindowWidth();
 
         if(mouseXPosForWindowWidth == 0){
@@ -148,8 +171,26 @@ public class Player extends Entity {
 
             camera.rotateLeft(moveValue);
         }
+    }
 
-        eventsHandler.resetMouseMove();
+    private void handleVerticalRotate(){
+
+        double mouseYPosForWindowHeight = eventsHandler.getMouseYPosForWindowHeight();
+
+        if(mouseYPosForWindowHeight == 0){
+            return;
+        }
+
+        double moveValue = Math.abs(mouseYPosForWindowHeight) * ROTATION_SENS * deltaTimeInSeconds;
+
+        if(mouseYPosForWindowHeight > 0){
+
+            camera.rotateTop(moveValue);
+        }
+        else{
+
+            camera.rotateDown(moveValue);
+        }
     }
 
     private void updatePositionForCamera() {
@@ -185,7 +226,7 @@ public class Player extends Entity {
         combatState = CombatState.NO_WEAPON;
         isMoving = false;
 
-        handleMove();
+        handleKeyboard();
         handleMouseRotate();
         handleAttack();
 
