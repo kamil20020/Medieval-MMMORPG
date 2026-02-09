@@ -6,7 +6,7 @@ Implemented:
 * Moving camera,
 * Skeletal animation (Rigging) with jgltf (for assimp almost works but is a little 
   bugged, for example head of person is in other place),
-* Simple generating height map for gravity - it needs few fixes,
+* Generating height map from glb terrain for gravity,
 * Moving player 3d model with camera,
 * Basic animations of players movement,
 * Rendering test grass floor.

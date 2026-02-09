@@ -200,7 +200,8 @@ public class TerrainMeshHeightMapGenerator {
 
                 future.get();
             }
-        } catch (InterruptedException | ExecutionException e) {
+        }
+        catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -320,16 +321,13 @@ public class TerrainMeshHeightMapGenerator {
 
     private static void loadBarycentricParams(Vector3f a, Vector3f b, Vector3f c, Vector3f point, float[] barycentricParams){
 
-        float v0x = b.x - a.x;
-        float v0z = b.z - a.z;
-        float v1x = c.x - a.x;
-        float v1z = c.z - a.z;
-        float v2x = point.x - a.x;
-        float v2z = point.z - a.z;
+        float bcZ = b.z - c.z;
+        float acX = a.x - c.x;
+        float cbx = c.x - b.x;
+        float acZ = a.z - c.z;
+        float determinant = bcZ * acX + cbx * acZ;
 
-        float denominator = v0x * v1z - v1x * v0z;
-
-        if (denominator == 0f) {
+        if (determinant == 0f) {
 
             barycentricParams[0] = -1;
             barycentricParams[1] = -1;
@@ -338,8 +336,12 @@ public class TerrainMeshHeightMapGenerator {
             return;
         }
 
-        float alpha = (v2x * v1z - v1x * v2z) / denominator;
-        float beta = (v0x * v2z - v2x * v0z) / denominator;
+        float pcX = point.x - c.x;
+        float pcZ = point.z - c.z;
+        float caZ = c.z - a.z;
+
+        float alpha = (bcZ * pcX + cbx * pcZ) / determinant;
+        float beta = (caZ * pcX + acX * pcZ) / determinant;
         float gamma = 1.0f - alpha - beta;
 
         barycentricParams[0] = alpha;

@@ -22,7 +22,7 @@ public class HeightMapVisualizeMesh extends VisualizeMesh {
 
         for(int xI = 0, vertexIndex = 0; xI < xNumberOfPoints; xI++){
 
-            for(int zI = 0; zI < zNumberOfPoints; zI++){
+            for(int zI = 0; zI < zNumberOfPoints; zI++, vertexIndex += 3){
 
                 vertices[vertexIndex] =  minX + xI;
 
@@ -34,8 +34,6 @@ public class HeightMapVisualizeMesh extends VisualizeMesh {
 
                 vertices[vertexIndex + 1] = heightMap.get(key);
                 vertices[vertexIndex + 2] = minZ + zI;
-
-                vertexIndex += 3;
             }
         }
 
