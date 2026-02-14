@@ -101,4 +101,19 @@ public class Entity implements Meshable {
 
         return mesh;
     }
+
+    public void setMoveState(MoveState moveState){
+
+        this.moveState = moveState;
+    }
+
+    public void setMoveDirectionState(MoveDirectionState moveDirectionState){
+
+        this.moveDirectionState = moveDirectionState;
+    }
+
+    public double getDeltaTimeInSeconds(){
+
+        return deltaTimeInSeconds;
+    }
 }

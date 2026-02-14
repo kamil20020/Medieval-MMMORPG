@@ -8,7 +8,6 @@ import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import java.util.*;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 import static pl.engine.mmorpg.entity.CombinedAnimationController.*;
 
 public class Player extends Entity {
@@ -17,22 +16,20 @@ public class Player extends Entity {
 
     private final Camera camera;
     private final EventsHandler eventsHandler;
-    private boolean isSprinting = true;
-    private boolean isMoving = false;
-    private boolean isVerticalCameraUnlocked = false;
+
+    private final MoveComponent moveComponent;
+    private final PlayerInputComponent playerInputComponent;
 
     private static final String MODEL_PATH = "models/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(MoveState.STANDING);
-
-    private static final double RUN_SENS = 6;
-
-    private static final Vector3f CAMERA_OFFSET = new Vector3f(0, -2, 2.5f);
 
     public Player(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
         super(MODEL_PATH, getAnimationNamesPathsMappings(), meshFactory, FIRST_ANIMATION_NAME);
 
         this.camera = camera;
         this.eventsHandler = eventsHandler;
+        this.moveComponent = new MoveComponent(this);
+        this.playerInputComponent = new PlayerInputComponent(this, camera, eventsHandler);
 
         updatePositionForCamera();
     }
@@ -57,140 +54,6 @@ public class Player extends Entity {
         result.put(getKey(CombatState.FIGHTING), "animations/warrior/combat/sword-inplace.glb");
 
         return result;
-    }
-
-    private void handleKeyboard(){
-
-        handleMove();
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_R)){
-            isVerticalCameraUnlocked = !isVerticalCameraUnlocked;
-        }
-    }
-
-    private void handleMove(){
-
-        handleMoveWasd();
-
-        double moveValue = deltaTimeInSeconds * MOVE_SENS;
-        double rotationValue = deltaTimeInSeconds * ROTATION_SENS;
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_UP)){
-            camera.rotateTop(rotationValue);
-        }
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_DOWN)){
-            camera.rotateDown(rotationValue);
-        }
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE)){
-            camera.moveTop(moveValue);
-            moveState = MoveState.JUMP;
-        }
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_Z)){
-            camera.moveDown(moveValue);
-        }
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_V)){
-
-            isSprinting = !isSprinting;
-            eventsHandler.resetKey(GLFW_KEY_V);
-        }
-    }
-
-    private void handleMoveWasd(){
-
-        double moveMultiplier = isSprinting ? RUN_SENS : MOVE_SENS;
-        double moveValue = deltaTimeInSeconds * moveMultiplier;
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_W)){
-
-            camera.moveForward(moveValue);
-            moveDirectionState = MoveDirectionState.FRONT;
-            isMoving = true;
-        }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_S)){
-
-            camera.moveBack(moveValue * 0.5);
-            moveDirectionState = MoveDirectionState.BACK;
-            isMoving = true;
-        }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_A)){
-
-            camera.moveLeft(moveValue);
-            moveDirectionState = MoveDirectionState.LEFT;
-            isMoving = true;
-        }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_D)){
-
-            camera.moveRight(moveValue);
-            moveDirectionState = MoveDirectionState.RIGHT;
-            isMoving = true;
-        }
-
-        if(!isMoving) {
-            return;
-        }
-
-        if(isSprinting){
-            moveState = MoveState.RUN;
-        }
-        else{
-            moveState = MoveState.WALK;
-        }
-    }
-
-    private void handleMouseRotate(){
-
-        handleHorizontalRotate();
-
-        if(isVerticalCameraUnlocked){
-
-            handleVerticalRotate();
-        }
-
-        eventsHandler.resetMouseMove();
-    }
-
-    private void handleHorizontalRotate(){
-
-        double mouseXPosForWindowWidth = eventsHandler.getMouseXPosForWindowWidth();
-
-        if(mouseXPosForWindowWidth == 0){
-            return;
-        }
-
-        double moveValue = Math.abs(mouseXPosForWindowWidth) * ROTATION_SENS * deltaTimeInSeconds;
-
-        if(mouseXPosForWindowWidth > 0){
-
-            camera.rotateRight(moveValue);
-        }
-        else{
-
-            camera.rotateLeft(moveValue);
-        }
-    }
-
-    private void handleVerticalRotate(){
-
-        double mouseYPosForWindowHeight = eventsHandler.getMouseYPosForWindowHeight();
-
-        if(mouseYPosForWindowHeight == 0){
-            return;
-        }
-
-        double moveValue = Math.abs(mouseYPosForWindowHeight) * ROTATION_SENS * deltaTimeInSeconds;
-
-        if(mouseYPosForWindowHeight > 0){
-
-            camera.rotateTop(moveValue);
-        }
-        else{
-
-            camera.rotateDown(moveValue);
-        }
     }
 
     private void updatePositionForCamera() {
@@ -218,16 +81,18 @@ public class Player extends Entity {
         }
     }
 
+    public MoveComponent getPlayerMoveComponent(){
+
+        return moveComponent;
+    }
+
     @Override
     public void update(double deltaTimeInSeconds){
 
-        moveState = MoveState.STANDING;
-        moveDirectionState = MoveDirectionState.FRONT;
+        moveComponent.resetMove();
         combatState = CombatState.NO_WEAPON;
-        isMoving = false;
 
-        handleKeyboard();
-        handleMouseRotate();
+        playerInputComponent.update(deltaTimeInSeconds);
         handleAttack();
 
         updatePositionForCamera();

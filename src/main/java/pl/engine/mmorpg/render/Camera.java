@@ -40,46 +40,19 @@ public class Camera {
         return new Vector3f(middle);
     }
 
-    public void moveForward(double speed){
-
-        moveInForward(speed);
-    }
-
-    public void moveBack(double speed){
-
-        moveInForward(-speed);
-    }
-
-    public void moveTop(double speed){
+    public void moveWithoutDirectionChange(double speed){
 
         middle.y += speed;
         eye.y += speed;
         destination.y += speed;
     }
 
-    public void moveDown(double speed){
+    public void moveWithDirectionChange(Vector3f moveVec){
 
-        middle.y -= speed;
-        eye.y -= speed;
-        destination.y -= speed;
-    }
-
-    public void moveLeft(double speed){
-
-        Vector3f forward = getForward();
-
-        forward.rotateY((float) Math.toRadians(90));
-
-        moveInDirection(speed, forward);
-    }
-
-    public void moveRight(double speed){
-
-        Vector3f forward = getForward();
-
-        forward.rotateY((float) Math.toRadians(90));
-
-        moveInDirection(-speed, forward);
+        middle.x += moveVec.x;
+        middle.y += moveVec.y;
+        middle.z += moveVec.z;
+        updateDestinationAndEye();
     }
 
     public void rotateLeft(double angle){
@@ -114,23 +87,7 @@ public class Camera {
         updateDestinationAndEye();
     }
 
-    private void moveInForward(double scale){
-
-        Vector3f forward = getForward();
-
-        moveInDirection(scale, forward);
-    }
-
-    private void moveInDirection(double scale, Vector3f dir){
-
-        middle.x += scale * dir.x;
-        middle.y += scale * dir.y;
-        middle.z += scale * dir.z;
-
-        updateDestinationAndEye();
-    }
-
-    private Vector3f getForward(){
+    public Vector3f getForward(){
 
         float yawRad = (float)Math.toRadians(angle.y);
         Vector3f forward = new Vector3f(
