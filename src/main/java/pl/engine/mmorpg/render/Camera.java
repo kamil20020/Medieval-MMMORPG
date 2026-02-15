@@ -40,18 +40,12 @@ public class Camera {
         return new Vector3f(middle);
     }
 
-    public void moveWithoutDirectionChange(double speed){
-
-        middle.y += speed;
-        eye.y += speed;
-        destination.y += speed;
-    }
-
-    public void moveWithDirectionChange(Vector3f moveVec){
+    public void move(Vector3f moveVec){
 
         middle.x += moveVec.x;
         middle.y += moveVec.y;
         middle.z += moveVec.z;
+
         updateDestinationAndEye();
     }
 

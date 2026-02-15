@@ -86,6 +86,18 @@ public class Player extends Entity {
         return moveComponent;
     }
 
+    public void move(Vector3f vec){
+
+        position.x += vec.x;
+        position.x += vec.x;
+        position.x += vec.x;
+    }
+
+    public Vector3f getPosition(){
+
+        return position;
+    }
+
     @Override
     public void update(double deltaTimeInSeconds){
 

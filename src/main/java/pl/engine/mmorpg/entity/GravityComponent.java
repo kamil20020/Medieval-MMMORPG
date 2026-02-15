@@ -14,6 +14,8 @@ public class GravityComponent {
 
     public Vector3f getMove(Vector3f wantMove){
 
-        return null;
+        Vector3f resultMove = new Vector3f();
+
+        return resultMove;
     }
 }

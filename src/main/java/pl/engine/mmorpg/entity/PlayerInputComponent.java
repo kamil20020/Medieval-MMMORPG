@@ -34,8 +34,19 @@ public class PlayerInputComponent {
     private void handleKeyboard(double deltaTimeInSeconds){
 
         handleMove(deltaTimeInSeconds);
+        handleActions();
+    }
+
+    private void handleActions(){
+
+        if(eventsHandler.isKeyPressed(GLFW_KEY_V)){
+
+            playerMoveComponent.switchIsSprinting();
+            eventsHandler.resetKey(GLFW_KEY_V);
+        }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_R)){
+
             isVerticalCameraUnlocked = !isVerticalCameraUnlocked;
             eventsHandler.resetKey(GLFW_KEY_R);
         }
@@ -44,6 +55,37 @@ public class PlayerInputComponent {
     private void handleMove(double deltaTimeInSeconds){
 
         handleMoveWasd(deltaTimeInSeconds);
+        handleMoveVertical(deltaTimeInSeconds);
+
+        if(playerMoveComponent.wasMoved()){
+
+            camera.move(playerMoveComponent.getWantMove());
+        }
+    }
+
+    private void handleMoveWasd(double deltaTimeInSeconds){
+
+        Vector3f forward = camera.getForward();
+
+        if(eventsHandler.isKeyPressed(GLFW_KEY_W)){
+
+            playerMoveComponent.moveForward(deltaTimeInSeconds, forward);
+        }
+        else if(eventsHandler.isKeyPressed(GLFW_KEY_S)){
+
+            playerMoveComponent.moveBackward(deltaTimeInSeconds, forward);
+        }
+        else if(eventsHandler.isKeyPressed(GLFW_KEY_A)){
+
+            playerMoveComponent.moveLeft(deltaTimeInSeconds, forward);
+        }
+        else if(eventsHandler.isKeyPressed(GLFW_KEY_D)){
+
+            playerMoveComponent.moveRight(deltaTimeInSeconds, forward);
+        }
+    }
+
+    private void handleMoveVertical(double deltaTimeInSeconds){
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_UP)){
             camera.rotateTop(deltaTimeInSeconds);
@@ -54,52 +96,11 @@ public class PlayerInputComponent {
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE)){
-           playerMoveComponent.moveTop(deltaTimeInSeconds);
-           camera.moveWithoutDirectionChange(playerMoveComponent.getWantMove().y);
+            playerMoveComponent.moveTop(deltaTimeInSeconds);
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_Z)){
             playerMoveComponent.moveDown(deltaTimeInSeconds);
-            camera.moveWithoutDirectionChange(playerMoveComponent.getWantMove().y);
-        }
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_V)){
-
-            playerMoveComponent.switchIsSprinting();
-            eventsHandler.resetKey(GLFW_KEY_V);
-        }
-    }
-
-    private void handleMoveWasd(double deltaTimeInSeconds){
-
-        Vector3f forward = camera.getForward();
-        boolean wasMoved = false;
-
-        if(eventsHandler.isKeyPressed(GLFW_KEY_W)){
-
-            playerMoveComponent.moveForward(deltaTimeInSeconds, forward);
-            wasMoved = true;
-        }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_S)){
-
-            playerMoveComponent.moveBackward(deltaTimeInSeconds, forward);
-            wasMoved = true;
-        }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_A)){
-
-            playerMoveComponent.moveLeft(deltaTimeInSeconds, forward);
-            wasMoved = true;
-        }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_D)){
-
-            playerMoveComponent.moveRight(deltaTimeInSeconds, forward);
-            wasMoved = true;
-        }
-
-        if(wasMoved){
-
-            Vector3f wantMove = playerMoveComponent.getWantMove();
-            camera.moveWithDirectionChange(wantMove);
         }
     }
 

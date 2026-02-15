@@ -44,7 +44,7 @@ public class MoveComponent {
 
     public void moveBackward(double deltaTimeInSeconds, Vector3f forward){
 
-        double moveValue = getMoveValue(deltaTimeInSeconds);
+        double moveValue = getMoveValue(deltaTimeInSeconds) * 0.5;
         moveInForward(-moveValue, forward);
 
         entity.setMoveDirectionState((MoveDirectionState.BACK));
@@ -112,6 +112,11 @@ public class MoveComponent {
 
             entity.setMoveState(MoveState.WALK);
         }
+    }
+
+    public boolean wasMoved(){
+
+        return !wantMove.equals(0, 0, 0);
     }
 
     public Vector3f getWantMove(){
