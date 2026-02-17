@@ -175,11 +175,17 @@ public class TerrainMeshHeightMapGenerator {
         logger.info("Loaded blocks triangles mappings");
     }
 
-    public static Map<String, Float> generate(float[] vertices, int[] faces){
+    public static TerrainMeshHeightMapData generate(float[] vertices, int[] faces){
 
         TerrainMeshHeightMapGenerator generator = new TerrainMeshHeightMapGenerator(vertices, faces);
 
-        return generator.generateHeightMap();
+        Map<String, Float> heightMap = generator.generateHeightMap();
+
+        return new TerrainMeshHeightMapData(
+            generator.minCoords,
+            generator.maxCoords,
+            heightMap
+        );
     }
 
     public Map<String, Float> generateHeightMap() {
@@ -299,7 +305,10 @@ public class TerrainMeshHeightMapGenerator {
 
         int pointX = (int) point.x;
         int pointZ = (int) point.z;
-        result.put(pointX + " " + pointZ, maxY);
+
+        String key = TerrainMeshHeightMapData.getHeightMapKey(pointX, pointZ);
+
+        result.put(key, maxY);
     }
 
     private void loadTriangleVertex(int vertexIndex, Vector3f resultVec){
@@ -352,8 +361,8 @@ public class TerrainMeshHeightMapGenerator {
     private static boolean isPointInsideTriangle(float alpha, float beta, float gamma){
 
         return (alpha >= 0f && alpha <= 1f) &&
-                (beta >= 0f && beta <= 1f) &&
-                (gamma >= 0f && gamma <= 1f);
+               (beta >= 0f && beta <= 1f) &&
+               (gamma >= 0f && gamma <= 1f);
     }
 
     private static float getY(float aY, float bY, float cY, float alpha, float beta, float gamma){

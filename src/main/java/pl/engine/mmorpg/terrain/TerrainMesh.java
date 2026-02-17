@@ -1,6 +1,7 @@
 package pl.engine.mmorpg.terrain;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.engine.mmorpg.mesh.ComplexMesh;
@@ -14,6 +15,9 @@ public class TerrainMesh implements Meshable {
     private final float[] vertices;
     private final int[] faces;
     private final ComplexMesh mesh;
+    private Map<String, Float> heightMap;
+    private Vector3f minCoords;
+    private Vector3f maxCoords;
 
     private static final Logger logger = LoggerFactory.getLogger(TerrainMeshHeightMapGenerator.class);
 
@@ -91,8 +95,29 @@ public class TerrainMesh implements Meshable {
         return mesh.getFaces();
     }
 
-    public Map<String, Float> generateHeightMap() {
+    public TerrainMeshHeightMapData generateHeightMap() {
 
-        return TerrainMeshHeightMapGenerator.generate(vertices, faces);
+        TerrainMeshHeightMapData terrainMeshHeightMapData = TerrainMeshHeightMapGenerator.generate(vertices, faces);
+
+        minCoords = terrainMeshHeightMapData.minCoords();
+        maxCoords = terrainMeshHeightMapData.maxCoords();
+        heightMap = terrainMeshHeightMapData.heightMap();
+
+        return terrainMeshHeightMapData;
+    }
+
+    public Map<String, Float> getHeightMap(){
+
+        return heightMap;
+    }
+
+    public Vector3f getMinCoords(){
+
+        return minCoords;
+    }
+
+    public Vector3f getMaxCoords(){
+
+        return maxCoords;
     }
 }

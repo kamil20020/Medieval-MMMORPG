@@ -11,7 +11,7 @@ public class PlayerInputComponent {
 
     private final Camera camera;
     private final EventsHandler eventsHandler;
-    private final Entity player;
+    private final Player player;
     private final MoveComponent playerMoveComponent;
 
     private boolean isVerticalCameraUnlocked = false;
@@ -56,6 +56,11 @@ public class PlayerInputComponent {
 
         handleMoveWasd(deltaTimeInSeconds);
         handleMoveVertical(deltaTimeInSeconds);
+
+        if(GravityComponent.getInstance().getYMove(player.getPosition()) == 0){
+
+            System.out.println("AAA");
+        }
 
         if(playerMoveComponent.wasMoved()){
 
