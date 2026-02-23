@@ -15,9 +15,7 @@ public class TerrainMesh implements Meshable {
     private final float[] vertices;
     private final int[] faces;
     private final ComplexMesh mesh;
-    private Map<String, Float> heightMap;
-    private Vector3f minCoords;
-    private Vector3f maxCoords;
+    private TerrainMeshHeightMapData terrainMeshHeightMapData;
 
     private static final Logger logger = LoggerFactory.getLogger(TerrainMeshHeightMapGenerator.class);
 
@@ -97,27 +95,83 @@ public class TerrainMesh implements Meshable {
 
     public TerrainMeshHeightMapData generateHeightMap() {
 
-        TerrainMeshHeightMapData terrainMeshHeightMapData = TerrainMeshHeightMapGenerator.generate(vertices, faces);
-
-        minCoords = terrainMeshHeightMapData.minCoords();
-        maxCoords = terrainMeshHeightMapData.maxCoords();
-        heightMap = terrainMeshHeightMapData.heightMap();
+        terrainMeshHeightMapData = TerrainMeshHeightMapGenerator.generate(vertices, faces);
 
         return terrainMeshHeightMapData;
     }
 
+    public double getTerrainMaxY(double x, double z){
+
+        return getTerrainMaxY(x, z, Math.floor(x), Math.floor(z));
+    }
+
+    private double getTerrainMaxY(double x, double z, double leftX, double leftZ){
+
+        if(leftX == x && leftZ == z){
+
+            return terrainMeshHeightMapData.getValue(leftX, leftZ);
+        }
+
+        if(leftX == x){
+
+            return interpolateYInZ(x, z, leftZ);
+        }
+
+        if(leftZ == z){
+
+            return interpolateYInX(z, x, leftX);
+        }
+
+        double xZ1Y = interpolateYInX(leftZ, x, leftX);
+        double xZ2Y = interpolateYInX(leftZ + 1, x, leftX);
+
+        return interpolate1D(z, leftZ, xZ1Y, xZ2Y);
+    }
+
+    private double interpolateYInX(double z, double x, double leftX) {
+
+        double leftXY = terrainMeshHeightMapData.getValue(leftX, z);
+        double rightXY = terrainMeshHeightMapData.getValue(leftX + 1, z);
+
+        return interpolate1D(x, leftX, leftXY, rightXY);
+    }
+
+    private double interpolate1D(double middleCoords, double leftCoords, double leftValue, double rightValue){
+
+        if(middleCoords == leftCoords){
+            return leftValue;
+        }
+
+        if(middleCoords == leftCoords + 1){
+            return rightValue;
+        }
+
+        double coordsDiff = middleCoords - leftCoords;
+        double valueDiff = rightValue - leftValue;
+
+        return leftValue + coordsDiff * valueDiff;
+    }
+
+    private double interpolateYInZ(double x, double z, double leftZ) {
+
+        double leftZY = terrainMeshHeightMapData.getValue(x, leftZ);
+        double rightZY = terrainMeshHeightMapData.getValue(x, leftZ + 1);
+
+        return interpolate1D(z, leftZ, leftZY, rightZY);
+    }
+
     public Map<String, Float> getHeightMap(){
 
-        return heightMap;
+        return terrainMeshHeightMapData.heightMap();
     }
 
     public Vector3f getMinCoords(){
 
-        return minCoords;
+        return terrainMeshHeightMapData.minCoords();
     }
 
     public Vector3f getMaxCoords(){
 
-        return maxCoords;
+        return terrainMeshHeightMapData.maxCoords();
     }
 }

@@ -60,10 +60,24 @@ public class TerrainMeshHeightMapGenerator {
         blocksTrianglesMappings = initializeBlocksTrianglesMappings();
         loadBlocksTrianglesMappings();
 
+        initResult();
+
         logInit();
     }
 
-    private void logInit(){
+    private void initResult(){
+
+        for(int xI = 0; xI < numberOfXPoints; xI++){
+
+            for (int zI = 0; zI < numberOfZPoints; zI++){
+
+                String key = TerrainMeshHeightMapData.getHeightMapKey(minCoords.x + xI, minCoords.z + zI);
+                result.put(key, Float.MIN_VALUE);
+            }
+        }
+    }
+
+    private void logInit() {
 
         logger.info("");
         logger.info("Initialized terrain height generator params");

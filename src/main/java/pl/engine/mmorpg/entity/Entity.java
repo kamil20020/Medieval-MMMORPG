@@ -2,6 +2,9 @@ package pl.engine.mmorpg.entity;
 
 import org.joml.Matrix4f;
 import pl.engine.mmorpg.animation.Skeleton;
+import pl.engine.mmorpg.entity.combat.CombatState;
+import pl.engine.mmorpg.entity.move.MoveDirectionState;
+import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
@@ -19,9 +22,6 @@ public class Entity implements Meshable {
     protected CombatState combatState = CombatState.NO_WEAPON;
 
     private final CombinedAnimationController combinedAnimationController;
-
-    protected static final double ROTATION_SENS = 50000;
-    protected static final double MOVE_SENS = 2;
 
     public Entity(
         String modelPath,

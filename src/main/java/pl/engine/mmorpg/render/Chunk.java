@@ -4,12 +4,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.entity.GravityComponent;
-import pl.engine.mmorpg.entity.Player;
+import pl.engine.mmorpg.entity.player.Player;
 import pl.engine.mmorpg.mesh.*;
-import pl.engine.mmorpg.terrain.HeightMapVisualizeMesh;
-import pl.engine.mmorpg.terrain.TerrainMesh;
-import pl.engine.mmorpg.terrain.TerrainMeshHeightMapData;
-import pl.engine.mmorpg.terrain.TerrainMeshHeightMapGenerator;
+import pl.engine.mmorpg.terrain.*;
 import pl.engine.mmorpg.texture.FileTexture;
 import pl.engine.mmorpg.texture.Texture;
 
@@ -62,7 +59,7 @@ public class Chunk {
 
         TerrainMesh terrain = new TerrainMesh("models/snow1.glb", meshFactory);
         TerrainMeshHeightMapData heightMapData = terrain.generateHeightMap();
-        GravityComponent.getInstance(heightMapData);
+        GravityComponent.getInstance(terrain);
         //new Player(camera, eventsHandler, meshFactory);
 //        terrain.setModel(new Matrix4f().identity().scaling(0.01f).rotateX((float) Math.toRadians(-90)));
 //        terrain.setModel(new Matrix4f().identity().rotateX((float) Math.toRadians(-90)));
@@ -70,9 +67,11 @@ public class Chunk {
 //        terrain.setModel(new Matrix4f().identity().scaling(50f));
        HeightMapVisualizeMesh heightMapVisualizeMesh = new HeightMapVisualizeMesh(-250, -250, heightMapData.heightMap());
 //        heightMapVisualizeMesh.setModel(new Matrix4f().identity().scaling(0.01f).rotateX((float) Math.toRadians(-90)));
-//        VisualizeMesh visualizeMesh = new VisualizeMesh(terrain.getVertices(), new Vector4f(0, 0, 1, 1));
-//        meshables.add(visualizeMesh);
+        DenseHeightMapVisualizeMesh denseHeightMapVisualizeMesh = new DenseHeightMapVisualizeMesh(terrain);
+        VisualizeMesh visualizeMesh = new VisualizeMesh(terrain.getVertices(), new Vector4f(0, 0, 1, 1));
+        meshables.add(visualizeMesh);
         meshables.add(terrain);
+//        meshables.add(denseHeightMapVisualizeMesh);
         meshables.add(heightMapVisualizeMesh);
 //        TerrainMeshHeightMapGenerator.saveToCsv(heightMap, "");
 

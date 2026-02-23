@@ -1,4 +1,4 @@
-package pl.engine.mmorpg.entity;
+package pl.engine.mmorpg.entity.move;
 
 public enum MoveDirectionState {
 

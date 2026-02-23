@@ -1,6 +1,7 @@
-package pl.engine.mmorpg.entity;
+package pl.engine.mmorpg.entity.move;
 
 import org.joml.Vector3f;
+import pl.engine.mmorpg.entity.Entity;
 
 public class MoveComponent {
 
@@ -12,6 +13,7 @@ public class MoveComponent {
 
     private static final double RUN_SENS = 6;
     protected static final double MOVE_SENS = 2;
+    protected static final double JUMP_SENS = 10;
 
     public MoveComponent(Entity entity){
 
@@ -21,7 +23,7 @@ public class MoveComponent {
     public void resetMove(){
 
         wantMove.x = 0;
-        wantMove.y = 0;
+        wantMove.y = 0;//
         wantMove.z = 0;
 
         entity.setMoveDirectionState(MoveDirectionState.FRONT);
@@ -54,7 +56,7 @@ public class MoveComponent {
     public void moveTop(double deltaTimeInSeconds){
 
         double moveValue = getMoveValue(deltaTimeInSeconds);
-        wantMove.y += moveValue;
+        wantMove.y += moveValue * JUMP_SENS;
 
         entity.setMoveDirectionState((MoveDirectionState.TOP));
         entity.setMoveState(MoveState.JUMP);

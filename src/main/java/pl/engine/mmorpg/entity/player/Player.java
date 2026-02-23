@@ -1,5 +1,10 @@
-package pl.engine.mmorpg.entity;
+package pl.engine.mmorpg.entity.player;
 
+import pl.engine.mmorpg.entity.Entity;
+import pl.engine.mmorpg.entity.combat.CombatState;
+import pl.engine.mmorpg.entity.move.MoveComponent;
+import pl.engine.mmorpg.entity.move.MoveDirectionState;
+import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.render.Camera;
 import pl.engine.mmorpg.EventsHandler;
 import org.joml.Vector3f;
@@ -12,7 +17,7 @@ import static pl.engine.mmorpg.entity.CombinedAnimationController.*;
 
 public class Player extends Entity {
 
-    private Vector3f position;
+    private Vector3f position = new Vector3f(0, 0,0);
 
     private final Camera camera;
     private final EventsHandler eventsHandler;
@@ -89,8 +94,8 @@ public class Player extends Entity {
     public void move(Vector3f vec){
 
         position.x += vec.x;
-        position.x += vec.x;
-        position.x += vec.x;
+        position.y += vec.y;
+        position.z += vec.z;
     }
 
     public Vector3f getPosition(){

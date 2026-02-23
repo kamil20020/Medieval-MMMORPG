@@ -3,6 +3,9 @@ package pl.engine.mmorpg.entity;
 import org.joml.Matrix4f;
 import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
+import pl.engine.mmorpg.entity.combat.CombatState;
+import pl.engine.mmorpg.entity.move.MoveDirectionState;
+import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 
 import java.util.HashMap;

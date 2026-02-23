@@ -1,7 +1,9 @@
-package pl.engine.mmorpg.entity;
+package pl.engine.mmorpg.entity.player;
 
 import org.joml.Vector3f;
 import pl.engine.mmorpg.EventsHandler;
+import pl.engine.mmorpg.entity.GravityComponent;
+import pl.engine.mmorpg.entity.move.MoveComponent;
 import pl.engine.mmorpg.render.Camera;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -15,6 +17,7 @@ public class PlayerInputComponent {
     private final MoveComponent playerMoveComponent;
 
     private boolean isVerticalCameraUnlocked = false;
+    private boolean isInAir = false;
     protected static final double ROTATION_SENS = 50000;
 
     public PlayerInputComponent(Player player, Camera camera, EventsHandler eventsHandler){
@@ -57,14 +60,26 @@ public class PlayerInputComponent {
         handleMoveWasd(deltaTimeInSeconds);
         handleMoveVertical(deltaTimeInSeconds);
 
-        if(GravityComponent.getInstance().getYMove(player.getPosition()) == 0){
+//        setGravity();
 
-            System.out.println("AAA");
+        player.move(playerMoveComponent.getWantMove());
+        camera.move(playerMoveComponent.getWantMove());
+    }
+
+    private void setGravity(){
+
+        Vector3f newPlayerPosition = new Vector3f(player.getPosition());
+        newPlayerPosition.add(playerMoveComponent.getWantMove());
+
+        double newYMove = GravityComponent.getInstance().getNewYMove(newPlayerPosition);
+        playerMoveComponent.getWantMove().y += (float) newYMove;
+
+        if(Math.abs(playerMoveComponent.getWantMove().y) < GravityComponent.GRAVITY_SPEED_POSITIVE){
+            playerMoveComponent.getWantMove().y = 0;
         }
 
-        if(playerMoveComponent.wasMoved()){
-
-            camera.move(playerMoveComponent.getWantMove());
+        if(newYMove == 0){
+            isInAir = false;
         }
     }
 
@@ -100,8 +115,9 @@ public class PlayerInputComponent {
             camera.rotateTop(deltaTimeInSeconds);
         }
 
-        if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE)){
+        if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE)){//!isInAir
             playerMoveComponent.moveTop(deltaTimeInSeconds);
+            isInAir = true;
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_Z)){
