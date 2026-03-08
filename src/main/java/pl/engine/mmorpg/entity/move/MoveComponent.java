@@ -23,7 +23,7 @@ public class MoveComponent {
     public void resetMove(){
 
         wantMove.x = 0;
-        wantMove.y = 0;//
+        wantMove.y = 0;
         wantMove.z = 0;
 
         entity.setMoveDirectionState(MoveDirectionState.FRONT);

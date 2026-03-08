@@ -50,8 +50,8 @@ public class TerrainMeshHeightMapGenerator {
         xCoordsDiff = maxCoords.x - minCoords.x;
         zCoordsDiff = maxCoords.z - minCoords.z;
 
-        numberOfXPoints = ((int) xCoordsDiff) + 1;
-        numberOfZPoints = ((int) zCoordsDiff) + 1;
+        numberOfXPoints = (int) Math.ceil(xCoordsDiff) + 1;
+        numberOfZPoints = (int) Math.ceil(zCoordsDiff) + 1;
 
         numberOfXBlocks = (int) Math.ceil(xCoordsDiff / BLOCK_SIZE);
         numberOfZBlocks = (int) Math.ceil(zCoordsDiff / BLOCK_SIZE);
@@ -67,12 +67,19 @@ public class TerrainMeshHeightMapGenerator {
 
     private void initResult(){
 
+        int startX = (int) Math.floor(minCoords.x);
+        int startZ = (int) Math.floor(minCoords.z);
+
         for(int xI = 0; xI < numberOfXPoints; xI++){
+
+            int x = startX + xI;
 
             for (int zI = 0; zI < numberOfZPoints; zI++){
 
-                String key = TerrainMeshHeightMapData.getHeightMapKey(minCoords.x + xI, minCoords.z + zI);
-                result.put(key, Float.MIN_VALUE);
+                int z = startZ + zI;
+
+                String key = TerrainMeshHeightMapData.getHeightMapKey(x, z);
+                result.put(key, -Float.MAX_VALUE);
             }
         }
     }
@@ -102,7 +109,7 @@ public class TerrainMeshHeightMapGenerator {
     private Vector3f[] getMinAndMaxCoords(){
 
         Vector3f min = new Vector3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
-        Vector3f max = new Vector3f(-Float.MIN_VALUE, -Float.MIN_VALUE, -Float.MIN_VALUE);
+        Vector3f max = new Vector3f(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
 
         for(int i = 0; i < vertices.length; i += 3){
 
@@ -176,14 +183,26 @@ public class TerrainMeshHeightMapGenerator {
         for(int triangleIndex = 0; triangleIndex < trianglesAABB.length; triangleIndex++){
 
             float[] triangleAABB = trianglesAABB[triangleIndex];
-            float averageX = (triangleAABB[1] + triangleAABB[0]) / 2f;
-            float averageZ = (triangleAABB[3] + triangleAABB[2]) / 2f;
-            float a = getAbsoluteDiff(minCoords.x, averageX);
-            float b = getAbsoluteDiff(minCoords.z, averageZ);
-            int blockXIndex = (int) (a / BLOCK_SIZE);
-            int blockYIndex = (int) (b / BLOCK_SIZE);
 
-            blocksTrianglesMappings[blockXIndex][blockYIndex].add(triangleIndex);
+            int startBlockXIndex = (int)Math.floor((triangleAABB[0] - minCoords.x) / BLOCK_SIZE);
+            startBlockXIndex = Math.max(0, startBlockXIndex);
+
+            int endBlockXIndex = (int)Math.floor((triangleAABB[1] - minCoords.x) / BLOCK_SIZE);
+            endBlockXIndex = Math.min(numberOfXBlocks - 1, endBlockXIndex);
+
+            int startBlockZIndex = (int)Math.floor((triangleAABB[2] - minCoords.z) / BLOCK_SIZE);
+            startBlockZIndex = Math.max(0, startBlockZIndex);
+
+            int endBlockZIndex = (int)Math.floor((triangleAABB[3] - minCoords.z) / BLOCK_SIZE);
+            endBlockZIndex = Math.min(numberOfZBlocks - 1, endBlockZIndex);
+
+            for(int blockXIndex = startBlockXIndex; blockXIndex <= endBlockXIndex; blockXIndex++){
+
+                for(int blockZIndex = startBlockZIndex; blockZIndex <= endBlockZIndex; blockZIndex++){
+
+                    blocksTrianglesMappings[blockXIndex][blockZIndex].add(triangleIndex);
+                }
+            }
         }
 
         logger.info("Loaded blocks triangles mappings");
@@ -261,20 +280,19 @@ public class TerrainMeshHeightMapGenerator {
         Vector3f triangleA = new Vector3f();
         Vector3f triangleB = new Vector3f();
         Vector3f triangleC = new Vector3f();
-        Vector3f point = new Vector3f(minCoords.x + initXI, 0, minCoords.z + initZI);
+        Vector3f point = new Vector3f();
         int maxXI = Math.min(initXI + BLOCK_SIZE, numberOfXPoints);
         int maxZI = Math.min(initZI + BLOCK_SIZE, numberOfZPoints);
 
        for(int i = initXI; i < maxXI; i++) {
 
+           point.x = minCoords.x + i;
+
            for(int j = initZI; j < maxZI; j++) {
 
+               point.z = minCoords.z + j;
                appendToHeightMapForPoint(point, triangleA, triangleB, triangleC, barycentricParams);
-               point.z++;
            }
-           point.z = minCoords.z + initZI;
-
-           point.x++;
        }
 
         logger.info("Loaded height map for x, y " + initXI + ", " + initZI);
@@ -285,11 +303,11 @@ public class TerrainMeshHeightMapGenerator {
     ){
         float maxY = Float.MIN_VALUE;
 
-        int blockXIndex = (int) ((point.x - minCoords.x) / BLOCK_SIZE);
-        int blockZIndex = (int) ((point.z - minCoords.z) / BLOCK_SIZE);
+        int blockXIndex = (int) Math.floor((point.x - minCoords.x) / BLOCK_SIZE);
+        int blockZIndex = (int) Math.floor((point.z - minCoords.z) / BLOCK_SIZE);
 
-        blockXIndex = Math.min(blockXIndex, numberOfXBlocks - 1);
-        blockZIndex = Math.min(blockZIndex, numberOfZBlocks - 1);
+        blockXIndex = Math.max(0, Math.min(blockXIndex, numberOfXBlocks - 1));
+        blockZIndex = Math.max(0, Math.min(blockZIndex, numberOfZBlocks - 1));
 
         List<Integer> blockTriangles = blocksTrianglesMappings[blockXIndex][blockZIndex];
 
@@ -317,10 +335,7 @@ public class TerrainMeshHeightMapGenerator {
             maxY = Math.max(y, maxY);
         }
 
-        int pointX = (int) point.x;
-        int pointZ = (int) point.z;
-
-        String key = TerrainMeshHeightMapData.getHeightMapKey(pointX, pointZ);
+        String key = TerrainMeshHeightMapData.getHeightMapKey(point.x, point.z);
 
         result.put(key, maxY);
     }
@@ -350,7 +365,7 @@ public class TerrainMeshHeightMapGenerator {
         float acZ = a.z - c.z;
         float determinant = bcZ * acX + cbx * acZ;
 
-        if (determinant == 0f) {
+        if (Math.abs(determinant) < 1e-6f) {
 
             barycentricParams[0] = -1;
             barycentricParams[1] = -1;
@@ -374,9 +389,10 @@ public class TerrainMeshHeightMapGenerator {
 
     private static boolean isPointInsideTriangle(float alpha, float beta, float gamma){
 
-        return (alpha >= 0f && alpha <= 1f) &&
-               (beta >= 0f && beta <= 1f) &&
-               (gamma >= 0f && gamma <= 1f);
+        float epsilon = 1e-6f;
+        return (alpha >= -epsilon && alpha <= 1f + epsilon) &&
+                (beta  >= -epsilon && beta  <= 1f + epsilon) &&
+                (gamma >= -epsilon && gamma <= 1f + epsilon);
     }
 
     private static float getY(float aY, float bY, float cY, float alpha, float beta, float gamma){

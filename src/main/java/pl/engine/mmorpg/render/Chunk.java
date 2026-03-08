@@ -69,10 +69,10 @@ public class Chunk {
 //        heightMapVisualizeMesh.setModel(new Matrix4f().identity().scaling(0.01f).rotateX((float) Math.toRadians(-90)));
         DenseHeightMapVisualizeMesh denseHeightMapVisualizeMesh = new DenseHeightMapVisualizeMesh(terrain);
         VisualizeMesh visualizeMesh = new VisualizeMesh(terrain.getVertices(), new Vector4f(0, 0, 1, 1));
-        meshables.add(visualizeMesh);
+//        meshables.add(visualizeMesh);
         meshables.add(terrain);
 //        meshables.add(denseHeightMapVisualizeMesh);
-        meshables.add(heightMapVisualizeMesh);
+//        meshables.add(heightMapVisualizeMesh);
 //        TerrainMeshHeightMapGenerator.saveToCsv(heightMap, "");
 
         for(Meshable meshable : meshables){

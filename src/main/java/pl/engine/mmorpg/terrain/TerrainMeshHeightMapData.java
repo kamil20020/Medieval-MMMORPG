@@ -14,13 +14,7 @@ public record TerrainMeshHeightMapData(
 
         String key = getHeightMapKey(x, z);
 
-        try {
-            return heightMap.get(key);
-        }
-        catch (NullPointerException e){
-           int a = 2;
-        }
-        return 0;
+        return heightMap.get(key);
     }
 
     public void addValue(double x, double z, double y){
@@ -32,8 +26,8 @@ public record TerrainMeshHeightMapData(
 
     public static String getHeightMapKey(double x, double z){
 
-        int convertedX = (int) x;
-        int convertedZ = (int) z;
+        int convertedX = (int)Math.floor(x);
+        int convertedZ = (int)Math.floor(z);
 
         return convertedX + " " + convertedZ;
     }

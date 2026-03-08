@@ -20,7 +20,7 @@ public class Renderer {
     public Renderer(Window window, EventsHandler eventsHandler){
 
         this.window = window;
-        this.camera = new Camera(new Vector3f(0, 10, 15));
+        this.camera = new Camera(new Vector3f(-200, 10, -200));
         this.meshFactory = new JgltfMeshAbstractFactory();
         this.chunk = new Chunk(camera, window, eventsHandler, meshFactory);
     }

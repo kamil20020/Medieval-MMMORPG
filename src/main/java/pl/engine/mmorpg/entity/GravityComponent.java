@@ -9,7 +9,7 @@ public class GravityComponent {
 
     private final TerrainMesh terrainMesh;
 
-    public static final double GRAVITY_SPEED = -0.05;
+    public static final double GRAVITY_SPEED = -0.3;
     public static final double GRAVITY_SPEED_POSITIVE = -GRAVITY_SPEED;
 
     private GravityComponent(TerrainMesh terrainMesh){
@@ -57,5 +57,10 @@ public class GravityComponent {
         }
 
         return GRAVITY_SPEED;
+    }
+
+    public TerrainMesh getTerrainMesh(){
+
+        return terrainMesh;
     }
 }

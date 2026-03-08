@@ -5,6 +5,10 @@ import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.entity.GravityComponent;
 import pl.engine.mmorpg.entity.move.MoveComponent;
 import pl.engine.mmorpg.render.Camera;
+import pl.engine.mmorpg.terrain.TerrainMesh;
+import pl.engine.mmorpg.terrain.TerrainMeshHeightMapData;
+
+import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
@@ -18,6 +22,8 @@ public class PlayerInputComponent {
 
     private boolean isVerticalCameraUnlocked = false;
     private boolean isInAir = false;
+    private double timeInAir = 0;
+    private boolean isTurnedOnGravity = true;
     protected static final double ROTATION_SENS = 50000;
 
     public PlayerInputComponent(Player player, Camera camera, EventsHandler eventsHandler){
@@ -60,7 +66,10 @@ public class PlayerInputComponent {
         handleMoveWasd(deltaTimeInSeconds);
         handleMoveVertical(deltaTimeInSeconds);
 
-//        setGravity();
+        if(isTurnedOnGravity){
+
+            setGravity();
+        }
 
         player.move(playerMoveComponent.getWantMove());
         camera.move(playerMoveComponent.getWantMove());
@@ -102,6 +111,18 @@ public class PlayerInputComponent {
         else if(eventsHandler.isKeyPressed(GLFW_KEY_D)){
 
             playerMoveComponent.moveRight(deltaTimeInSeconds, forward);
+        }
+        else if(eventsHandler.isKeyPressed(GLFW_KEY_P)){
+            System.out.println("P " + (int)player.getPosition().x + " " + (int)player.getPosition().z);
+            TerrainMesh terrainMesh = GravityComponent.getInstance().getTerrainMesh();
+            Map<String, Float> heightMap = terrainMesh.getHeightMap();
+            String key = TerrainMeshHeightMapData.getHeightMapKey(player.getPosition().x, player.getPosition().z);
+            System.out.println("T " + heightMap.get(key).intValue() + "\n");
+            eventsHandler.resetKey(GLFW_KEY_P);
+        }
+        else if(eventsHandler.isKeyPressed(GLFW_KEY_G)){
+            isTurnedOnGravity = !isTurnedOnGravity;
+            eventsHandler.resetKey(GLFW_KEY_G);
         }
     }
 
@@ -169,11 +190,11 @@ public class PlayerInputComponent {
 
         if(mouseYPosForWindowHeight > 0){
 
-            camera.rotateTop(rotationValue);
+            camera.rotateDown(rotationValue);
         }
         else{
 
-            camera.rotateDown(rotationValue);
+            camera.rotateTop(rotationValue);
         }
     }
 }

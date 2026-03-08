@@ -18,22 +18,25 @@ public class HeightMapVisualizeMesh extends VisualizeMesh {
 
     private static float[] loadVertices(float minX, float minZ, Map<String, Float> heightMap){
 
+        System.out.println("AA");
+
         float[] vertices = new float[xNumberOfPoints * zNumberOfPoints * 3];
 
         for(int xI = 0, vertexIndex = 0; xI < xNumberOfPoints; xI++){
 
             for(int zI = 0; zI < zNumberOfPoints; zI++, vertexIndex += 3){
 
-                vertices[vertexIndex] =  minX + xI;
+                float x = minX + xI;
+                float z = minZ + zI;
 
-                String key = ((int)(minX + xI)) + " " + ((int) minZ + zI);
+                vertices[vertexIndex] = x;
 
-                if(!heightMap.containsKey(key)){
-                    continue;
+                String key = TerrainMeshHeightMapData.getHeightMapKey(x, z);
+                if(heightMap.containsKey(key)){
+                    vertices[vertexIndex + 1] = heightMap.get(key);
                 }
 
-                vertices[vertexIndex + 1] = heightMap.get(key);
-                vertices[vertexIndex + 2] = minZ + zI;
+                vertices[vertexIndex + 2] = z;
             }
         }
 
