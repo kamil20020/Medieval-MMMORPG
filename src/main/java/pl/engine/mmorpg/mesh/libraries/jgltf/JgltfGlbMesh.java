@@ -19,6 +19,7 @@ public class JgltfGlbMesh extends Mesh {
     private final MeshModel mesh;
     private IntBuffer indices;
     private FloatBuffer vertices;
+    private FloatBuffer normals;
 
     public JgltfGlbMesh(MeshModel mesh, JgltfTexture texture){
 
@@ -27,6 +28,7 @@ public class JgltfGlbMesh extends Mesh {
 
         loadVerticesData();
         loadFacesData();
+        loadNormalsData();
     }
 
     private void loadVerticesData(){
@@ -80,6 +82,15 @@ public class JgltfGlbMesh extends Mesh {
         indices.flip();
     }
 
+    private void loadNormalsData(){
+
+        MeshPrimitiveModel primitive = mesh.getMeshPrimitiveModels().get(0);
+        AccessorModel positionAccessor = primitive.getAttributes().get("NORMAL");
+        AccessorData gotNormalData = positionAccessor.getAccessorData();
+
+        this.normals = gotNormalData.createByteBuffer().asFloatBuffer();
+    }
+
     @Override
     public int getFaceNumberOfVertices(int faceIndex) {
 
@@ -112,6 +123,7 @@ public class JgltfGlbMesh extends Mesh {
 
             appendVertex(buffer, i);
             texture.appendUv(buffer, i);
+            appendNormals(buffer, i);
         }
     }
 
@@ -122,6 +134,15 @@ public class JgltfGlbMesh extends Mesh {
         buffer.put(vertices.get(firstVertexIndex));
         buffer.put(vertices.get(firstVertexIndex + 1));
         buffer.put(vertices.get(firstVertexIndex + 2));
+    }
+
+    protected void appendNormals(FloatBuffer buffer, int vertexIndex){
+
+        int firstVertexIndex = vertexIndex * 3;
+
+        buffer.put(normals.get(firstVertexIndex));
+        buffer.put(normals.get(firstVertexIndex + 1));
+        buffer.put(normals.get(firstVertexIndex + 2));
     }
 
     @Override

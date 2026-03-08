@@ -10,7 +10,7 @@ Implemented:
 * Collisions of player with terrain,
 * Moving player 3d model with camera,
 * Basic animations of players movement,
-* Rendering test grass floor.
+* Simple ambient and diffuse lighting.
 
 I used free models and animations from Mixamo (https://www.mixamo.com/)
 

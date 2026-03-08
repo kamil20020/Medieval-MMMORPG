@@ -5,15 +5,28 @@ uniform int isGivenColor;
 uniform vec4 color;
 
 in vec2 vTexCoord;
+in vec3 modelPosition;
+in vec3 normal;
 out vec4 fragColor;
+
+vec4 lightColor = vec4(1.0);
+vec3 lightPosition = vec3(500, 1000, 500);
+float ambient = 0.2f;
+
+vec4 getLight(){
+
+    vec3 lightDirection = normalize(lightPosition - modelPosition);
+    float diffuse = max(dot(lightDirection, normal), 0.0);
+
+    return lightColor * (ambient + diffuse);
+}
 
 void main() {
 
     if(isGivenColor == 1){
-        //fragColor = vec4(1.0, 0.0, 0.0, 1.0);
         fragColor = color;
     }
     else{
-        fragColor = texture(texture0, vTexCoord);
+        fragColor = texture(texture0, vTexCoord) * getLight();
     }
 }

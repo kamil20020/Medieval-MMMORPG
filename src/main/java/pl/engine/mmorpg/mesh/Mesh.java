@@ -1,7 +1,6 @@
 package pl.engine.mmorpg.mesh;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import pl.engine.mmorpg.shaders.Shader;
 import pl.engine.mmorpg.shaders.ShaderProps;
@@ -29,7 +28,8 @@ public abstract class Mesh implements Meshable{
     private final FloatBuffer modelBuffer = BufferUtils.createFloatBuffer(16);
     protected double deltaTime;
 
-    private static final int STRIDE = 5 * Float.BYTES;
+    private static final int VERTEX_LENGTH = 8;
+    private static final int STRIDE = VERTEX_LENGTH * Float.BYTES;
 
     @Override
     public void uploadToGpu(){
@@ -52,7 +52,7 @@ public abstract class Mesh implements Meshable{
     protected FloatBuffer loadVerticesBuffer(){
 
         //3 - x, y, z, 2 - uv texture, 3 - normals
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(numberOfVertices * 5);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(numberOfVertices * VERTEX_LENGTH);
 
         appendVertices(buffer);
 
@@ -93,6 +93,9 @@ public abstract class Mesh implements Meshable{
 
         glVertexAttribPointer(1, 2, GL_FLOAT, false, STRIDE, 3 * Float.BYTES);
         glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 3, GL_FLOAT, false, STRIDE, 3 * Float.BYTES);
+        glEnableVertexAttribArray(2);
     }
 
     private void bindEboBuffer(IntBuffer indicesBuffer){

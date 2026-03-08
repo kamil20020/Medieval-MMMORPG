@@ -137,14 +137,14 @@ public abstract class AnimatedMesh extends Mesh {
         vboBoneIndices = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboBoneIndices);
         glBufferData(GL_ARRAY_BUFFER, boneIndicesBuffer, GL_STATIC_DRAW);
-        glVertexAttribIPointer(2, MAX_NUMBER_OF_BONS_PER_VERTEX, GL_INT, MAX_NUMBER_OF_BONS_PER_VERTEX * Integer.BYTES, 0);
-        glEnableVertexAttribArray(2);
+        glVertexAttribIPointer(3, MAX_NUMBER_OF_BONS_PER_VERTEX, GL_INT, MAX_NUMBER_OF_BONS_PER_VERTEX * Integer.BYTES, 0);
+        glEnableVertexAttribArray(3);
 
         vboBoneWeights = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboBoneWeights);
         glBufferData(GL_ARRAY_BUFFER, boneWeightsBuffer, GL_STATIC_DRAW);
-        glVertexAttribPointer(3, MAX_NUMBER_OF_BONS_PER_VERTEX, GL_FLOAT, false, MAX_NUMBER_OF_BONS_PER_VERTEX * Float.BYTES, 0);
-        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(4, MAX_NUMBER_OF_BONS_PER_VERTEX, GL_FLOAT, false, MAX_NUMBER_OF_BONS_PER_VERTEX * Float.BYTES, 0);
+        glEnableVertexAttribArray(4);
 
         glBindVertexArray(0);
     }
