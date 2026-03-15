@@ -19,6 +19,10 @@ I used free models and animations from Mixamo (https://www.mixamo.com/)
 <p>
 
 <p align="center">
+    <img src="light.png">
+<p>
+
+<p align="center">
     <img src="terrain-movement.gif">
 <p>
 
