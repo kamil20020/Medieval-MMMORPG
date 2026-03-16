@@ -3,6 +3,8 @@ package pl.engine.mmorpg.entity.move;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.Entity;
 
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
+
 public class MoveComponent {
 
     private final Entity entity;
@@ -13,7 +15,7 @@ public class MoveComponent {
 
     private static final double RUN_SENS = 6;
     protected static final double MOVE_SENS = 2;
-    protected static final double JUMP_SENS = 10;
+    protected static final double JUMP_SENS = 50;
 
     public MoveComponent(Entity entity){
 
@@ -40,7 +42,7 @@ public class MoveComponent {
         double moveValue = getMoveValue(deltaTimeInSeconds);
         moveInForward(moveValue, forward);
 
-        entity.setMoveDirectionState((MoveDirectionState.FRONT));
+        entity.setMoveDirectionState(MoveDirectionState.FRONT);
         updateMoveState();
     }
 
@@ -49,8 +51,26 @@ public class MoveComponent {
         double moveValue = getMoveValue(deltaTimeInSeconds) * 0.5;
         moveInForward(-moveValue, forward);
 
-        entity.setMoveDirectionState((MoveDirectionState.BACK));
+        entity.setMoveDirectionState(MoveDirectionState.BACK);
         updateMoveState();
+    }
+
+    public void handleVertical(){
+
+        if(wantMove.y == 0 || Math.abs(wantMove.y) < 0.5){
+            return;
+        }
+
+        entity.setMoveState(MoveState.JUMP);
+
+        if(wantMove.y < 0){
+
+            entity.setMoveDirectionState(MoveDirectionState.DOWN);
+        }
+        else{
+
+            entity.setMoveDirectionState(MoveDirectionState.TOP);
+        }
     }
 
     public void moveTop(double deltaTimeInSeconds){
@@ -58,7 +78,7 @@ public class MoveComponent {
         double moveValue = getMoveValue(deltaTimeInSeconds);
         wantMove.y += moveValue * JUMP_SENS;
 
-        entity.setMoveDirectionState((MoveDirectionState.TOP));
+        entity.setMoveDirectionState(MoveDirectionState.TOP);
         entity.setMoveState(MoveState.JUMP);
     }
 
@@ -67,7 +87,8 @@ public class MoveComponent {
         double moveValue = getMoveValue(deltaTimeInSeconds);
         wantMove.y -= moveValue;
 
-        entity.setMoveState(MoveState.STANDING);
+        entity.setMoveDirectionState(MoveDirectionState.DOWN);
+        entity.setMoveState(MoveState.JUMP);
     }
 
     public void moveLeft(double deltaTimeInSeconds, Vector3f forward){

@@ -25,6 +25,8 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
     private NodeModel rootNode;
     private AnimationModel animation;
 
+    private static final float DEFAULT_NUMBER_OF_TICS_PER_SECOND = 1;
+
     private record ChannelTimeInterpolationData (
 
         int lessTimeIndex,
@@ -52,11 +54,17 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
     }
 
     public AnimatedJgltfMesh(Mesh mesh, MeshModel meshData, GltfModel animatedModel, Skeleton skeleton) {
+
+        this(mesh, meshData, animatedModel, skeleton, DEFAULT_NUMBER_OF_TICS_PER_SECOND);
+    }
+
+    public AnimatedJgltfMesh(Mesh mesh, MeshModel meshData, GltfModel animatedModel, Skeleton skeleton, float animationNumberOfTicsPerSecond) {
         super(mesh, skeleton);
 
         this.mesh = meshData;
         this.animatedModel = animatedModel;
         this.meshNode = findMeshNodeModel(animatedModel, meshData.getName());
+        this.animationTicksPerSecond = animationNumberOfTicsPerSecond;
 
         loadBonesData();
 //        sortVerticesBones();
@@ -190,8 +198,6 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
                 animationDurationInTicksPerSeconds = Math.max(animationDurationInTicksPerSeconds, time);
             }
         }
-
-        animationTicksPerSecond = 1;
     }
 
     @Override

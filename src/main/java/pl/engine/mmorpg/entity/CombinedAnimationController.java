@@ -91,10 +91,10 @@ public class CombinedAnimationController {
             return getKey(combatState);
         }
 
-        if(moveState == MoveState.JUMP){
-
-            return getKey(moveState);
-        }
+//        if(moveState == MoveState.JUMP){
+//
+//            return getKey(moveState);
+//        }
 
         if(moveState != MoveState.STANDING){
 

@@ -33,7 +33,7 @@ public class GravityComponent {
         return INSTANCE;
     }
 
-    public double getNewYMove(Vector3f position){
+    public double getNewYMove(Vector3f position, double gravityMultiplier){
 
         double x = position.x;
         double z = position.z;
@@ -42,21 +42,28 @@ public class GravityComponent {
         Vector3f maxCoords = terrainMesh.getMaxCoords();
 
         if(x < minCoords.x || x > maxCoords.x){
+
             return 0;
         }
 
         if(z < minCoords.z || z > maxCoords.z){
+
             return 0;
         }
 
         double terrainMaxY = terrainMesh.getTerrainMaxY(x, z);
+
+        if(Math.abs(position.y - terrainMaxY) < 1e-1) {
+
+            return 0;
+        }
 
         if(position.y <= terrainMaxY){
 
             return terrainMaxY - position.y;
         }
 
-        return GRAVITY_SPEED;
+        return GRAVITY_SPEED * gravityMultiplier;
     }
 
     public TerrainMesh getTerrainMesh(){

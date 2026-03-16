@@ -22,7 +22,7 @@ public class PlayerInputComponent {
 
     private boolean isVerticalCameraUnlocked = false;
     private boolean isInAir = false;
-    private double timeInAir = 0;
+    private double timeStartInAir = 0;
     private boolean isTurnedOnGravity = true;
     protected static final double ROTATION_SENS = 50000;
 
@@ -59,6 +59,20 @@ public class PlayerInputComponent {
             isVerticalCameraUnlocked = !isVerticalCameraUnlocked;
             eventsHandler.resetKey(GLFW_KEY_R);
         }
+
+        if(eventsHandler.isKeyPressed(GLFW_KEY_P)){
+            System.out.println("P " + (int)player.getPosition().x + " " + (int)player.getPosition().z);
+            TerrainMesh terrainMesh = GravityComponent.getInstance().getTerrainMesh();
+            Map<String, Float> heightMap = terrainMesh.getHeightMap();
+            String key = TerrainMeshHeightMapData.getHeightMapKey(player.getPosition().x, player.getPosition().z);
+            System.out.println("T " + heightMap.get(key).intValue() + "\n");
+            eventsHandler.resetKey(GLFW_KEY_P);
+        }
+
+        if(eventsHandler.isKeyPressed(GLFW_KEY_G)){
+            isTurnedOnGravity = !isTurnedOnGravity;
+            eventsHandler.resetKey(GLFW_KEY_G);
+        }
     }
 
     private void handleMove(double deltaTimeInSeconds){
@@ -80,16 +94,32 @@ public class PlayerInputComponent {
         Vector3f newPlayerPosition = new Vector3f(player.getPosition());
         newPlayerPosition.add(playerMoveComponent.getWantMove());
 
-        double newYMove = GravityComponent.getInstance().getNewYMove(newPlayerPosition);
+        double seconds = 1;
+
+        if(isInAir){
+
+            seconds = glfwGetTime() - timeStartInAir;
+        }
+
+        double newYMove = GravityComponent.getInstance().getNewYMove(newPlayerPosition, seconds);
         playerMoveComponent.getWantMove().y += (float) newYMove;
 
-        if(Math.abs(playerMoveComponent.getWantMove().y) < GravityComponent.GRAVITY_SPEED_POSITIVE){
-            playerMoveComponent.getWantMove().y = 0;
+        if(newYMove == 0){
+
+            timeStartInAir = 0;
+            isInAir = false;
+
+            return;
         }
 
-        if(newYMove == 0){
-            isInAir = false;
+        if(!isInAir){
+
+            timeStartInAir = glfwGetTime();
         }
+
+        isInAir = true;
+
+//        playerMoveComponent.handleVertical();
     }
 
     private void handleMoveWasd(double deltaTimeInSeconds){
@@ -112,18 +142,6 @@ public class PlayerInputComponent {
 
             playerMoveComponent.moveRight(deltaTimeInSeconds, forward);
         }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_P)){
-            System.out.println("P " + (int)player.getPosition().x + " " + (int)player.getPosition().z);
-            TerrainMesh terrainMesh = GravityComponent.getInstance().getTerrainMesh();
-            Map<String, Float> heightMap = terrainMesh.getHeightMap();
-            String key = TerrainMeshHeightMapData.getHeightMapKey(player.getPosition().x, player.getPosition().z);
-            System.out.println("T " + heightMap.get(key).intValue() + "\n");
-            eventsHandler.resetKey(GLFW_KEY_P);
-        }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_G)){
-            isTurnedOnGravity = !isTurnedOnGravity;
-            eventsHandler.resetKey(GLFW_KEY_G);
-        }
     }
 
     private void handleMoveVertical(double deltaTimeInSeconds){
@@ -136,9 +154,8 @@ public class PlayerInputComponent {
             camera.rotateTop(deltaTimeInSeconds);
         }
 
-        if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE)){//!isInAir
+        if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE) && !isInAir){
             playerMoveComponent.moveTop(deltaTimeInSeconds);
-            isInAir = true;
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_Z)){

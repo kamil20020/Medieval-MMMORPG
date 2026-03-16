@@ -44,7 +44,8 @@ public class Player extends Entity {
         Map<String, String> result = new HashMap<>();
 
         result.put(getKey(MoveState.STANDING), "animations/warrior/idle.glb");
-        result.put(getKey(MoveState.JUMP), "animations/warrior/move/jump.glb");
+        result.put(getKey(MoveState.JUMP, MoveDirectionState.TOP), "animations/warrior/move/jump/jump.glb");
+        result.put(getKey(MoveState.JUMP, MoveDirectionState.DOWN), "animations/warrior/move/jump/fall.glb");
 
         result.put(getKey(MoveState.WALK, MoveDirectionState.FRONT), "animations/warrior/move/walk/front.glb");
         result.put(getKey(MoveState.WALK, MoveDirectionState.LEFT), "animations/warrior/move/walk/left.glb");
