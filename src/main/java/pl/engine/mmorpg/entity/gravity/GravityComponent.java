@@ -1,4 +1,4 @@
-package pl.engine.mmorpg.entity;
+package pl.engine.mmorpg.entity.gravity;
 
 import org.joml.Vector3f;
 import pl.engine.mmorpg.terrain.TerrainMesh;
@@ -9,8 +9,7 @@ public class GravityComponent {
 
     private final TerrainMesh terrainMesh;
 
-    public static final double GRAVITY_SPEED = -0.3;
-    public static final double GRAVITY_SPEED_POSITIVE = -GRAVITY_SPEED;
+    public static final double GRAVITY_SPEED = 0.05;
 
     private GravityComponent(TerrainMesh terrainMesh){
 
@@ -33,7 +32,7 @@ public class GravityComponent {
         return INSTANCE;
     }
 
-    public double getNewYMove(Vector3f position, double gravityMultiplier){
+    public double getPositionTerrainGravity(Vector3f position){
 
         double x = position.x;
         double z = position.z;
@@ -63,7 +62,7 @@ public class GravityComponent {
             return terrainMaxY - position.y;
         }
 
-        return GRAVITY_SPEED * gravityMultiplier;
+        return GRAVITY_SPEED;
     }
 
     public TerrainMesh getTerrainMesh(){

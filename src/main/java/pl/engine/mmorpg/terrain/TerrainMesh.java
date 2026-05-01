@@ -174,4 +174,9 @@ public class TerrainMesh implements Meshable {
 
         return terrainMeshHeightMapData.maxCoords();
     }
+
+    public boolean isOutside(double x, double z){
+
+        return x < getMinCoords().x || x > getMaxCoords().x || z < getMinCoords().x || z > getMaxCoords().z;
+    }
 }

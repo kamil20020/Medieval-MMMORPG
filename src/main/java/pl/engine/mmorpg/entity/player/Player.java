@@ -1,6 +1,7 @@
 package pl.engine.mmorpg.entity.player;
 
 import pl.engine.mmorpg.entity.Entity;
+import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.combat.CombatState;
 import pl.engine.mmorpg.entity.move.MoveComponent;
 import pl.engine.mmorpg.entity.move.MoveDirectionState;
@@ -17,24 +18,22 @@ import static pl.engine.mmorpg.entity.CombinedAnimationController.*;
 
 public class Player extends Entity {
 
-    private Vector3f position = new Vector3f(0, 0,0);
-
     private final Camera camera;
     private final EventsHandler eventsHandler;
-
-    private final MoveComponent moveComponent;
-    private final PlayerInputComponent playerInputComponent;
-
     private static final String MODEL_PATH = "models/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(MoveState.STANDING);
 
     public Player(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
-        super(MODEL_PATH, getAnimationNamesPathsMappings(), meshFactory, FIRST_ANIMATION_NAME);
+        super(
+            MODEL_PATH,
+            getAnimationNamesPathsMappings(),
+            meshFactory, FIRST_ANIMATION_NAME
+        );
+
+        super.setInputComponent(new PlayerInputComponent(moveComponent, camera, eventsHandler));
 
         this.camera = camera;
         this.eventsHandler = eventsHandler;
-        this.moveComponent = new MoveComponent(this);
-        this.playerInputComponent = new PlayerInputComponent(this, camera, eventsHandler);
 
         updatePositionForCamera();
     }
@@ -68,53 +67,31 @@ public class Player extends Entity {
         mesh.setModel(camera.getMatrixRelativeToCamera());
     }
 
-    private void handleAttack(){
-
-        int eventButtonId = eventsHandler.getEventButtonId();
-        int buttonEventId = eventsHandler.getButtonEventId();
-
-        if(eventButtonId == GLFW_MOUSE_BUTTON_1){
-
-            if(buttonEventId == GLFW_PRESS){
-
-                moveState = MoveState.STANDING;
-                combatState = CombatState.FIGHTING;
-            }
-            else if(buttonEventId == GLFW_RELEASE){
-
-                combatState = CombatState.NO_WEAPON;
-            }
-        }
-    }
-
-    public MoveComponent getPlayerMoveComponent(){
-
-        return moveComponent;
-    }
-
-    public void move(Vector3f vec){
-
-        position.x += vec.x;
-        position.y += vec.y;
-        position.z += vec.z;
-    }
-
-    public Vector3f getPosition(){
-
-        return position;
-    }
+//    private void handleAttack(){
+//
+//        int eventButtonId = eventsHandler.getEventButtonId();
+//        int buttonEventId = eventsHandler.getButtonEventId();
+//
+//        if(eventButtonId == GLFW_MOUSE_BUTTON_1){
+//
+//            if(buttonEventId == GLFW_PRESS){
+//
+//                moveState = MoveState.STANDING;
+//                combatState = CombatState.FIGHTING;
+//            }
+//            else if(buttonEventId == GLFW_RELEASE){
+//
+//                combatState = CombatState.NO_WEAPON;
+//            }
+//        }
+//    }
 
     @Override
     public void update(double deltaTimeInSeconds){
 
-        moveComponent.resetMove();
-        combatState = CombatState.NO_WEAPON;
-
-        playerInputComponent.update(deltaTimeInSeconds);
-        handleAttack();
-
-        updatePositionForCamera();
-
         super.update(deltaTimeInSeconds);
+
+        camera.move(moveComponent.getVelocity());
+        updatePositionForCamera();
     }
 }

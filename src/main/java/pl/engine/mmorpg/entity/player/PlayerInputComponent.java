@@ -2,8 +2,12 @@ package pl.engine.mmorpg.entity.player;
 
 import org.joml.Vector3f;
 import pl.engine.mmorpg.EventsHandler;
-import pl.engine.mmorpg.entity.GravityComponent;
+import pl.engine.mmorpg.entity.InputComponent;
+import pl.engine.mmorpg.entity.TerrainCollisionComponent;
+import pl.engine.mmorpg.entity.gravity.GravityComponent;
+import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.move.MoveComponent;
+import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.render.Camera;
 import pl.engine.mmorpg.terrain.TerrainMesh;
 import pl.engine.mmorpg.terrain.TerrainMeshHeightMapData;
@@ -13,27 +17,25 @@ import java.util.Map;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 
-public class PlayerInputComponent {
+public class PlayerInputComponent implements InputComponent {
 
     private final Camera camera;
     private final EventsHandler eventsHandler;
-    private final Player player;
+
     private final MoveComponent playerMoveComponent;
 
     private boolean isVerticalCameraUnlocked = false;
-    private boolean isInAir = false;
-    private double timeStartInAir = 0;
     private boolean isTurnedOnGravity = true;
     protected static final double ROTATION_SENS = 50000;
 
-    public PlayerInputComponent(Player player, Camera camera, EventsHandler eventsHandler){
+    public PlayerInputComponent(MoveComponent playerMoveComponent, Camera camera, EventsHandler eventsHandler){
 
-        this.player = player;
-        this.playerMoveComponent = player.getPlayerMoveComponent();
+        this.playerMoveComponent = playerMoveComponent;
         this.camera = camera;
         this.eventsHandler = eventsHandler;
     }
 
+    @Override
     public void update(double deltaTimeUInSeconds){
 
         handleKeyboard(deltaTimeUInSeconds);
@@ -60,66 +62,25 @@ public class PlayerInputComponent {
             eventsHandler.resetKey(GLFW_KEY_R);
         }
 
-        if(eventsHandler.isKeyPressed(GLFW_KEY_P)){
-            System.out.println("P " + (int)player.getPosition().x + " " + (int)player.getPosition().z);
-            TerrainMesh terrainMesh = GravityComponent.getInstance().getTerrainMesh();
-            Map<String, Float> heightMap = terrainMesh.getHeightMap();
-            String key = TerrainMeshHeightMapData.getHeightMapKey(player.getPosition().x, player.getPosition().z);
-            System.out.println("T " + heightMap.get(key).intValue() + "\n");
-            eventsHandler.resetKey(GLFW_KEY_P);
-        }
-
         if(eventsHandler.isKeyPressed(GLFW_KEY_G)){
             isTurnedOnGravity = !isTurnedOnGravity;
             eventsHandler.resetKey(GLFW_KEY_G);
+        }
+
+        if(eventsHandler.isKeyPressed(GLFW_KEY_M)){
+            System.out.println(playerMoveComponent.getMoveState() + " " + playerMoveComponent.getMoveDirectionState());
+            eventsHandler.resetKey(GLFW_KEY_M);
         }
     }
 
     private void handleMove(double deltaTimeInSeconds){
 
-        handleMoveWasd(deltaTimeInSeconds);
+        if(playerMoveComponent.getMoveState() != MoveState.JUMP){
+
+            handleMoveWasd(deltaTimeInSeconds);
+        }
+
         handleMoveVertical(deltaTimeInSeconds);
-
-        if(isTurnedOnGravity){
-
-            setGravity();
-        }
-
-        player.move(playerMoveComponent.getWantMove());
-        camera.move(playerMoveComponent.getWantMove());
-    }
-
-    private void setGravity(){
-
-        Vector3f newPlayerPosition = new Vector3f(player.getPosition());
-        newPlayerPosition.add(playerMoveComponent.getWantMove());
-
-        double seconds = 1;
-
-        if(isInAir){
-
-            seconds = glfwGetTime() - timeStartInAir;
-        }
-
-        double newYMove = GravityComponent.getInstance().getNewYMove(newPlayerPosition, seconds);
-        playerMoveComponent.getWantMove().y += (float) newYMove;
-
-        if(newYMove == 0){
-
-            timeStartInAir = 0;
-            isInAir = false;
-
-            return;
-        }
-
-        if(!isInAir){
-
-            timeStartInAir = glfwGetTime();
-        }
-
-        isInAir = true;
-
-//        playerMoveComponent.handleVertical();
     }
 
     private void handleMoveWasd(double deltaTimeInSeconds){
@@ -134,7 +95,7 @@ public class PlayerInputComponent {
 
             playerMoveComponent.moveBackward(deltaTimeInSeconds, forward);
         }
-        else if(eventsHandler.isKeyPressed(GLFW_KEY_A)){
+        else if(eventsHandler.isKeyPressed(GLFW_KEY_A)){    
 
             playerMoveComponent.moveLeft(deltaTimeInSeconds, forward);
         }
@@ -154,8 +115,9 @@ public class PlayerInputComponent {
             camera.rotateTop(deltaTimeInSeconds);
         }
 
-        if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE) && !isInAir){
+        if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE) && playerMoveComponent.getMoveState() != MoveState.JUMP){
             playerMoveComponent.moveTop(deltaTimeInSeconds);
+            eventsHandler.resetKey(GLFW_KEY_SPACE);
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_Z)){

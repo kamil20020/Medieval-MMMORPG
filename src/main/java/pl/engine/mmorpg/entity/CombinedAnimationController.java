@@ -3,7 +3,9 @@ package pl.engine.mmorpg.entity;
 import org.joml.Matrix4f;
 import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
+import pl.engine.mmorpg.entity.combat.CombatComponent;
 import pl.engine.mmorpg.entity.combat.CombatState;
+import pl.engine.mmorpg.entity.move.MoveComponent;
 import pl.engine.mmorpg.entity.move.MoveDirectionState;
 import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
@@ -69,11 +71,10 @@ public class CombinedAnimationController {
 
     public void update(
         double deltaTimeInSeconds,
-        MoveDirectionState moveDirectionState,
-        MoveState moveState,
-        CombatState combatState
+        MoveComponent moveComponent,
+        CombatComponent combatComponent
     ){
-        String newAnimationName = getActualAnimationName(moveDirectionState, moveState, combatState);
+        String newAnimationName = getActualAnimationName(moveComponent, combatComponent);
 
         setAnimation(newAnimationName);
         actualAnimation.update(deltaTimeInSeconds);
@@ -84,17 +85,20 @@ public class CombinedAnimationController {
 //        }
     }
 
-    private String getActualAnimationName(
-        MoveDirectionState moveDirectionState, MoveState moveState, CombatState combatState
-    ){
+    private String getActualAnimationName(MoveComponent moveComponent, CombatComponent combatComponent){
+
+        MoveState moveState = moveComponent.getMoveState();
+        MoveDirectionState moveDirectionState = moveComponent.getMoveDirectionState();
+        CombatState combatState = combatComponent.getCombatState();
+
         if(combatState == CombatState.FIGHTING){
             return getKey(combatState);
         }
 
-//        if(moveState == MoveState.JUMP){
-//
-//            return getKey(moveState);
-//        }
+        if(moveState == MoveState.JUMP){
+
+            return getKey(moveState, moveDirectionState);
+        }
 
         if(moveState != MoveState.STANDING){
 
