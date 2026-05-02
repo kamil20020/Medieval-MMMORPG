@@ -92,6 +92,7 @@ public class Player extends Entity {
         super.update(deltaTimeInSeconds);
 
         camera.move(moveComponent.getVelocity());
+
         updatePositionForCamera();
     }
 }

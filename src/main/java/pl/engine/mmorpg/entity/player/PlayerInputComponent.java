@@ -3,16 +3,9 @@ package pl.engine.mmorpg.entity.player;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.entity.InputComponent;
-import pl.engine.mmorpg.entity.TerrainCollisionComponent;
-import pl.engine.mmorpg.entity.gravity.GravityComponent;
-import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.move.MoveComponent;
 import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.render.Camera;
-import pl.engine.mmorpg.terrain.TerrainMesh;
-import pl.engine.mmorpg.terrain.TerrainMeshHeightMapData;
-
-import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
@@ -68,7 +61,6 @@ public class PlayerInputComponent implements InputComponent {
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_M)){
-            System.out.println(playerMoveComponent.getMoveState() + " " + playerMoveComponent.getMoveDirectionState());
             eventsHandler.resetKey(GLFW_KEY_M);
         }
     }
@@ -78,6 +70,10 @@ public class PlayerInputComponent implements InputComponent {
         if(playerMoveComponent.getMoveState() != MoveState.JUMP){
 
             handleMoveWasd(deltaTimeInSeconds);
+        }
+        else{
+
+            playerMoveComponent.moveInForwardForDelta(deltaTimeInSeconds, camera.getForward());
         }
 
         handleMoveVertical(deltaTimeInSeconds);

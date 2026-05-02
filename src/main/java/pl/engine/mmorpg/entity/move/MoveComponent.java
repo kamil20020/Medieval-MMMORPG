@@ -99,6 +99,11 @@ public class MoveComponent {
         updateMoveState();
     }
 
+    public void moveInForwardForDelta(double deltaTime, Vector3f forward){
+
+        moveInDirection(getMoveValue(deltaTime), forward);
+    }
+
     private void moveInForward(double scale, Vector3f forward){
 
         moveInDirection(scale, forward);

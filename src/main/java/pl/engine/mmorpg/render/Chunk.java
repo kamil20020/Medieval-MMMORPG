@@ -2,8 +2,7 @@ package pl.engine.mmorpg.render;
 
 import org.joml.Vector4f;
 import pl.engine.mmorpg.EventsHandler;
-import pl.engine.mmorpg.entity.TerrainCollisionComponent;
-import pl.engine.mmorpg.entity.gravity.GravityComponent;
+import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
 import pl.engine.mmorpg.entity.player.Player;
 import pl.engine.mmorpg.mesh.*;
 import pl.engine.mmorpg.terrain.*;
@@ -58,7 +57,6 @@ public class Chunk {
 
         TerrainMesh terrain = new TerrainMesh("models/snow1.glb", meshFactory);
         TerrainMeshHeightMapData heightMapData = terrain.generateHeightMap();
-        GravityComponent.getInstance(terrain);
         TerrainCollisionComponent.getInstance(terrain);
         //new Player(camera, eventsHandler, meshFactory);
 //        terrain.setModel(new Matrix4f().identity().scaling(0.01f).rotateX((float) Math.toRadians(-90)));

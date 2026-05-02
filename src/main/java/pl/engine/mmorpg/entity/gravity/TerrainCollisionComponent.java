@@ -1,7 +1,6 @@
-package pl.engine.mmorpg.entity;
+package pl.engine.mmorpg.entity.gravity;
 
 import org.joml.Vector3f;
-import pl.engine.mmorpg.entity.gravity.GravityComponent;
 import pl.engine.mmorpg.terrain.TerrainMesh;
 
 public class TerrainCollisionComponent {
@@ -9,9 +8,6 @@ public class TerrainCollisionComponent {
     private static TerrainCollisionComponent INSTANCE = null;
 
     private final TerrainMesh terrainMesh;
-
-    public static final double GRAVITY_SPEED = -25;
-    public static final double GRAVITY_SPEED_POSITIVE = -GRAVITY_SPEED;
 
     private TerrainCollisionComponent(TerrainMesh terrainMesh){
 

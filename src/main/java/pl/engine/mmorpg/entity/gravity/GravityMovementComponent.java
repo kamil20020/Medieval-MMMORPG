@@ -1,17 +1,11 @@
 package pl.engine.mmorpg.entity.gravity;
 
 import org.joml.Vector3f;
-import pl.engine.mmorpg.entity.Entity;
-import pl.engine.mmorpg.entity.TerrainCollisionComponent;
 import pl.engine.mmorpg.entity.move.MoveComponent;
-import pl.engine.mmorpg.entity.move.MoveState;
-import pl.engine.mmorpg.terrain.TerrainMesh;
-
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 public class GravityMovementComponent {
 
-    private double timeStartInAir = 0;
+    public static final double GRAVITY_SPEED = 0.08;
 
     private final MoveComponent moveComponent;
 
@@ -20,8 +14,15 @@ public class GravityMovementComponent {
         this.moveComponent = moveComponent;
     }
 
-    public void update(double deltaTime){
+    public Vector3f update(Vector3f position){
 
-        moveComponent.getVelocity().y += GravityComponent.GRAVITY_SPEED;
+        moveComponent.getVelocity().y -= GRAVITY_SPEED;
+
+        position = position.add(moveComponent.getVelocity());
+
+        double collisionMove = TerrainCollisionComponent.getInstance().getCollisionMove(position);
+        moveComponent.getVelocity().y += collisionMove;
+
+        return position;
     }
 }

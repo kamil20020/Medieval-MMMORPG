@@ -4,13 +4,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.entity.combat.CombatComponent;
-import pl.engine.mmorpg.entity.combat.CombatState;
-import pl.engine.mmorpg.entity.gravity.GravityComponent;
 import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
+import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
 import pl.engine.mmorpg.entity.move.MoveComponent;
-import pl.engine.mmorpg.entity.move.MoveDirectionState;
-import pl.engine.mmorpg.entity.move.MoveState;
-import pl.engine.mmorpg.entity.player.Player;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
@@ -99,12 +95,7 @@ public class Entity implements Meshable {
 
         if(isTurnedOnGravity){
 
-            moveComponent.getVelocity().y -= GravityComponent.GRAVITY_SPEED;
-
-            position = position.add(moveComponent.getVelocity());
-
-            double collisionMove = TerrainCollisionComponent.getInstance().getCollisionMove(position);
-            moveComponent.getVelocity().y += collisionMove;
+            position = gravityMovementComponent.update(position);
         }
         else{
             position = position.add(moveComponent.getVelocity());
