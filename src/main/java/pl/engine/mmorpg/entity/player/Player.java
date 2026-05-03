@@ -32,7 +32,7 @@ public class Player extends Entity {
             FIRST_ANIMATION_NAME
         );
 
-        super.setInputComponent(new PlayerInputComponent(moveComponent, camera, eventsHandler));
+        super.setInputComponent(new PlayerInputComponent(moveComponent, combatComponent, camera, eventsHandler));
 
         this.camera = camera;
         this.eventsHandler = eventsHandler;
@@ -58,7 +58,7 @@ public class Player extends Entity {
         result.put(getKey(MoveState.RUN, MoveDirectionState.RIGHT), getAnimationInfo("animations/warrior/move/run/right.glb"));
         result.put(getKey(MoveState.RUN, MoveDirectionState.BACK), getAnimationInfo("animations/warrior/move/run/backward.glb"));
 
-        result.put(getKey(CombatState.FIGHTING), getAnimationInfo("animations/warrior/combat/sword-inplace.glb"));
+        result.put(getKey(CombatState.FIGHTING), getAnimationInfo("animations/warrior/combat/sword-inplace.glb", 1.5f));
 
         return result;
     }
@@ -68,25 +68,6 @@ public class Player extends Entity {
         position = camera.getRootPosition();
         mesh.setModel(camera.getMatrixRelativeToCamera());
     }
-
-//    private void handleAttack(){
-//
-//        int eventButtonId = eventsHandler.getEventButtonId();
-//        int buttonEventId = eventsHandler.getButtonEventId();
-//
-//        if(eventButtonId == GLFW_MOUSE_BUTTON_1){
-//
-//            if(buttonEventId == GLFW_PRESS){
-//
-//                moveState = MoveState.STANDING;
-//                combatState = CombatState.FIGHTING;
-//            }
-//            else if(buttonEventId == GLFW_RELEASE){
-//
-//                combatState = CombatState.NO_WEAPON;
-//            }
-//        }
-//    }
 
     @Override
     public void update(double deltaTimeInSeconds){

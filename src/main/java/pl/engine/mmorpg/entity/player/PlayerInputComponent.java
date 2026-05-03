@@ -3,6 +3,7 @@ package pl.engine.mmorpg.entity.player;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.entity.InputComponent;
+import pl.engine.mmorpg.entity.combat.CombatComponent;
 import pl.engine.mmorpg.entity.move.MoveComponent;
 import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.render.Camera;
@@ -16,14 +17,16 @@ public class PlayerInputComponent implements InputComponent {
     private final EventsHandler eventsHandler;
 
     private final MoveComponent playerMoveComponent;
+    private final CombatComponent combatComponent;
 
     private boolean isVerticalCameraUnlocked = false;
     private boolean isTurnedOnGravity = true;
     protected static final double ROTATION_SENS = 50000;
 
-    public PlayerInputComponent(MoveComponent playerMoveComponent, Camera camera, EventsHandler eventsHandler){
+    public PlayerInputComponent(MoveComponent playerMoveComponent, CombatComponent combatComponent, Camera camera, EventsHandler eventsHandler){
 
         this.playerMoveComponent = playerMoveComponent;
+        this.combatComponent = combatComponent;
         this.camera = camera;
         this.eventsHandler = eventsHandler;
     }
@@ -32,7 +35,7 @@ public class PlayerInputComponent implements InputComponent {
     public void update(double deltaTimeUInSeconds){
 
         handleKeyboard(deltaTimeUInSeconds);
-        handleMouseRotate(deltaTimeUInSeconds);
+        handleMouse(deltaTimeUInSeconds);
     }
 
     private void handleKeyboard(double deltaTimeInSeconds){
@@ -121,6 +124,12 @@ public class PlayerInputComponent implements InputComponent {
         }
     }
 
+    private void handleMouse(double deltaTimeInSeconds){
+
+        handleMouseClick(deltaTimeInSeconds);
+        handleMouseRotate(deltaTimeInSeconds);
+    }
+
     private void handleMouseRotate(double deltaTimeInSeconds){
 
         handleHorizontalRotate(deltaTimeInSeconds);
@@ -170,6 +179,30 @@ public class PlayerInputComponent implements InputComponent {
         else{
 
             camera.rotateTop(rotationValue);
+        }
+    }
+
+    private void handleMouseClick(double deltaTimeInSeconds){
+
+        handleAttack(deltaTimeInSeconds);
+    }
+
+    private void handleAttack(double deltaTimeInSeconds){
+
+        int eventButtonId = eventsHandler.getEventButtonId();
+        int buttonEventId = eventsHandler.getButtonEventId();
+
+        if(eventButtonId == GLFW_MOUSE_BUTTON_1){
+
+            if(buttonEventId == GLFW_PRESS){
+
+                playerMoveComponent.moveInForwardForDelta(deltaTimeInSeconds / 10, camera.getForward());
+                combatComponent.startFight();
+            }
+            else if(buttonEventId == GLFW_RELEASE){
+
+                combatComponent.endFight();
+            }
         }
     }
 }
