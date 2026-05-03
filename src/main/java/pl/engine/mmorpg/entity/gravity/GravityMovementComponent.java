@@ -5,7 +5,7 @@ import pl.engine.mmorpg.entity.move.MoveComponent;
 
 public class GravityMovementComponent {
 
-    public static final double GRAVITY_SPEED = 0.08;
+    public static final double GRAVITY_SPEED = 0.12;
 
     private final MoveComponent moveComponent;
 

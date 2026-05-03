@@ -15,27 +15,21 @@ import pl.engine.mmorpg.texture.Texture;
 public class AssimpMeshAbstractFactory extends MeshAbstractFactory {
 
     @Override
-    public Mesh createMesh(Object meshData, Texture texture) {
-
-        return new AssimpGlbMesh((AIMesh) meshData, (AssimpTexture) texture);
-    }
-
-    @Override
     public ComplexMesh createComplexMesh(String complexModelFilePath) {
 
         return new ComplexAssimpMesh(complexModelFilePath);
     }
 
     @Override
-    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh complexMesh, String complexModelFilePath) {
+    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh model, String animatedModelPath, float animationSpeedMultiplier) {
 
-        return new AnimatedComplexAssimpModel(complexModelFilePath);
+        return null;
     }
 
     @Override
-    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh complexMesh, String complexModelFilePath, Skeleton skeleton) {
+    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh complexMesh, String complexModelFilePath) {
 
-        return new AnimatedComplexAssimpModel(complexModelFilePath, skeleton);
+        return new AnimatedComplexAssimpModel(complexModelFilePath);
     }
 
     @Override

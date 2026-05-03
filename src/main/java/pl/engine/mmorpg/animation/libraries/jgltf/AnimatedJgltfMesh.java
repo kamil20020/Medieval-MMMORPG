@@ -25,8 +25,6 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
     private NodeModel rootNode;
     private AnimationModel animation;
 
-    private static final float DEFAULT_NUMBER_OF_TICS_PER_SECOND = 1;
-
     private record ChannelTimeInterpolationData (
 
         int lessTimeIndex,

@@ -1,5 +1,6 @@
 package pl.engine.mmorpg.entity.player;
 
+import pl.engine.mmorpg.entity.AnimationInfo;
 import pl.engine.mmorpg.entity.Entity;
 import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.combat.CombatState;
@@ -27,7 +28,8 @@ public class Player extends Entity {
         super(
             MODEL_PATH,
             getAnimationNamesPathsMappings(),
-            meshFactory, FIRST_ANIMATION_NAME
+            meshFactory,
+            FIRST_ANIMATION_NAME
         );
 
         super.setInputComponent(new PlayerInputComponent(moveComponent, camera, eventsHandler));
@@ -38,25 +40,25 @@ public class Player extends Entity {
         updatePositionForCamera();
     }
 
-    private static Map<String, String> getAnimationNamesPathsMappings() {
+    private static Map<String, AnimationInfo> getAnimationNamesPathsMappings() {
 
-        Map<String, String> result = new HashMap<>();
+        Map<String, AnimationInfo> result = new HashMap<>();
 
-        result.put(getKey(MoveState.STANDING), "animations/warrior/idle.glb");
-        result.put(getKey(MoveState.JUMP, MoveDirectionState.TOP), "animations/warrior/move/jump/jump.glb");
-        result.put(getKey(MoveState.JUMP, MoveDirectionState.DOWN), "animations/warrior/move/jump/fall.glb");
+        result.put(getKey(MoveState.STANDING), getAnimationInfo("animations/warrior/idle.glb"));
+        result.put(getKey(MoveState.JUMP, MoveDirectionState.TOP), getAnimationInfo("animations/warrior/move/jump/jump.glb", 1.8f));
+        result.put(getKey(MoveState.JUMP, MoveDirectionState.DOWN), getAnimationInfo("animations/warrior/move/jump/fall.glb"));
 
-        result.put(getKey(MoveState.WALK, MoveDirectionState.FRONT), "animations/warrior/move/walk/front.glb");
-        result.put(getKey(MoveState.WALK, MoveDirectionState.LEFT), "animations/warrior/move/walk/left.glb");
-        result.put(getKey(MoveState.WALK, MoveDirectionState.RIGHT), "animations/warrior/move/walk/right.glb");
-        result.put(getKey(MoveState.WALK, MoveDirectionState.BACK), "animations/warrior/move/walk/backward.glb");
+        result.put(getKey(MoveState.WALK, MoveDirectionState.FRONT), getAnimationInfo("animations/warrior/move/walk/front.glb"));
+        result.put(getKey(MoveState.WALK, MoveDirectionState.LEFT), getAnimationInfo("animations/warrior/move/walk/left.glb"));
+        result.put(getKey(MoveState.WALK, MoveDirectionState.RIGHT), getAnimationInfo("animations/warrior/move/walk/right.glb"));
+        result.put(getKey(MoveState.WALK, MoveDirectionState.BACK), getAnimationInfo("animations/warrior/move/walk/backward.glb"));
 
-        result.put(getKey(MoveState.RUN, MoveDirectionState.FRONT), "animations/warrior/move/run/front.glb");
-        result.put(getKey(MoveState.RUN, MoveDirectionState.LEFT), "animations/warrior/move/run/left.glb");
-        result.put(getKey(MoveState.RUN, MoveDirectionState.RIGHT), "animations/warrior/move/run/right.glb");
-        result.put(getKey(MoveState.RUN, MoveDirectionState.BACK), "animations/warrior/move/run/backward.glb");
+        result.put(getKey(MoveState.RUN, MoveDirectionState.FRONT), getAnimationInfo("animations/warrior/move/run/front.glb"));
+        result.put(getKey(MoveState.RUN, MoveDirectionState.LEFT), getAnimationInfo("animations/warrior/move/run/left.glb"));
+        result.put(getKey(MoveState.RUN, MoveDirectionState.RIGHT), getAnimationInfo("animations/warrior/move/run/right.glb"));
+        result.put(getKey(MoveState.RUN, MoveDirectionState.BACK), getAnimationInfo("animations/warrior/move/run/backward.glb"));
 
-        result.put(getKey(CombatState.FIGHTING), "animations/warrior/combat/sword-inplace.glb");
+        result.put(getKey(CombatState.FIGHTING), getAnimationInfo("animations/warrior/combat/sword-inplace.glb"));
 
         return result;
     }

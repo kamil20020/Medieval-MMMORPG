@@ -20,23 +20,21 @@ public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh implements Animat
     private final ComplexJgltfMesh model;
     private final Skeleton skeleton;
     private final GltfModel animatedModel;
+    private float numberOfTicksPerSecond;
 
-    public AnimatedComplexJgltfMesh(ComplexJgltfMesh complexMesh, String animatedComplexModelFilePath, Skeleton skeleton) {
+    public AnimatedComplexJgltfMesh(ComplexJgltfMesh complexMesh, String animatedComplexModelFilePath, float numberOfTicksPerSecond) {
 
         this.model = complexMesh;
         this.animatedModel = ComplexJgltfMesh.load(animatedComplexModelFilePath);
-        this.skeleton = skeleton;
+        this.skeleton = new JgltfGlbSkeleton(animatedModel);
+        this.numberOfTicksPerSecond = numberOfTicksPerSecond;
 
         loadModel(null);
     }
 
     public AnimatedComplexJgltfMesh(ComplexJgltfMesh complexMesh, String animatedComplexModelFilePath) {
 
-        this.model = complexMesh;
-        this.animatedModel = ComplexJgltfMesh.load(animatedComplexModelFilePath);
-        this.skeleton = new JgltfGlbSkeleton(animatedModel);
-
-        loadModel(null);
+        this(complexMesh, animatedComplexModelFilePath, AnimatedMesh.DEFAULT_NUMBER_OF_TICS_PER_SECOND);
     }
 
     @Override
@@ -56,7 +54,7 @@ public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh implements Animat
 
             if(AnimatedJgltfMesh.isAnimated(rawMesh)){
 
-                animatedMesh = new AnimatedJgltfMesh(mesh, rawMesh, animatedModel, skeleton);
+                animatedMesh = new AnimatedJgltfMesh(mesh, rawMesh, animatedModel, skeleton, numberOfTicksPerSecond);
             }
             else{
 

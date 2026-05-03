@@ -18,14 +18,6 @@ public class AnimatedComplexAssimpModel extends ComplexAssimpMesh implements Ani
     private final AIScene animatedScene;
     private final Skeleton skeleton;
 
-    public AnimatedComplexAssimpModel(String animatedComplexModelFilePath, Skeleton skeleton) {
-
-        this.animatedScene = loadScene(animatedComplexModelFilePath);
-        this.skeleton = skeleton;
-
-        loadModel(animatedComplexModelFilePath);
-    }
-
     public AnimatedComplexAssimpModel(String animatedComplexModelFilePath) {
 
         this.animatedScene = loadScene(animatedComplexModelFilePath);

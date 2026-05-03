@@ -44,6 +44,8 @@ public abstract class AnimatedMesh extends Mesh {
     protected static final Integer MAX_NUMBER_OF_BONES = 200;
     protected static final Integer MAX_NUMBER_OF_BONS_PER_VERTEX = 4;
 
+    public static final float DEFAULT_NUMBER_OF_TICS_PER_SECOND = 1;
+
     public AnimatedMesh(Mesh additionalMesh, Skeleton skeleton){
 
         this.additionalMesh = additionalMesh;

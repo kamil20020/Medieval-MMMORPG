@@ -21,7 +21,7 @@ public class CombinedAnimationController {
 
     private Entity entity;
     private final Map<String, AnimatedMeshable> animations = new HashMap<>();
-    private final Map<String, String> animationsKeysPathsMappings;
+    private final Map<String, AnimationInfo> animationsKeysInfoMappings;
     private final MeshAbstractFactory meshFactory;
 
     protected String actualAnimationName = null;
@@ -37,11 +37,11 @@ public class CombinedAnimationController {
     protected static final double BLEND_DURATION = 0.2;
 
     public CombinedAnimationController(
-        Map<String, String> animationsKeysPathsMappings,
+        Map<String, AnimationInfo> animationsKeysPathsMappings,
         MeshAbstractFactory meshFactory,
         String firstAnimationName
     ){
-        this.animationsKeysPathsMappings = animationsKeysPathsMappings;
+        this.animationsKeysInfoMappings = animationsKeysPathsMappings;
         this.meshFactory = meshFactory;
 
         this.actualAnimationName = firstAnimationName;
@@ -52,19 +52,22 @@ public class CombinedAnimationController {
 
         this.entity = entity;
 
-        loadAnimations(animationsKeysPathsMappings, meshFactory);
+        loadAnimations();
 
         this.actualAnimation = animations.get(actualAnimationName);
     }
 
-    private void loadAnimations(Map<String, String> animationsKeysPathsMappings, MeshAbstractFactory meshFactory){
+    private void loadAnimations(){
 
-        for(Map.Entry<String, String> animationNamePathMapping : animationsKeysPathsMappings.entrySet()){
+        for(Map.Entry<String, AnimationInfo> animationNameInfoMapping : animationsKeysInfoMappings.entrySet()){
 
-            String animationKey = animationNamePathMapping.getKey();
-            String animationPath = animationNamePathMapping.getValue();
+            String animationKey = animationNameInfoMapping.getKey();
 
-            AnimatedMeshable animation = meshFactory.createComplexAnimatedMesh(entity.getComplexMesh(), animationPath);
+            AnimationInfo animationInfo = animationNameInfoMapping.getValue();
+            String animationPath = animationInfo.path();
+            float animationSpeedMultiplier = animationInfo.animationSpeedMultiplier();
+
+            AnimatedMeshable animation = meshFactory.createComplexAnimatedMesh(entity.getComplexMesh(), animationPath, animationSpeedMultiplier);
             animations.put(animationKey, animation);
         }
     }
@@ -192,6 +195,16 @@ public class CombinedAnimationController {
     public static String getKey(MoveState moveState){
 
         return moveState.name();
+    }
+
+    public static AnimationInfo getAnimationInfo(String animationModelInfo){
+
+        return new AnimationInfo(animationModelInfo);
+    }
+
+    public static AnimationInfo getAnimationInfo(String animationModelInfo, float animationSpeedMultiplier){
+
+        return new AnimationInfo(animationModelInfo, animationSpeedMultiplier);
     }
 
     public static String getKey(MoveDirectionState moveDirectionState){

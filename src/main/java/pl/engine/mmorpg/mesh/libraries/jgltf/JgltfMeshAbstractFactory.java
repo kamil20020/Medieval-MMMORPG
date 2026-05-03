@@ -15,27 +15,21 @@ import pl.engine.mmorpg.texture.Texture;
 public class JgltfMeshAbstractFactory extends MeshAbstractFactory {
 
     @Override
-    public Mesh createMesh(Object meshData, Texture texture) {
-
-        return new JgltfGlbMesh((MeshModel) meshData, (JgltfTexture) texture);
-    }
-
-    @Override
     public ComplexMesh createComplexMesh(String complexModelFilePath) {
 
         return new ComplexJgltfMesh(complexModelFilePath);
     }
 
     @Override
-    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh model, String animatedModelPath, Skeleton skeleton) {
-
-        return new AnimatedComplexJgltfMesh((ComplexJgltfMesh) model, animatedModelPath, skeleton);
-    }
-
-    @Override
     public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh model, String animatedModelPath) {
 
         return new AnimatedComplexJgltfMesh((ComplexJgltfMesh) model, animatedModelPath);
+    }
+
+    @Override
+    public AnimatedMeshable createComplexAnimatedMesh(ComplexMesh model, String animatedModelPath, float animationSpeedMultiplier) {
+
+        return new AnimatedComplexJgltfMesh((ComplexJgltfMesh) model, animatedModelPath, animationSpeedMultiplier);
     }
 
     @Override

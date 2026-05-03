@@ -34,7 +34,7 @@ public class Entity implements Meshable {
 
     public Entity(
         String modelPath,
-        Map<String, String> animationsKeysPathsMappings,
+        Map<String, AnimationInfo> animationsKeysInfoMappings,
         MeshAbstractFactory meshFactory,
         String firstAnimationName
     ){
@@ -45,7 +45,7 @@ public class Entity implements Meshable {
         this.combatComponent = new CombatComponent();
         this.gravityMovementComponent = new GravityMovementComponent(moveComponent);
         this.combinedAnimationController = new CombinedAnimationController(
-            animationsKeysPathsMappings,
+            animationsKeysInfoMappings,
             meshFactory,
             firstAnimationName
         );
