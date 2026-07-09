@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.entity.InputComponent;
 import pl.engine.mmorpg.entity.combat.CombatComponent;
+import pl.engine.mmorpg.entity.combat.CombatState;
 import pl.engine.mmorpg.entity.move.MoveComponent;
 import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.render.Camera;
@@ -70,7 +71,7 @@ public class PlayerInputComponent implements InputComponent {
 
     private void handleMove(double deltaTimeInSeconds){
 
-        if(playerMoveComponent.getMoveState() != MoveState.JUMP){
+        if(playerMoveComponent.getMoveState() != MoveState.JUMP && combatComponent.getCombatState() != CombatState.FIGHTING){
 
             handleMoveWasd(deltaTimeInSeconds);
         }
@@ -196,7 +197,6 @@ public class PlayerInputComponent implements InputComponent {
 
             if(buttonEventId == GLFW_PRESS){
 
-                playerMoveComponent.moveInForwardForDelta(deltaTimeInSeconds / 10, camera.getForward());
                 combatComponent.startFight();
             }
             else if(buttonEventId == GLFW_RELEASE){

@@ -104,6 +104,11 @@ public class MoveComponent {
         moveInDirection(getMoveValue(deltaTime), forward);
     }
 
+    public void moveInForwardForDelta(double deltaTime, double moveMultiplier, Vector3f forward){
+
+        moveInDirection(getMoveValue(deltaTime, moveMultiplier), forward);
+    }
+
     private void moveInForward(double scale, Vector3f forward){
 
         moveInDirection(scale, forward);
@@ -111,7 +116,7 @@ public class MoveComponent {
 
     private void moveInDirection(double scale, Vector3f dir){
 
-        velocity.x = (float) (scale * dir.x);
+        velocity.x += scale * dir.x;
         velocity.y += scale * dir.y;
         velocity.z += scale * dir.z;
     }
@@ -151,9 +156,14 @@ public class MoveComponent {
 
     private double getMoveValue(double deltaTimeInSeconds){
 
-        double moveMultiplier = isSprinting ? RUN_SENS : MOVE_SENS;
+        return getMoveValue(deltaTimeInSeconds, 1d);
+    }
 
-        return deltaTimeInSeconds * moveMultiplier;
+    private double getMoveValue(double deltaTimeInSeconds, double moveMultiplier){
+
+        double moveTypeMultiplier = isSprinting ? RUN_SENS : MOVE_SENS;
+
+        return deltaTimeInSeconds * moveTypeMultiplier * moveMultiplier;
     }
 
     public MoveState getMoveState(){
