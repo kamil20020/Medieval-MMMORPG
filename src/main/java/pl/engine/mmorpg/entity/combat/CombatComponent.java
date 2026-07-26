@@ -1,33 +1,41 @@
 package pl.engine.mmorpg.entity.combat;
 
-import org.joml.Vector3f;
-import pl.engine.mmorpg.entity.input.InputComponent;
-import pl.engine.mmorpg.entity.move.MoveComponent;
-import pl.engine.mmorpg.entity.move.MoveState;
+import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.input.InputData;
 
-public class CombatComponent {
+public class CombatComponent implements Component {
 
     private CombatState combatState = CombatState.NO_WEAPON;
+    private InputData inputData;
+
+    private double stateCloseDelta;
+    public static final double STATE_CLOSE_TIME = 0.5;
+    private boolean wantFight = false;
+
+    public CombatComponent(InputData inputData){
+
+        this.inputData = inputData;
+    }
 
     public void reset(){
 
         this.combatState = CombatState.NO_WEAPON;
     }
 
-    public void update(InputComponent inputComponent, MoveComponent moveComponent, double deltaTime, Vector3f forward){
+    public void update(double deltaTime){
 
-        if(inputComponent.combatStart){
-            this.combatState = CombatState.FIGHTING;
+        if(inputData.combatStart){
+            wantFight = true;
         }
         else{
-            this.combatState = CombatState.NO_WEAPON;
+            wantFight = false;
         }
 
         if(!isActive()){
             return;
         }
 
-        moveComponent.moveForward(deltaTime / 2, forward);
+        inputData.moveFront = true;
     }
 
     public CombatState getCombatState(){

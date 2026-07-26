@@ -1,4 +1,4 @@
-package pl.engine.mmorpg.entity;
+package pl.engine.mmorpg.entity.animation;
 
 import pl.engine.mmorpg.animation.AnimatedMesh;
 

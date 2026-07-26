@@ -1,28 +1,22 @@
 package pl.engine.mmorpg.entity.gravity;
 
-import org.joml.Vector3f;
-import pl.engine.mmorpg.entity.move.MoveComponent;
+import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.move.MovementComponent;
 
-public class GravityMovementComponent {
+public class GravityMovementComponent implements Component {
 
     public static final double GRAVITY_SPEED = 0.12;
 
-    private final MoveComponent moveComponent;
+    private final MovementComponent movementComponent;
 
-    public GravityMovementComponent(MoveComponent moveComponent){
+    public GravityMovementComponent(MovementComponent movementComponent){
 
-        this.moveComponent = moveComponent;
+        this.movementComponent = movementComponent;
     }
 
-    public Vector3f update(Vector3f position){
+    @Override
+    public void update(double deltaTime){
 
-        moveComponent.getVelocity().y -= GRAVITY_SPEED;
-
-        position = position.add(moveComponent.getVelocity());
-
-        double collisionMove = TerrainCollisionComponent.getInstance().getCollisionMove(position);
-        moveComponent.getVelocity().y += collisionMove;
-
-        return position;
+        movementComponent.getVelocity().y -= GRAVITY_SPEED;
     }
 }

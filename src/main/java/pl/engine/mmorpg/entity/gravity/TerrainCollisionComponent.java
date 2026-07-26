@@ -1,33 +1,41 @@
 package pl.engine.mmorpg.entity.gravity;
 
 import org.joml.Vector3f;
+import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.EntityStateData;
+import pl.engine.mmorpg.entity.move.MovementComponent;
 import pl.engine.mmorpg.terrain.TerrainMesh;
 
-public class TerrainCollisionComponent {
+import java.util.function.Supplier;
 
-    private static TerrainCollisionComponent INSTANCE = null;
+public class TerrainCollisionComponent implements Component {
 
     private final TerrainMesh terrainMesh;
+    private final EntityStateData entityStateData;
+    private final MovementComponent movementComponent;
+    private final Supplier<Vector3f> getPosition;
 
-    private TerrainCollisionComponent(TerrainMesh terrainMesh){
+    public TerrainCollisionComponent(EntityStateData entityStateData, MovementComponent movementComponent, Supplier<Vector3f> getPosition){
 
-        this.terrainMesh = terrainMesh;
+        this.terrainMesh = TerrainMesh.getInstance();
+        this.entityStateData = entityStateData;
+        this.movementComponent = movementComponent;
+        this.getPosition = getPosition;
     }
 
-    public static TerrainCollisionComponent getInstance(TerrainMesh terrainMesh){
+    @Override
+    public void update(double deltaTime){
 
-        if(INSTANCE != null){
-            return INSTANCE;
+        Vector3f position = getPosition.get();
+
+        entityStateData.isInAir = isInAir(position);
+
+        if(entityStateData.isInAir){
+            return;
         }
 
-        INSTANCE = new TerrainCollisionComponent(terrainMesh);
-
-        return INSTANCE;
-    }
-
-    public static TerrainCollisionComponent getInstance(){
-
-        return INSTANCE;
+        double collisionMove = getCollisionMove(position);
+        movementComponent.getVelocity().y += collisionMove;
     }
 
     public boolean isInAir(Vector3f position){
@@ -42,12 +50,7 @@ public class TerrainCollisionComponent {
         return position.y > maxValidY;
     }
 
-    public double getCollisionMove(Vector3f position){
-
-        if(terrainMesh.isOutside(position.x, position.z)){
-
-            return 0;
-        }
+    private double getCollisionMove(Vector3f position){
 
         double maxValidY = terrainMesh.getTerrainMaxY(position.x, position.z);
 

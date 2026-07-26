@@ -1,43 +1,18 @@
 package pl.engine.mmorpg.entity.input;
 
-public class InputComponent {
+import pl.engine.mmorpg.entity.Component;
 
-    public boolean switchSprintPressed;
-    public boolean cameraUnlockPressed;
-    public boolean gravitySwitchPressed;
+public abstract class InputComponent implements Component {
 
-    public boolean moveLeft;
-    public boolean moveRight;
-    public boolean moveFront;
-    public boolean moveBack;
-    public boolean moveTop;
+    protected final InputData inputData;
 
-    public boolean keyboardRotateTopCamera;
-    public boolean keyboardRotateDownCamera;
-    public boolean mouseRotateCamera;
-    public double mouseXPosForWindowHeight;
-    public double mouseYPosForWindowHeight;
+    public InputComponent(){
 
-    public boolean combatStart;
+        this.inputData = new InputData();
+    }
 
-    public void reset() {
+    public InputData getInputData(){
 
-        this.switchSprintPressed = false;
-        this.cameraUnlockPressed = false;
-        this.gravitySwitchPressed = false;
-
-        this.moveLeft = false;
-        this.moveRight = false;
-        this.moveFront = false;
-        this.moveBack = false;
-        this.moveTop = false;
-
-        this.keyboardRotateTopCamera = false;
-        this.keyboardRotateDownCamera = false;
-        this.mouseRotateCamera = false;
-        this.mouseXPosForWindowHeight = 0;
-        this.mouseYPosForWindowHeight = 0;
-
-        this.combatStart = false;
+        return inputData;
     }
 }

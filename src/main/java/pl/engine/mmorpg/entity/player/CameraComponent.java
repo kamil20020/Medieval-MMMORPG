@@ -1,37 +1,41 @@
 package pl.engine.mmorpg.entity.player;
 
-import pl.engine.mmorpg.entity.input.InputComponent;
+import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.input.InputData;
 import pl.engine.mmorpg.render.Camera;
 
-public class CameraComponent {
+public class CameraComponent implements Component {
 
     private final Camera camera;
     private boolean isVerticalCameraUnlocked = false;
+    private InputData inputData;
 
     protected static final double ROTATION_SENS = 50000;
 
-    public CameraComponent(Camera camera){
+    public CameraComponent(Camera camera, InputData inputData){
 
         this.camera = camera;
+        this.inputData = inputData;
     }
 
-    public void update(InputComponent inputComponent, double deltaTimeInSeconds){
+    @Override
+    public void update(double deltaTimeInSeconds){
 
-        if(inputComponent.cameraUnlockPressed){
+        if(inputData.cameraUnlockPressed){
             isVerticalCameraUnlocked = !isVerticalCameraUnlocked;
         }
-        else if(inputComponent.mouseRotateCamera){
-            handleMouseRotate(deltaTimeInSeconds, inputComponent);
+        else if(inputData.mouseRotateCamera){
+            handleMouseRotate(deltaTimeInSeconds, inputData);
         }
-        else if(inputComponent.keyboardRotateTopCamera){
+        else if(inputData.keyboardRotateTopCamera){
             camera.rotateTop(deltaTimeInSeconds);
         }
-        else if(inputComponent.keyboardRotateDownCamera){
+        else if(inputData.keyboardRotateDownCamera){
             camera.rotateDown(deltaTimeInSeconds);
         }
     }
 
-    private void handleMouseRotate(double deltaTimeInSeconds, InputComponent inputComponent){
+    private void handleMouseRotate(double deltaTimeInSeconds, InputData inputComponent){
 
         handleHorizontalRotate(deltaTimeInSeconds, inputComponent.mouseXPosForWindowHeight);
 

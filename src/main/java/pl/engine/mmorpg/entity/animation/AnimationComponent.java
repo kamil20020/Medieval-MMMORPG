@@ -1,25 +1,30 @@
-package pl.engine.mmorpg.entity;
+package pl.engine.mmorpg.entity.animation;
 
 import org.joml.Matrix4f;
 import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
-import pl.engine.mmorpg.entity.combat.CombatComponent;
-import pl.engine.mmorpg.entity.combat.CombatState;
-import pl.engine.mmorpg.entity.move.MoveComponent;
+import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.EntityState;
+import pl.engine.mmorpg.entity.move.MovementComponent;
 import pl.engine.mmorpg.entity.move.MoveDirectionState;
 import pl.engine.mmorpg.entity.move.MoveState;
+import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
-public class CombinedAnimationController {
+public class AnimationComponent implements Component {
 
-    private Entity entity;
+    private ComplexMesh complexMesh;
+    private MovementComponent movementComponent;
+    private Supplier<EntityState> getEntityState;
+
     private final Map<String, AnimatedMeshable> animations = new HashMap<>();
     private final Map<String, AnimationInfo> animationsKeysInfoMappings;
     private final MeshAbstractFactory meshFactory;
@@ -36,21 +41,36 @@ public class CombinedAnimationController {
 
     protected static final double BLEND_DURATION = 0.2;
 
-    public CombinedAnimationController(
+    public AnimationComponent(
+        ComplexMesh complexMesh,
         Map<String, AnimationInfo> animationsKeysPathsMappings,
         MeshAbstractFactory meshFactory,
-        String firstAnimationName
+        String firstAnimationName,
+        MovementComponent movementComponent,
+        Supplier<EntityState> getEntityState
     ){
+        this.complexMesh = complexMesh;
+
         this.animationsKeysInfoMappings = animationsKeysPathsMappings;
         this.meshFactory = meshFactory;
 
         this.actualAnimationName = firstAnimationName;
         this.oldAnimationName = firstAnimationName;
+
+        this.movementComponent = movementComponent;
+        this.getEntityState = getEntityState;
     }
 
-    public void init(Entity entity){
+    @Override
+    public void prepare(){
 
-        this.entity = entity;
+        init(complexMesh);
+        uploadToGpu();
+    }
+
+    public void init(ComplexMesh complexMesh){
+
+        this.complexMesh = complexMesh;
 
         loadAnimations();
 
@@ -67,17 +87,15 @@ public class CombinedAnimationController {
             String animationPath = animationInfo.path();
             float animationSpeedMultiplier = animationInfo.animationSpeedMultiplier();
 
-            AnimatedMeshable animation = meshFactory.createComplexAnimatedMesh(entity.getComplexMesh(), animationPath, animationSpeedMultiplier);
+            AnimatedMeshable animation = meshFactory.createComplexAnimatedMesh(complexMesh, animationPath, animationSpeedMultiplier);
             animations.put(animationKey, animation);
         }
     }
 
-    public void update(
-        double deltaTimeInSeconds,
-        MoveComponent moveComponent,
-        CombatComponent combatComponent
-    ){
-        String newAnimationName = getActualAnimationName(moveComponent, combatComponent);
+    @Override
+    public void update(double deltaTimeInSeconds){
+        EntityState entityState = getEntityState.get();
+        String newAnimationName = getActualAnimationName();
 
         setAnimation(newAnimationName);
         actualAnimation.update(deltaTimeInSeconds);
@@ -88,14 +106,14 @@ public class CombinedAnimationController {
 //        }
     }
 
-    private String getActualAnimationName(MoveComponent moveComponent, CombatComponent combatComponent){
+    private String getActualAnimationName(){
 
-        MoveState moveState = moveComponent.getMoveState();
-        MoveDirectionState moveDirectionState = moveComponent.getMoveDirectionState();
-        CombatState combatState = combatComponent.getCombatState();
+        EntityState entityState = getEntityState.get();
+        MoveState moveState = movementComponent.getMoveState();
+        MoveDirectionState moveDirectionState = movementComponent.getMoveDirectionState();
 
-        if(combatState == CombatState.FIGHTING){
-            return getKey(combatState);
+        if(entityState == EntityState.COMBAT){
+            return getKey(entityState);
         }
 
         if(moveState == MoveState.JUMP){
@@ -187,6 +205,7 @@ public class CombinedAnimationController {
         actualAnimation.draw();
     }
 
+    @Override
     public void clear(){
 
         actualAnimation.clear();
@@ -212,9 +231,9 @@ public class CombinedAnimationController {
         return moveDirectionState.name();
     }
 
-    public static String getKey(CombatState combatState){
+    public static String getKey(EntityState entityState){
 
-        return combatState.name();
+        return entityState.name();
     }
 
     public static String getKey(MoveState moveState, MoveDirectionState moveDirectionState){

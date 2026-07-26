@@ -5,19 +5,19 @@ import pl.engine.mmorpg.EventsHandler;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 
-public class PlayerInputController extends InputController{
+public class PlayerInputComponent extends InputComponent {
 
     private final EventsHandler eventsHandler;
 
-    public PlayerInputController(EventsHandler eventsHandler){
+    public PlayerInputComponent(EventsHandler eventsHandler){
 
         this.eventsHandler = eventsHandler;
     }
 
     @Override
-    public void update(){
+    public void update(double deltaTime){
 
-        inputComponent.reset();
+        inputData.reset();
         handleKeyboard();
         handleMouse();
     }
@@ -32,19 +32,19 @@ public class PlayerInputController extends InputController{
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_V)){
 
-            inputComponent.switchSprintPressed = true;
+            inputData.switchSprintPressed = true;
             eventsHandler.resetKey(GLFW_KEY_V);
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_R)){
 
-            inputComponent.cameraUnlockPressed = true;
+            inputData.cameraUnlockPressed = true;
             eventsHandler.resetKey(GLFW_KEY_R);
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_G)){
 
-            inputComponent.gravitySwitchPressed = true;
+            inputData.gravitySwitchPressed = true;
             eventsHandler.resetKey(GLFW_KEY_G);
         }
     }
@@ -59,34 +59,34 @@ public class PlayerInputController extends InputController{
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_W)){
 
-            inputComponent.moveFront = true;
+            inputData.moveFront = true;
         }
         else if(eventsHandler.isKeyPressed(GLFW_KEY_S)){
 
-            inputComponent.moveBack = true;
+            inputData.moveBack = true;
         }
         else if(eventsHandler.isKeyPressed(GLFW_KEY_A)){
 
-            inputComponent.moveLeft = true;
+            inputData.moveLeft = true;
         }
         else if(eventsHandler.isKeyPressed(GLFW_KEY_D)){
 
-            inputComponent.moveRight = true;
+            inputData.moveRight = true;
         }
     }
 
     private void handleMoveVertical(){
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_UP)){
-            inputComponent.keyboardRotateTopCamera = true;
+            inputData.keyboardRotateTopCamera = true;
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_DOWN)){
-            inputComponent.keyboardRotateDownCamera = true;
+            inputData.keyboardRotateDownCamera = true;
         }
 
         if(eventsHandler.isKeyPressed(GLFW_KEY_SPACE)){
-            inputComponent.moveTop = true;
+            inputData.moveTop = true;
             eventsHandler.resetKey(GLFW_KEY_SPACE);
         }
     }
@@ -99,9 +99,9 @@ public class PlayerInputController extends InputController{
 
     private void handleMouseRotate(){
 
-        inputComponent.mouseRotateCamera = true;
-        inputComponent.mouseXPosForWindowHeight = eventsHandler.getMouseXPosForWindowWidth();
-        inputComponent.mouseYPosForWindowHeight = eventsHandler.getMouseYPosForWindowHeight();
+        inputData.mouseRotateCamera = true;
+        inputData.mouseXPosForWindowHeight = eventsHandler.getMouseXPosForWindowWidth();
+        inputData.mouseYPosForWindowHeight = eventsHandler.getMouseYPosForWindowHeight();
 
         eventsHandler.resetMouseMove();
     }
@@ -120,11 +120,11 @@ public class PlayerInputController extends InputController{
 
             if(buttonEventId == GLFW_PRESS){
 
-                inputComponent.combatStart = true;
+                inputData.combatStart = true;
             }
             else if(buttonEventId == GLFW_RELEASE){
 
-                inputComponent.combatStart = false;
+                inputData.combatStart = false;
             }
         }
     }

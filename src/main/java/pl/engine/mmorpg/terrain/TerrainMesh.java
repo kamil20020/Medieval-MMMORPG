@@ -12,6 +12,8 @@ import java.util.Map;
 
 public class TerrainMesh implements Meshable {
 
+    private static TerrainMesh INSTANCE = null;
+
     private final float[] vertices;
     private final int[] faces;
     private final ComplexMesh mesh;
@@ -19,7 +21,7 @@ public class TerrainMesh implements Meshable {
 
     private static final Logger logger = LoggerFactory.getLogger(TerrainMeshHeightMapGenerator.class);
 
-    public TerrainMesh(String terrainFilePath, MeshAbstractFactory meshFactory){
+    private TerrainMesh(String terrainFilePath, MeshAbstractFactory meshFactory){
 
         this.mesh = meshFactory.createComplexMesh(terrainFilePath);
         this.vertices = mesh.getVertices();
@@ -37,6 +39,20 @@ public class TerrainMesh implements Meshable {
 //
 //            vertices[i] = -vertices[i];
 //        }*/
+    }
+
+    public static TerrainMesh getInstance(String terrainFilePath, MeshAbstractFactory meshFactory){
+
+        if(INSTANCE == null){
+            INSTANCE = new TerrainMesh(terrainFilePath, meshFactory);
+        }
+
+        return INSTANCE;
+    }
+
+    public static TerrainMesh getInstance(){
+
+        return INSTANCE;
     }
 
     @Override
@@ -93,11 +109,9 @@ public class TerrainMesh implements Meshable {
         return mesh.getFaces();
     }
 
-    public TerrainMeshHeightMapData generateHeightMap() {
+    public void generateHeightMap() {
 
         terrainMeshHeightMapData = TerrainMeshHeightMapGenerator.generate(vertices, faces);
-
-        return terrainMeshHeightMapData;
     }
 
     public double getTerrainMaxY(double x, double z){

@@ -39,6 +39,9 @@ public class Chunk {
         Meshable grass = new Rect(texture);
 //        meshables.add(grass);
 
+        TerrainMesh terrain = TerrainMesh.getInstance("models/snow1.glb", meshFactory);
+        terrain.generateHeightMap();
+
         Meshable player = new Player(camera, eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
         meshables.add(player);
 
@@ -55,18 +58,17 @@ public class Chunk {
 //        Meshable wood = new Cube(texture1);
 //        meshables.add(wood);
 
-        TerrainMesh terrain = new TerrainMesh("models/snow1.glb", meshFactory);
-        TerrainMeshHeightMapData heightMapData = terrain.generateHeightMap();
-        TerrainCollisionComponent.getInstance(terrain);
+//         terrain.generateHeightMap();
+//        TerrainCollisionComponent.getInstance(terrain);
         //new Player(camera, eventsHandler, meshFactory);
 //        terrain.setModel(new Matrix4f().identity().scaling(0.01f).rotateX((float) Math.toRadians(-90)));
 //        terrain.setModel(new Matrix4f().identity().rotateX((float) Math.toRadians(-90)));
 //        terrain.setModel(new Matrix4f().identity().scaling(0.02f).rotateX((float) Math.toRadians(180)));
 //        terrain.setModel(new Matrix4f().identity().scaling(50f));
-       HeightMapVisualizeMesh heightMapVisualizeMesh = new HeightMapVisualizeMesh(-250, -250, heightMapData.heightMap());
+//       HeightMapVisualizeMesh heightMapVisualizeMesh = new HeightMapVisualizeMesh(-250, -250, heightMapData.heightMap());
 //        heightMapVisualizeMesh.setModel(new Matrix4f().identity().scaling(0.01f).rotateX((float) Math.toRadians(-90)));
-        DenseHeightMapVisualizeMesh denseHeightMapVisualizeMesh = new DenseHeightMapVisualizeMesh(terrain);
-        VisualizeMesh visualizeMesh = new VisualizeMesh(terrain.getVertices(), new Vector4f(0, 0, 1, 1));
+//        DenseHeightMapVisualizeMesh denseHeightMapVisualizeMesh = new DenseHeightMapVisualizeMesh(terrain);
+//        VisualizeMesh visualizeMesh = new VisualizeMesh(terrain.getVertices(), new Vector4f(0, 0, 1, 1));
 //        meshables.add(visualizeMesh);
         meshables.add(terrain);
 //        meshables.add(denseHeightMapVisualizeMesh);

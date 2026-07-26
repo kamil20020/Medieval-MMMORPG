@@ -1,41 +1,87 @@
 package pl.engine.mmorpg.entity.player;
 
 import org.joml.Vector3f;
-import pl.engine.mmorpg.entity.AnimationInfo;
+import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.EntityState;
+import pl.engine.mmorpg.entity.TransformComponent;
+import pl.engine.mmorpg.entity.animation.AnimationInfo;
 import pl.engine.mmorpg.entity.Entity;
-import pl.engine.mmorpg.entity.combat.CombatState;
-import pl.engine.mmorpg.entity.input.PlayerInputController;
+import pl.engine.mmorpg.entity.animation.AnimationComponent;
+import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
+import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
+import pl.engine.mmorpg.entity.input.InputComponent;
+import pl.engine.mmorpg.entity.input.InputData;
+import pl.engine.mmorpg.entity.input.PlayerInputComponent;
 import pl.engine.mmorpg.entity.move.MoveDirectionState;
 import pl.engine.mmorpg.entity.move.MoveState;
+import pl.engine.mmorpg.entity.move.MovementComponent;
 import pl.engine.mmorpg.render.Camera;
 import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 
 import java.util.*;
 
-import static pl.engine.mmorpg.entity.CombinedAnimationController.*;
+import static pl.engine.mmorpg.entity.animation.AnimationComponent.*;
 
 public class Player extends Entity {
 
-    private final Camera camera;
-    private final CameraComponent cameraComponent;
+    private AnimationComponent animationComponent = null;
 
     private static final String MODEL_PATH = "models/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(MoveState.STANDING);
 
+    private static final Map<String, AnimationInfo> animationNamesPathsMappings;
+    static {
+        animationNamesPathsMappings = getAnimationNamesPathsMappings();
+    }
+
     public Player(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
-        super(
-            MODEL_PATH,
-            getAnimationNamesPathsMappings(),
-            meshFactory,
-            FIRST_ANIMATION_NAME
+        super(MODEL_PATH, meshFactory);
+
+        List<Component> components = initComponents(camera, eventsHandler, meshFactory);
+        addComponents(components);
+    }
+
+    private List<Component> initComponents(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
+
+        TransformComponent transformComponent = new TransformComponent(mesh);
+
+        InputComponent inputComponent = new PlayerInputComponent(eventsHandler);
+        InputData inputData = inputComponent.getInputData();
+
+        MovementComponent movementComponent = new MovementComponent(
+            inputData,
+            entityStateData,
+            transformComponent
         );
 
-        super.setInputComponent(new PlayerInputController(eventsHandler));
-        this.camera = camera;
-        this.cameraComponent = new CameraComponent(camera);
+        GravityMovementComponent gravityMovementComponent = new GravityMovementComponent(movementComponent);
+        TerrainCollisionComponent terrainCollisionComponent = new TerrainCollisionComponent(
+            entityStateData,
+            movementComponent,
+            transformComponent::getPosition
+        );
 
-        updatePositionForCamera();
+        this.animationComponent = new AnimationComponent(
+            mesh,
+            animationNamesPathsMappings,
+            meshFactory,
+            FIRST_ANIMATION_NAME,
+            movementComponent,
+            this::getEntityState
+        );
+
+        CameraComponent cameraComponent = new CameraComponent(camera, inputData);
+
+        return List.of(
+            transformComponent,
+            inputComponent,
+            movementComponent,
+//            gravityMovementComponent,
+//            terrainCollisionComponent,
+            animationComponent
+//            cameraComponent
+        );
     }
 
     private static Map<String, AnimationInfo> getAnimationNamesPathsMappings() {
@@ -56,34 +102,20 @@ public class Player extends Entity {
         result.put(getKey(MoveState.RUN, MoveDirectionState.RIGHT), getAnimationInfo("animations/warrior/move/run/right.glb"));
         result.put(getKey(MoveState.RUN, MoveDirectionState.BACK), getAnimationInfo("animations/warrior/move/run/backward.glb"));
 
-        result.put(getKey(CombatState.FIGHTING), getAnimationInfo("animations/warrior/combat/sword-inplace.glb", 1.5f));
+        result.put(getKey(EntityState.COMBAT), getAnimationInfo("animations/warrior/combat/sword-inplace.glb", 1.5f));
 
         return result;
     }
 
-    private void updatePositionForCamera() {
+    @Override
+    public void draw() {
 
-        position = camera.getRootPosition();
-        mesh.setModel(camera.getMatrixRelativeToCamera());
+        animationComponent.draw();
     }
 
     @Override
     public void update(double deltaTimeInSeconds){
 
-        if(!combatComponent.isActive()){
-            cameraComponent.update(inputController.getInputComponent(), deltaTimeInSeconds);
-        }
-
         super.update(deltaTimeInSeconds);
-
-        camera.move(moveComponent.getVelocity());
-
-        updatePositionForCamera();
-    }
-
-    @Override
-    protected Vector3f getForward() {
-
-        return camera.getForward();
     }
 }
