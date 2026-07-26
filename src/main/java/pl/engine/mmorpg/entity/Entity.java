@@ -6,6 +6,8 @@ import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.entity.combat.CombatComponent;
 import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
+import pl.engine.mmorpg.entity.input.InputComponent;
+import pl.engine.mmorpg.entity.input.InputController;
 import pl.engine.mmorpg.entity.move.MoveComponent;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
@@ -13,7 +15,7 @@ import pl.engine.mmorpg.mesh.Meshable;
 
 import java.util.*;
 
-public class Entity implements Meshable {
+public abstract class Entity implements Meshable {
 
     protected ComplexMesh mesh;
     protected Skeleton skeleton;
@@ -24,9 +26,11 @@ public class Entity implements Meshable {
     protected CombatComponent combatComponent;
 
     protected GravityMovementComponent gravityMovementComponent;
-    protected InputComponent inputComponent;
+    protected InputController inputController;
 
     private boolean isTurnedOnGravity = true;
+
+    private EntityState entityState = EntityState.STANDING;
 
     protected double deltaTimeInSeconds = 0;
 
@@ -82,7 +86,25 @@ public class Entity implements Meshable {
     @Override
     public void update(double deltaTimeInSeconds) {
 
+        entityState = EntityState.STANDING;
+
         moveComponent.resetHorizontal();
+
+        handleTerrainGround();
+
+        inputController.update();
+        InputComponent inputComponent = inputController.getInputComponent();
+
+        combatComponent.update(inputComponent, moveComponent, deltaTimeInSeconds, getForward());
+
+        updatePosition(inputComponent);
+
+        combinedAnimationController.update(deltaTimeInSeconds, moveComponent, combatComponent);
+
+        this.deltaTimeInSeconds = deltaTimeInSeconds;
+    }
+
+    private void handleTerrainGround(){
 
         boolean isInAir = TerrainCollisionComponent.getInstance().isInAir(position);
 
@@ -90,8 +112,19 @@ public class Entity implements Meshable {
 
             moveComponent.resetState();
         }
+    }
 
-        inputComponent.update(deltaTimeInSeconds);
+    private void updatePosition(InputComponent inputComponent){
+
+        if(!combatComponent.isActive()){
+
+            moveComponent.update(inputComponent, deltaTimeInSeconds, getForward());
+
+            if(moveComponent.isActive()){
+
+                entityState = EntityState.MOVE;
+            }
+        }
 
         if(isTurnedOnGravity){
 
@@ -100,12 +133,6 @@ public class Entity implements Meshable {
         else{
             position = position.add(moveComponent.getVelocity());
         }
-
-        moveComponent.handleVertical();
-
-        combinedAnimationController.update(deltaTimeInSeconds, moveComponent, combatComponent);
-
-        this.deltaTimeInSeconds = deltaTimeInSeconds;
     }
 
     @Override
@@ -156,8 +183,10 @@ public class Entity implements Meshable {
         return gravityMovementComponent;
     }
 
-    protected void setInputComponent(InputComponent inputComponent){
+    protected void setInputComponent(InputController inputController){
 
-        this.inputComponent = inputComponent;
+        this.inputController = inputController;
     }
+
+    protected abstract Vector3f getForward();
 }

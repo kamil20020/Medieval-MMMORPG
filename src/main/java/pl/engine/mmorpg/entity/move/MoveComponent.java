@@ -2,6 +2,7 @@ package pl.engine.mmorpg.entity.move;
 
 import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.Entity;
+import pl.engine.mmorpg.entity.input.InputComponent;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
@@ -17,31 +18,20 @@ public class MoveComponent {
     private static final double RUN_SENS = 6;
     protected static final double MOVE_SENS = 2;
     protected static final double JUMP_SENS = 20;
-    
-    public void switchIsSprinting(){
-        
-        this.isSprinting = !this.isSprinting;
-    }
 
     public void moveForward(double deltaTimeInSeconds, Vector3f forward){
 
         double moveValue = getMoveValue(deltaTimeInSeconds);
         moveInForward(moveValue, forward);
-
-        moveDirectionState = MoveDirectionState.FRONT;
-        updateMoveState();
     }
 
     public void moveBackward(double deltaTimeInSeconds, Vector3f forward){
 
         double moveValue = getMoveValue(deltaTimeInSeconds) * 0.5;
         moveInForward(-moveValue, forward);
-
-        moveDirectionState = MoveDirectionState.BACK;
-        updateMoveState();
     }
 
-    public void handleVertical(){
+    public void handleFalling(){
 
         if(velocity.y == 0 || Math.abs(velocity.y) < 0.5){
             return;
@@ -63,18 +53,6 @@ public class MoveComponent {
 
         double moveValue = getMoveValue(deltaTimeInSeconds);
         velocity.y += moveValue * JUMP_SENS;
-
-        moveDirectionState = MoveDirectionState.TOP;
-        moveState = MoveState.JUMP;
-    }
-
-    public void moveDown(double deltaTimeInSeconds){
-
-        double moveValue = getMoveValue(deltaTimeInSeconds);
-        velocity.y -= moveValue;
-
-        moveDirectionState = MoveDirectionState.DOWN;
-        moveState = MoveState.JUMP;
     }
 
     public void moveLeft(double deltaTimeInSeconds, Vector3f forward){
@@ -83,9 +61,6 @@ public class MoveComponent {
 
         double moveValue = getMoveValue(deltaTimeInSeconds);
         moveInDirection(moveValue, forward);
-
-        moveDirectionState = MoveDirectionState.LEFT;
-        updateMoveState();
     }
 
     public void moveRight(double deltaTimeInSeconds, Vector3f forward){
@@ -94,19 +69,6 @@ public class MoveComponent {
 
         double moveValue = getMoveValue(deltaTimeInSeconds);
         moveInDirection(-moveValue, forward);
-
-        moveDirectionState = MoveDirectionState.RIGHT;
-        updateMoveState();
-    }
-
-    public void moveInForwardForDelta(double deltaTime, Vector3f forward){
-
-        moveInDirection(getMoveValue(deltaTime), forward);
-    }
-
-    public void moveInForwardForDelta(double deltaTime, double moveMultiplier, Vector3f forward){
-
-        moveInDirection(getMoveValue(deltaTime, moveMultiplier), forward);
     }
 
     private void moveInForward(double scale, Vector3f forward){
@@ -121,18 +83,6 @@ public class MoveComponent {
         velocity.z += scale * dir.z;
     }
 
-    private void updateMoveState(){
-
-        if(isSprinting){
-
-            moveState = MoveState.RUN;
-        }
-        else{
-
-            moveState = MoveState.WALK;
-        }
-    }
-
     public void resetHorizontal(){
 
         velocity.x = 0;
@@ -142,11 +92,6 @@ public class MoveComponent {
     public void resetState(){
 
         moveState = MoveState.STANDING;
-    }
-
-    public boolean wasMoved(){
-
-        return !velocity.equals(0, 0, 0);
     }
 
     public Vector3f getVelocity(){
@@ -184,5 +129,52 @@ public class MoveComponent {
     public void setMoveDirectionState(MoveDirectionState moveDirectionState){
 
         this.moveDirectionState = moveDirectionState;
+    }
+
+    private void updateMoveSpeedState(){
+        moveState = isSprinting ? MoveState.RUN : MoveState.WALK;
+    }
+
+    public void update(InputComponent inputComponent, double deltaTimeInSeconds, Vector3f forward){
+
+        if(inputComponent.switchSprintPressed){
+            isSprinting = !isSprinting;
+        }
+
+        moveState = MoveState.STANDING;
+
+        if(inputComponent.moveFront){
+            moveDirectionState = MoveDirectionState.FRONT;
+            updateMoveSpeedState();
+            moveForward(deltaTimeInSeconds, forward);
+        }
+        else if(inputComponent.moveBack){
+            moveDirectionState = MoveDirectionState.BACK;
+            updateMoveSpeedState();
+            moveBackward(deltaTimeInSeconds, forward);
+        }
+        else if(inputComponent.moveRight){
+            moveDirectionState = MoveDirectionState.RIGHT;
+            updateMoveSpeedState();
+            moveRight(deltaTimeInSeconds, forward);
+        }
+        else if(inputComponent.moveLeft){
+            moveDirectionState = MoveDirectionState.LEFT;
+            updateMoveSpeedState();
+            moveLeft(deltaTimeInSeconds, forward);
+        }
+
+        handleFalling();
+
+        if(inputComponent.moveTop){
+            moveState = MoveState.JUMP;
+            moveDirectionState = MoveDirectionState.TOP;
+            moveTop(deltaTimeInSeconds);
+        }
+    }
+
+    public boolean isActive(){
+
+        return moveState != MoveState.STANDING;
     }
 }

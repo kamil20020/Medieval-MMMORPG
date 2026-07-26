@@ -1,26 +1,25 @@
 package pl.engine.mmorpg.entity.player;
 
+import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.AnimationInfo;
 import pl.engine.mmorpg.entity.Entity;
-import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.combat.CombatState;
-import pl.engine.mmorpg.entity.move.MoveComponent;
+import pl.engine.mmorpg.entity.input.PlayerInputController;
 import pl.engine.mmorpg.entity.move.MoveDirectionState;
 import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.render.Camera;
 import pl.engine.mmorpg.EventsHandler;
-import org.joml.Vector3f;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 
 import java.util.*;
 
-import static org.lwjgl.glfw.GLFW.*;
 import static pl.engine.mmorpg.entity.CombinedAnimationController.*;
 
 public class Player extends Entity {
 
     private final Camera camera;
-    private final EventsHandler eventsHandler;
+    private final CameraComponent cameraComponent;
+
     private static final String MODEL_PATH = "models/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(MoveState.STANDING);
 
@@ -32,10 +31,9 @@ public class Player extends Entity {
             FIRST_ANIMATION_NAME
         );
 
-        super.setInputComponent(new PlayerInputComponent(moveComponent, combatComponent, camera, eventsHandler));
-
+        super.setInputComponent(new PlayerInputController(eventsHandler));
         this.camera = camera;
-        this.eventsHandler = eventsHandler;
+        this.cameraComponent = new CameraComponent(camera);
 
         updatePositionForCamera();
     }
@@ -72,10 +70,20 @@ public class Player extends Entity {
     @Override
     public void update(double deltaTimeInSeconds){
 
+        if(!combatComponent.isActive()){
+            cameraComponent.update(inputController.getInputComponent(), deltaTimeInSeconds);
+        }
+
         super.update(deltaTimeInSeconds);
 
         camera.move(moveComponent.getVelocity());
 
         updatePositionForCamera();
+    }
+
+    @Override
+    protected Vector3f getForward() {
+
+        return camera.getForward();
     }
 }
