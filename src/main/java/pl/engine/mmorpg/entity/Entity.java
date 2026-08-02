@@ -9,6 +9,8 @@ import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public abstract class Entity implements Meshable {
 
@@ -33,10 +35,7 @@ public abstract class Entity implements Meshable {
 
         mesh.uploadToGpu();
 
-        for(Component component : components){
-
-            component.prepare();
-        }
+        doForAllComponents(Component::prepare);
     }
 
     @Override
@@ -55,11 +54,6 @@ public abstract class Entity implements Meshable {
     public void clear() {
 
         mesh.clear();
-
-        for (Component component : components){
-
-            component.clear();
-        }
     }
 
     @Override
@@ -67,12 +61,27 @@ public abstract class Entity implements Meshable {
 
         entityState = EntityState.STANDING;
 
-        for (Component component : components){
-
-            component.update(deltaTimeInSeconds);
-        }
+        doForAllComponents(Component::clear);
+        doForAllComponents(Component::update, deltaTimeInSeconds);
+        doForAllComponents(Component::save);
 
         this.deltaTimeInSeconds = deltaTimeInSeconds;
+    }
+
+    private void doForAllComponents(Consumer<Component> consumer){
+
+        for(Component component : components){
+
+            consumer.accept(component);
+        }
+    }
+
+    private void doForAllComponents(BiConsumer<Component, Double> consumer, double deltaTimeInSeconds){
+
+        for(Component component : components){
+
+            consumer.accept(component, deltaTimeInSeconds);
+        }
     }
 
     @Override

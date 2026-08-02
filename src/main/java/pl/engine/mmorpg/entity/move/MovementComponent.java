@@ -17,8 +17,6 @@ public class MovementComponent implements Component {
     private MoveState moveState = MoveState.STANDING;
     private MoveDirectionState moveDirectionState = MoveDirectionState.FRONT;
 
-    private boolean isSprinting = true;
-
     private Vector3f velocity = new Vector3f();
 
     private static final double RUN_SENS = 6;
@@ -39,21 +37,12 @@ public class MovementComponent implements Component {
         Vector3f forward = transformComponent.getForward();
 
         if(inputData.switchSprintPressed){
-            isSprinting = !isSprinting;
+            entityStateData.isSprinting = !entityStateData.isSprinting;
         }
-
-        moveState = MoveState.STANDING;
 
         updateHorizontalMovement(deltaTimeInSeconds, forward);
         updateVerticalMovement(deltaTimeInSeconds);
         updateRotationMovement(deltaTimeInSeconds);
-
-        if(moveState == MoveState.STANDING){
-            velocity.x = 0;
-            velocity.y = 0;
-        }
-
-        transformComponent.move(velocity);
     }
 
     private void updateHorizontalMovement(double deltaTimeInSeconds, Vector3f forward){
@@ -78,6 +67,11 @@ public class MovementComponent implements Component {
             updateMoveSpeedState();
             moveLeft(deltaTimeInSeconds, forward);
         }
+    }
+
+    private void updateMoveSpeedState(){
+
+        moveState = entityStateData.isSprinting ? MoveState.RUN : MoveState.WALK;
     }
 
     private void updateVerticalMovement(double deltaTimeInSeconds){
@@ -171,11 +165,6 @@ public class MovementComponent implements Component {
         velocity.z += scale * dir.z;
     }
 
-    public Vector3f getVelocity(){
-
-        return velocity;
-    }
-
     private double getMoveValue(double deltaTimeInSeconds){
 
         return getMoveValue(deltaTimeInSeconds, 1d);
@@ -183,7 +172,7 @@ public class MovementComponent implements Component {
 
     private double getMoveValue(double deltaTimeInSeconds, double moveMultiplier){
 
-        double moveTypeMultiplier = isSprinting ? RUN_SENS : MOVE_SENS;
+        double moveTypeMultiplier = entityStateData.isSprinting ? RUN_SENS : MOVE_SENS;
 
         return deltaTimeInSeconds * moveTypeMultiplier * moveMultiplier;
     }
@@ -220,6 +209,11 @@ public class MovementComponent implements Component {
         transformComponent.setAngle(angles);
     }
 
+    public Vector3f getVelocity(){
+
+        return velocity;
+    }
+
     public MoveState getMoveState(){
 
         return moveState;
@@ -230,8 +224,18 @@ public class MovementComponent implements Component {
         return moveDirectionState;
     }
 
-    private void updateMoveSpeedState(){
+    @Override
+    public void clear(){
 
-        moveState = isSprinting ? MoveState.RUN : MoveState.WALK;
+        velocity.x = 0;
+        velocity.y = 0;
+        velocity.z = 0;
+        moveState = MoveState.STANDING;
+    }
+
+    @Override
+    public void save(){
+
+        transformComponent.move(velocity);
     }
 }

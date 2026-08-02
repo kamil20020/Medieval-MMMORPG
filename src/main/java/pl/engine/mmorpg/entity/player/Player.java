@@ -9,6 +9,7 @@ import pl.engine.mmorpg.entity.Entity;
 import pl.engine.mmorpg.entity.animation.AnimationComponent;
 import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
+import pl.engine.mmorpg.entity.input.ActionsComponent;
 import pl.engine.mmorpg.entity.input.InputComponent;
 import pl.engine.mmorpg.entity.input.InputData;
 import pl.engine.mmorpg.entity.input.PlayerInputComponent;
@@ -71,16 +72,19 @@ public class Player extends Entity {
             this::getEntityState
         );
 
+        ActionsComponent actionsComponent = new ActionsComponent(inputData, entityStateData);
+
         CameraComponent cameraComponent = new CameraComponent(camera, inputData);
 
         return List.of(
             transformComponent,
             inputComponent,
             movementComponent,
-//            gravityMovementComponent,
-//            terrainCollisionComponent,
-            animationComponent
+            gravityMovementComponent,
+            terrainCollisionComponent,
+            animationComponent,
 //            cameraComponent
+            actionsComponent
         );
     }
 

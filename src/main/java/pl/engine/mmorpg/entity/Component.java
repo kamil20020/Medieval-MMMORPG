@@ -6,4 +6,5 @@ public interface Component {
 
     default void prepare(){}
     default void clear(){}
+    default void save(){}
 }

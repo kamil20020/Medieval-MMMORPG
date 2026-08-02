@@ -1,11 +1,24 @@
 package pl.engine.mmorpg.entity.input;
 
-public class ActionsComponent {
+import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.EntityStateData;
 
-    public void update(InputData inputComponent, double deltaTimeInSeconds){
+public class ActionsComponent implements Component {
 
-        if(inputComponent.gravitySwitchPressed){
+    private final InputData inputData;
+    private final EntityStateData entityStateData;
 
+    public ActionsComponent(InputData inputData, EntityStateData entityStateData){
+
+        this.inputData = inputData;
+        this.entityStateData = entityStateData;
+    }
+
+    @Override
+    public void update(double deltaTimeInSeconds){
+
+        if(inputData.gravitySwitchPressed){
+            entityStateData.isGravityEnabled = !entityStateData.isGravityEnabled;
         }
     }
 }

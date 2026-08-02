@@ -25,12 +25,6 @@ public class TransformComponent implements Component{
             .rotateY((float) -Math.toRadians(angle.y - 90));
 
         complexMesh.setModel(model);
-        System.out.println(angle.y);
-    }
-
-    public Vector3f getPosition(){
-
-        return position;
     }
 
     public void move(Vector3f value){
@@ -56,6 +50,11 @@ public class TransformComponent implements Component{
         }
 
         return forward;
+    }
+
+    public Vector3f getPosition(){
+
+        return position;
     }
 
     public Vector3f getAngle(){
