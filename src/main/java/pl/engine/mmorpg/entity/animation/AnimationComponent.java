@@ -22,8 +22,8 @@ import static org.lwjgl.glfw.GLFW.glfwGetTime;
 public class AnimationComponent implements Component {
 
     private ComplexMesh complexMesh;
-    private MovementComponent movementComponent;
-    private Supplier<EntityState> getEntityState;
+    private final MovementComponent movementComponent;
+    private final Supplier<EntityState> getEntityState;
 
     private final Map<String, AnimatedMeshable> animations = new HashMap<>();
     private final Map<String, AnimationInfo> animationsKeysInfoMappings;

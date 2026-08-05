@@ -36,14 +36,14 @@ public class Player extends Entity {
         animationNamesPathsMappings = getAnimationNamesPathsMappings();
     }
 
-    public Player(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
+    public Player(EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
         super(MODEL_PATH, meshFactory);
 
-        List<Component> components = initComponents(camera, eventsHandler, meshFactory);
+        List<Component> components = initComponents(eventsHandler, meshFactory);
         addComponents(components);
     }
 
-    private List<Component> initComponents(Camera camera, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
+    private List<Component> initComponents(EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
 
         TransformComponent transformComponent = new TransformComponent(mesh);
 
@@ -56,7 +56,7 @@ public class Player extends Entity {
             transformComponent
         );
 
-        GravityMovementComponent gravityMovementComponent = new GravityMovementComponent(movementComponent);
+        GravityMovementComponent gravityMovementComponent = new GravityMovementComponent(movementComponent, transformComponent::getPosition);
         TerrainCollisionComponent terrainCollisionComponent = new TerrainCollisionComponent(
             entityStateData,
             movementComponent,
@@ -74,17 +74,17 @@ public class Player extends Entity {
 
         ActionsComponent actionsComponent = new ActionsComponent(inputData, entityStateData);
 
-        CameraComponent cameraComponent = new CameraComponent(camera, inputData);
+        CameraComponent cameraComponent = new CameraComponent(transformComponent, movementComponent, inputData);
 
         return List.of(
-            transformComponent,
             inputComponent,
             movementComponent,
             gravityMovementComponent,
             terrainCollisionComponent,
+            transformComponent,
+            actionsComponent,
             animationComponent,
-//            cameraComponent
-            actionsComponent
+            cameraComponent
         );
     }
 

@@ -15,14 +15,12 @@ import java.util.List;
 public class Chunk {
 
     protected List<Meshable> meshables = new ArrayList<>();
-    protected final Camera camera;
     protected final EventsHandler eventsHandler;
     protected final Window window;
     private final MeshAbstractFactory meshFactory;
 
-    public Chunk(Camera camera, Window window, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
+    public Chunk(Window window, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
 
-        this.camera = camera;
         this.eventsHandler = eventsHandler;
         this.window = window;
         this.meshFactory = meshFactory;
@@ -42,7 +40,7 @@ public class Chunk {
         TerrainMesh terrain = TerrainMesh.getInstance("models/snow1.glb", meshFactory);
         terrain.generateHeightMap();
 
-        Meshable player = new Player(camera, eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
+        Meshable player = new Player(eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
         meshables.add(player);
 
 //        Meshable model = new ComplexJgltfMesh("animations/dragon1.glb"); //new Player(camera, eventsHandler, meshFactory);

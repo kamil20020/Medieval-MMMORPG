@@ -27,38 +27,15 @@ public class TerrainCollisionComponent implements Component {
     public void update(double deltaTime){
 
         Vector3f position = getPosition.get();
+        position = position.add(movementComponent.getVelocity());
 
-        entityStateData.isInAir = isInAir(position);
+        entityStateData.isInAir = !terrainMesh.isInsidePoint(position);
 
         if(entityStateData.isInAir){
             return;
         }
 
-        double collisionMove = getCollisionMove(position);
+        double collisionMove = terrainMesh.insidePointDifference(position);
         movementComponent.getVelocity().y += collisionMove;
-    }
-
-    public boolean isInAir(Vector3f position){
-
-        if(terrainMesh.isOutside(position.x, position.z)){
-
-            return false;
-        }
-
-        double maxValidY = terrainMesh.getTerrainMaxY(position.x, position.z);
-
-        return position.y > maxValidY;
-    }
-
-    private double getCollisionMove(Vector3f position){
-
-        double maxValidY = terrainMesh.getTerrainMaxY(position.x, position.z);
-
-        if(position.y < maxValidY){
-
-            return maxValidY - position.y;
-        }
-
-        return 0;
     }
 }

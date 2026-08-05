@@ -189,8 +189,30 @@ public class TerrainMesh implements Meshable {
         return terrainMeshHeightMapData.maxCoords();
     }
 
-    public boolean isOutside(double x, double z){
+    public boolean isInsidePoint(Vector3f position){
 
-        return x < getMinCoords().x || x > getMaxCoords().x || z < getMinCoords().x || z > getMaxCoords().z;
+        return insidePointDifference(position) > 0d;
+    }
+
+    public boolean isInAirForPoint(Vector3f position){
+
+        return insidePointDifference(position) < 0d;
+    }
+
+    public double insidePointDifference(Vector3f position) {
+
+        if(!isInsideTerrainHorizontal(position.x, position.z)){
+            return 0d;
+        }
+
+        double maxValidY = getTerrainMaxY(position.x, position.z);
+
+        return maxValidY - position.y;
+    }
+
+    public boolean isInsideTerrainHorizontal(double x, double z){
+
+        return x >= getMinCoords().x && x <= getMaxCoords().x &&
+               z >= getMinCoords().z && z <= getMaxCoords().z;
     }
 }

@@ -20,7 +20,7 @@ public class Camera {
     private final Vector3f top;
     private final Vector3f middle;
 
-    private static final Vector3f CAMERA_OFFSET = new Vector3f(0, 2, 0);
+    public static final Vector3f CAMERA_OFFSET = new Vector3f(0, 1, 0);
     private static final float DESTINATION_SCALE = 50;
     private static final float EYE_DIRECTION_SCALE = 2.5f;
 
@@ -33,11 +33,6 @@ public class Camera {
         this.middle = new Vector3f(position);
 
         updateDestinationAndEye();
-    }
-
-    public Vector3f getRootPosition(){
-
-        return new Vector3f(middle);
     }
 
     public void move(Vector3f moveVec){
@@ -81,26 +76,6 @@ public class Camera {
         updateDestinationAndEye();
     }
 
-    public Vector3f getForward(){
-
-        float yawRad = (float)Math.toRadians(angle.y);
-        Vector3f forward = new Vector3f(
-            (float)Math.cos(yawRad),
-            0,
-            (float)Math.sin(yawRad)
-        ).normalize();
-
-        if (forward.lengthSquared() < 1e-6f) {
-
-            forward.set(0, 0, -1);
-        }
-        else {
-            forward.normalize();
-        }
-
-        return forward;
-    }
-
     private void updateDestinationAndEye(){
 
         Vector3f direction = getDirection();
@@ -138,13 +113,5 @@ public class Camera {
         Shader shader = Shader.getInstance();
 
         shader.setPropertyValue(ShaderProps.CAMERA, view);
-    }
-
-    public Matrix4f getMatrixRelativeToCamera(){
-
-        return new Matrix4f()
-            .identity()
-            .translate(middle)
-            .rotateY((float) -Math.toRadians(angle.y - 90));
     }
 }

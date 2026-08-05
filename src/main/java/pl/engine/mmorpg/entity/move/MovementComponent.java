@@ -10,18 +10,18 @@ import java.util.function.Supplier;
 
 public class MovementComponent implements Component {
 
-    private InputData inputData;
-    private EntityStateData entityStateData;
-    private TransformComponent transformComponent;
+    private final InputData inputData;
+    private final EntityStateData entityStateData;
+    private final TransformComponent transformComponent;
 
     private MoveState moveState = MoveState.STANDING;
     private MoveDirectionState moveDirectionState = MoveDirectionState.FRONT;
 
-    private Vector3f velocity = new Vector3f();
+    private final Vector3f velocity = new Vector3f();
 
     private static final double RUN_SENS = 6;
     protected static final double MOVE_SENS = 2;
-    protected static final double JUMP_SENS = 20;
+    protected static final double JUMP_SENS = 50;
     protected static final double ROTATION_SENS = 50000;
 
     public MovementComponent(InputData inputData, EntityStateData entityStateData, TransformComponent transformComponent){
@@ -85,34 +85,6 @@ public class MovementComponent implements Component {
         }
     }
 
-    private void updateRotationMovement(double deltaTime){
-
-        if(inputData.rotateLeft){
-            rotateLeft(-deltaTime);
-        }
-        else if(inputData.rotateRight){
-            rotateRight(deltaTime);
-        }
-        else if(inputData.rotateTop){
-            rotateTop(-deltaTime);
-        }
-        else if(inputData.rotateDown){
-            rotateDown(deltaTime);
-        }
-    }
-
-    public void moveForward(double deltaTimeInSeconds, Vector3f forward){
-
-        double moveValue = getMoveValue(deltaTimeInSeconds);
-        moveInForward(moveValue, forward);
-    }
-
-    public void moveBackward(double deltaTimeInSeconds, Vector3f forward){
-
-        double moveValue = getMoveValue(deltaTimeInSeconds) * 0.5;
-        moveInForward(-moveValue, forward);
-    }
-
     public void handleFalling(){
 
         if(velocity.y == 0 || Math.abs(velocity.y) < 0.5){
@@ -129,6 +101,18 @@ public class MovementComponent implements Component {
 
             moveDirectionState = MoveDirectionState.TOP;
         }
+    }
+
+    public void moveForward(double deltaTimeInSeconds, Vector3f forward){
+
+        double moveValue = getMoveValue(deltaTimeInSeconds);
+        moveInForward(moveValue, forward);
+    }
+
+    public void moveBackward(double deltaTimeInSeconds, Vector3f forward){
+
+        double moveValue = getMoveValue(deltaTimeInSeconds) * 0.5;
+        moveInForward(-moveValue, forward);
     }
 
     public void moveTop(double deltaTimeInSeconds){
@@ -175,6 +159,36 @@ public class MovementComponent implements Component {
         double moveTypeMultiplier = entityStateData.isSprinting ? RUN_SENS : MOVE_SENS;
 
         return deltaTimeInSeconds * moveTypeMultiplier * moveMultiplier;
+    }
+
+    private void updateRotationMovement(double deltaTime){
+
+        updateHorizontalRotationMovement(deltaTime);
+        updateVerticalRotationMovement(deltaTime);
+    }
+
+    private void updateHorizontalRotationMovement(double deltaTime){
+
+        double rotationValue = Math.abs(inputData.mouseXPosForWindowWidth) * ROTATION_SENS * deltaTime;
+
+        if(inputData.rotateLeft){
+            rotateLeft(rotationValue);
+        }
+        else if(inputData.rotateRight){
+            rotateRight(rotationValue);
+        }
+    }
+
+    private void updateVerticalRotationMovement(double deltaTime){
+
+        double rotationValue = Math.abs(inputData.mouseYPosForWindowHeight) * ROTATION_SENS * deltaTime;
+
+        if(inputData.rotateDown){
+            rotateTop(rotationValue);
+        }
+        else if(inputData.rotateTop){
+            rotateDown(rotationValue);
+        }
     }
 
     public void rotateLeft(double angle){

@@ -13,16 +13,14 @@ import static org.lwjgl.opengl.GL11.*;
 public class Renderer {
 
     private final Window window;
-    private final Camera camera;
     private final MeshAbstractFactory meshFactory;
     private final Chunk chunk;
 
     public Renderer(Window window, EventsHandler eventsHandler){
 
         this.window = window;
-        this.camera = new Camera(new Vector3f(-200, 10, -200));
         this.meshFactory = new JgltfMeshAbstractFactory();
-        this.chunk = new Chunk(camera, window, eventsHandler, meshFactory);
+        this.chunk = new Chunk(window, eventsHandler, meshFactory);
     }
 
     public void init(){
@@ -48,7 +46,6 @@ public class Renderer {
     public void update(double deltaTime){
 
         chunk.update(deltaTime);
-        camera.update();
     }
 
     public void render(){

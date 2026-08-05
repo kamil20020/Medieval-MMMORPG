@@ -6,7 +6,7 @@ import pl.engine.mmorpg.entity.input.InputData;
 public class CombatComponent implements Component {
 
     private CombatState combatState = CombatState.NO_WEAPON;
-    private InputData inputData;
+    private final InputData inputData;
 
     private double stateCloseDelta;
     public static final double STATE_CLOSE_TIME = 0.5;

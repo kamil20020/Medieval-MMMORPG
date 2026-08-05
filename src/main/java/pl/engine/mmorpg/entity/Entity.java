@@ -20,7 +20,7 @@ public abstract class Entity implements Meshable {
     protected EntityState entityState = EntityState.STANDING;
     protected EntityStateData entityStateData = new EntityStateData();
 
-    private List<Component> components = new ArrayList<>();
+    private final List<Component> components = new ArrayList<>();
 
     protected double deltaTimeInSeconds = 0;
 

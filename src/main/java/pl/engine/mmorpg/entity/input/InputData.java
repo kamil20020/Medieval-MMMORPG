@@ -20,7 +20,7 @@ public class InputData {
     public boolean keyboardRotateTopCamera;
     public boolean keyboardRotateDownCamera;
     public boolean mouseRotateCamera;
-    public double mouseXPosForWindowHeight;
+    public double mouseXPosForWindowWidth;
     public double mouseYPosForWindowHeight;
 
     public boolean combatStart;
@@ -45,7 +45,7 @@ public class InputData {
         this.keyboardRotateTopCamera = false;
         this.keyboardRotateDownCamera = false;
         this.mouseRotateCamera = false;
-        this.mouseXPosForWindowHeight = 0;
+        this.mouseXPosForWindowWidth = 0;
         this.mouseYPosForWindowHeight = 0;
 
         this.combatStart = false;

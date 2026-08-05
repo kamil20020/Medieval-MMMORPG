@@ -99,9 +99,27 @@ public class PlayerInputComponent extends InputComponent {
 
     private void handleMouseRotate(){
 
-        inputData.mouseRotateCamera = true;
-        inputData.mouseXPosForWindowHeight = eventsHandler.getMouseXPosForWindowWidth();
+        inputData.mouseXPosForWindowWidth = eventsHandler.getMouseXPosForWindowWidth();
         inputData.mouseYPosForWindowHeight = eventsHandler.getMouseYPosForWindowHeight();
+
+        if(inputData.mouseXPosForWindowWidth == 0d && inputData.mouseYPosForWindowHeight == 0d){
+            return;
+        }
+        inputData.mouseRotateCamera = true;
+
+        if(inputData.mouseXPosForWindowWidth < 0){
+            inputData.rotateLeft = true;
+        }
+        else{
+            inputData.rotateRight = true;
+        }
+
+        if(inputData.mouseYPosForWindowHeight < 0){
+            inputData.rotateTop = true;
+        }
+        else {
+            inputData.rotateDown = true;
+        }
 
         eventsHandler.resetMouseMove();
     }

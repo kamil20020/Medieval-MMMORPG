@@ -1,25 +1,37 @@
 package pl.engine.mmorpg.entity.player;
 
+import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.TransformComponent;
 import pl.engine.mmorpg.entity.input.InputData;
+import pl.engine.mmorpg.entity.move.MovementComponent;
 import pl.engine.mmorpg.render.Camera;
 
 public class CameraComponent implements Component {
 
     private final Camera camera;
     private boolean isVerticalCameraUnlocked = false;
+    private final TransformComponent transformComponent;
+    private final MovementComponent movementComponent;
     private InputData inputData;
 
     protected static final double ROTATION_SENS = 50000;
 
-    public CameraComponent(Camera camera, InputData inputData){
+    public CameraComponent(TransformComponent transformComponent, MovementComponent movementComponent, InputData inputData){
 
-        this.camera = camera;
+        this.transformComponent = transformComponent;
+        this.camera = new Camera(transformComponent.getPosition().add(Camera.CAMERA_OFFSET));
+        this.movementComponent = movementComponent;
         this.inputData = inputData;
     }
 
     @Override
     public void update(double deltaTimeInSeconds){
+
+        camera.update();
+
+        Vector3f velocity = movementComponent.getVelocity();
+        camera.move(velocity);
 
         if(inputData.cameraUnlockPressed){
             isVerticalCameraUnlocked = !isVerticalCameraUnlocked;
@@ -37,7 +49,7 @@ public class CameraComponent implements Component {
 
     private void handleMouseRotate(double deltaTimeInSeconds, InputData inputComponent){
 
-        handleHorizontalRotate(deltaTimeInSeconds, inputComponent.mouseXPosForWindowHeight);
+        handleHorizontalRotate(deltaTimeInSeconds, inputComponent.mouseXPosForWindowWidth);
 
         if(isVerticalCameraUnlocked){
 
@@ -47,13 +59,13 @@ public class CameraComponent implements Component {
 
     private void handleHorizontalRotate(double deltaTimeInSeconds, double mouseX){
 
-        if(mouseX == 0){
+        if(!inputData.rotateLeft && !inputData.rotateRight){
             return;
         }
 
         double rotationValue = Math.abs(mouseX) * ROTATION_SENS * deltaTimeInSeconds;
 
-        if(mouseX > 0){
+        if(inputData.rotateRight){
 
             camera.rotateRight(rotationValue);
         }
@@ -65,13 +77,13 @@ public class CameraComponent implements Component {
 
     private void handleVerticalRotate(double deltaTimeInSeconds, double mouseY){
 
-        if(mouseY == 0){
+        if(!inputData.rotateTop && !inputData.rotateDown){
             return;
         }
 
         double rotationValue = Math.abs(mouseY) * ROTATION_SENS * deltaTimeInSeconds;
 
-        if(mouseY > 0){
+        if(inputData.rotateDown){
 
             camera.rotateDown(rotationValue);
         }
