@@ -2,6 +2,8 @@ package pl.engine.mmorpg.entity.gravity;
 
 import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.EntityState;
+import pl.engine.mmorpg.entity.EntityStateData;
 import pl.engine.mmorpg.entity.move.MovementComponent;
 import pl.engine.mmorpg.terrain.TerrainMesh;
 
@@ -9,19 +11,20 @@ import java.util.function.Supplier;
 
 public class GravityMovementComponent implements Component {
 
+    private double airStartTime = 0d;
+
+    public static final double GRAVITY_SPEED = 0.1d;
+
+    private final MovementComponent movementComponent;
+    private final EntityStateData entityStateData;
     private final TerrainMesh terrainMesh;
     private final Supplier<Vector3f> getPosition;
 
-    private double airStartTime = 0d;
+    public GravityMovementComponent(MovementComponent movementComponent, EntityStateData entityStateData, Supplier<Vector3f> getPosition){
 
-    public static final double GRAVITY_SPEED = 0.12d;
-
-    private final MovementComponent movementComponent;
-
-    public GravityMovementComponent(MovementComponent movementComponent, Supplier<Vector3f> getPosition){
-
-        this.terrainMesh = TerrainMesh.getInstance();
         this.movementComponent = movementComponent;
+        this.entityStateData = entityStateData;
+        this.terrainMesh = TerrainMesh.getInstance();
         this.getPosition = getPosition;
     }
 
@@ -29,20 +32,43 @@ public class GravityMovementComponent implements Component {
     public void update(double deltaTime){
 
         Vector3f position = getPosition.get();
-        position = position.add(movementComponent.getVelocity());
+        Vector3f speed = movementComponent.getVelocity();
+        Vector3f updatedPosition = position.add(speed);
 
-        if(!terrainMesh.isInAirForPoint(position)){
-            airStartTime = 0;
+        entityStateData.isInAir = terrainMesh.terrainPointVerticalDifference(updatedPosition) < -0.5d;
+
+        if(!entityStateData.isInAir){
+
+            movementComponent.getVelocity().y = 0;
+            airStartTime = 0d;
+
+            if(entityStateData.entityState == EntityState.FALLING) {
+
+                entityStateData.entityState = EntityState.STANDING;
+                entityStateData.canActionBeInterrupted = true;
+            }
             return;
         }
+
+        entityStateData.entityState = EntityState.FALLING;
+        entityStateData.canActionBeInterrupted = false;
 
         if(airStartTime == 0){
             airStartTime = System.nanoTime();
         }
 
+        speed.y -= getGravityVelocity();
+
+        if(speed.y < 0){
+
+            entityStateData.entityState = EntityState.FALLING;
+        }
+    }
+
+    private double getGravityVelocity(){
+
         double actualTime = System.nanoTime();
         double timeInAirInSeconds = (actualTime - airStartTime) / 1_000_000_000d;
-
-        movementComponent.getVelocity().y -= GRAVITY_SPEED * (timeInAirInSeconds + 1d);
+        return GRAVITY_SPEED * (timeInAirInSeconds + 1d);
     }
 }

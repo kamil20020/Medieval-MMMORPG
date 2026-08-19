@@ -37,7 +37,7 @@ public class Window {
         long primaryMonitor = glfwGetPrimaryMonitor();
         GLFWVidMode vidMode = glfwGetVideoMode(primaryMonitor);
 
-        this.width = vidMode.width();
+        this.width = vidMode.width() / 2;
         this.height = vidMode.height();
 
 //        windowId = glfwCreateWindow(width, height, "Engine 3d - OpenGL from lwjgl", NULL, NULL);

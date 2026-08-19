@@ -26,16 +26,18 @@ public class TerrainCollisionComponent implements Component {
     @Override
     public void update(double deltaTime){
 
+        if(entityStateData.isInAir){
+            return;
+        }
+
         Vector3f position = getPosition.get();
         position = position.add(movementComponent.getVelocity());
-
-        entityStateData.isInAir = !terrainMesh.isInsidePoint(position);
 
         if(entityStateData.isInAir){
             return;
         }
 
-        double collisionMove = terrainMesh.insidePointDifference(position);
+        double collisionMove = terrainMesh.terrainPointVerticalDifference(position);
         movementComponent.getVelocity().y += collisionMove;
     }
 }

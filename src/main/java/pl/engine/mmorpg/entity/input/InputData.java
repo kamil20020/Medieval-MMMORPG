@@ -24,6 +24,7 @@ public class InputData {
     public double mouseYPosForWindowHeight;
 
     public boolean combatStart;
+    public boolean useSkill;
 
     public void reset() {
 
@@ -49,5 +50,6 @@ public class InputData {
         this.mouseYPosForWindowHeight = 0;
 
         this.combatStart = false;
+        this.useSkill = false;
     }
 }

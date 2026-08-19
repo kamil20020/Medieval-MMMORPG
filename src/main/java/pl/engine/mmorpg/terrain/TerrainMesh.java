@@ -189,17 +189,7 @@ public class TerrainMesh implements Meshable {
         return terrainMeshHeightMapData.maxCoords();
     }
 
-    public boolean isInsidePoint(Vector3f position){
-
-        return insidePointDifference(position) > 0d;
-    }
-
-    public boolean isInAirForPoint(Vector3f position){
-
-        return insidePointDifference(position) < 0d;
-    }
-
-    public double insidePointDifference(Vector3f position) {
+    public double terrainPointVerticalDifference(Vector3f position) {
 
         if(!isInsideTerrainHorizontal(position.x, position.z)){
             return 0d;

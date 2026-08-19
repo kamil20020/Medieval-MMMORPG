@@ -2,11 +2,10 @@ package pl.engine.mmorpg.entity.move;
 
 import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.Component;
+import pl.engine.mmorpg.entity.EntityState;
 import pl.engine.mmorpg.entity.EntityStateData;
 import pl.engine.mmorpg.entity.TransformComponent;
 import pl.engine.mmorpg.entity.input.InputData;
-
-import java.util.function.Supplier;
 
 public class MovementComponent implements Component {
 
@@ -14,14 +13,14 @@ public class MovementComponent implements Component {
     private final EntityStateData entityStateData;
     private final TransformComponent transformComponent;
 
-    private MoveState moveState = MoveState.STANDING;
+    private boolean wasMoved = false;
     private MoveDirectionState moveDirectionState = MoveDirectionState.FRONT;
 
     private final Vector3f velocity = new Vector3f();
 
     private static final double RUN_SENS = 6;
     protected static final double MOVE_SENS = 2;
-    protected static final double JUMP_SENS = 50;
+    protected static final double JUMP_SENS = 15;
     protected static final double ROTATION_SENS = 50000;
 
     public MovementComponent(InputData inputData, EntityStateData entityStateData, TransformComponent transformComponent){
@@ -40,66 +39,53 @@ public class MovementComponent implements Component {
             entityStateData.isSprinting = !entityStateData.isSprinting;
         }
 
+        updateRotationMovement(deltaTimeInSeconds);
+
+        if(!entityStateData.canActionBeInterrupted){
+            return;
+        }
+
+        wasMoved = false;
+
         updateHorizontalMovement(deltaTimeInSeconds, forward);
         updateVerticalMovement(deltaTimeInSeconds);
-        updateRotationMovement(deltaTimeInSeconds);
+
+        if(wasMoved){
+
+            entityStateData.entityState = EntityState.MOVE;
+        }
     }
 
     private void updateHorizontalMovement(double deltaTimeInSeconds, Vector3f forward){
 
         if(inputData.moveFront){
             moveDirectionState = MoveDirectionState.FRONT;
-            updateMoveSpeedState();
             moveForward(deltaTimeInSeconds, forward);
+            wasMoved = true;
         }
         else if(inputData.moveBack){
             moveDirectionState = MoveDirectionState.BACK;
-            updateMoveSpeedState();
             moveBackward(deltaTimeInSeconds, forward);
+            wasMoved = true;
         }
         else if(inputData.moveRight){
             moveDirectionState = MoveDirectionState.RIGHT;
-            updateMoveSpeedState();
             moveRight(deltaTimeInSeconds, forward);
+            wasMoved = true;
         }
         else if(inputData.moveLeft){
             moveDirectionState = MoveDirectionState.LEFT;
-            updateMoveSpeedState();
             moveLeft(deltaTimeInSeconds, forward);
+            wasMoved = true;
         }
-    }
-
-    private void updateMoveSpeedState(){
-
-        moveState = entityStateData.isSprinting ? MoveState.RUN : MoveState.WALK;
     }
 
     private void updateVerticalMovement(double deltaTimeInSeconds){
 
-        handleFalling();
-
         if(inputData.moveTop && !entityStateData.isInAir){
-            moveState = MoveState.JUMP;
             moveDirectionState = MoveDirectionState.TOP;
             moveTop(deltaTimeInSeconds);
-        }
-    }
-
-    public void handleFalling(){
-
-        if(velocity.y == 0 || Math.abs(velocity.y) < 0.5){
-            return;
-        }
-
-        moveState = MoveState.JUMP;
-
-        if(velocity.y < 0){
-
-            moveDirectionState = MoveDirectionState.DOWN;
-        }
-        else{
-
-            moveDirectionState = MoveDirectionState.TOP;
+            wasMoved = true;
         }
     }
 
@@ -228,11 +214,6 @@ public class MovementComponent implements Component {
         return velocity;
     }
 
-    public MoveState getMoveState(){
-
-        return moveState;
-    }
-
     public MoveDirectionState getMoveDirectionState(){
 
         return moveDirectionState;
@@ -242,9 +223,7 @@ public class MovementComponent implements Component {
     public void clear(){
 
         velocity.x = 0;
-        velocity.y = 0;
         velocity.z = 0;
-        moveState = MoveState.STANDING;
     }
 
     @Override

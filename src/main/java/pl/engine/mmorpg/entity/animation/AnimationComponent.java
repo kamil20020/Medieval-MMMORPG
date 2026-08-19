@@ -5,9 +5,9 @@ import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
 import pl.engine.mmorpg.entity.Component;
 import pl.engine.mmorpg.entity.EntityState;
+import pl.engine.mmorpg.entity.EntityStateData;
 import pl.engine.mmorpg.entity.move.MovementComponent;
 import pl.engine.mmorpg.entity.move.MoveDirectionState;
-import pl.engine.mmorpg.entity.move.MoveState;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 
@@ -23,7 +23,9 @@ public class AnimationComponent implements Component {
 
     private ComplexMesh complexMesh;
     private final MovementComponent movementComponent;
-    private final Supplier<EntityState> getEntityState;
+    private final EntityStateData entityStateData;
+
+    private double blockingAnimationStartTime = 0;
 
     private final Map<String, AnimatedMeshable> animations = new HashMap<>();
     private final Map<String, AnimationInfo> animationsKeysInfoMappings;
@@ -41,13 +43,17 @@ public class AnimationComponent implements Component {
 
     protected static final double BLEND_DURATION = 0.2;
 
+    private static final String IS_SPRINTING_KEY = "is_sprinting";
+    private static final String IS_WALKING_KEY = "is_walking";
+    private static final String MOVEMENT_KEY_SEPARATOR = "_";
+
     public AnimationComponent(
         ComplexMesh complexMesh,
         Map<String, AnimationInfo> animationsKeysPathsMappings,
         MeshAbstractFactory meshFactory,
         String firstAnimationName,
         MovementComponent movementComponent,
-        Supplier<EntityState> getEntityState
+        EntityStateData entityStateData
     ){
         this.complexMesh = complexMesh;
 
@@ -58,7 +64,7 @@ public class AnimationComponent implements Component {
         this.oldAnimationName = firstAnimationName;
 
         this.movementComponent = movementComponent;
-        this.getEntityState = getEntityState;
+        this.entityStateData = entityStateData;
     }
 
     @Override
@@ -94,10 +100,16 @@ public class AnimationComponent implements Component {
 
     @Override
     public void update(double deltaTimeInSeconds){
-        EntityState entityState = getEntityState.get();
-        String newAnimationName = getActualAnimationName();
 
-        setAnimation(newAnimationName);
+        if(entityStateData.canActionBeInterrupted){
+
+            startNewAnimation();
+        }
+        else{
+
+            handleBlockingAnimation();
+        }
+
         actualAnimation.update(deltaTimeInSeconds);
 
 //        if(!Objects.equals(actualAnimationName, nextAnimationName)){
@@ -106,27 +118,56 @@ public class AnimationComponent implements Component {
 //        }
     }
 
+    private void handleBlockingAnimation(){
+
+        if(blockingAnimationStartTime == 0){
+
+            startNewAnimation();
+            blockingAnimationStartTime = System.nanoTime();
+            return;
+        }
+
+        double animationDuration = getBlockingAnimationDuration();
+//        System.out.println(animationDuration + " " + entityStateData.actionMinimumDuration);
+
+        if(animationDuration < entityStateData.actionMinimumDuration){
+            return;
+        }
+
+        entityStateData.canActionBeInterrupted = true;
+        entityStateData.actionMinimumDuration = 0;
+        blockingAnimationStartTime = 0;
+    }
+
+    private double getBlockingAnimationDuration(){
+
+        double actualTime = System.nanoTime();
+        return (actualTime - blockingAnimationStartTime) / 1_000_000_000d;
+    }
+
+    private void startNewAnimation(){
+
+        String newAnimationName = getActualAnimationName();
+        setAnimation(newAnimationName);
+    }
+
     private String getActualAnimationName(){
 
-        EntityState entityState = getEntityState.get();
-        MoveState moveState = movementComponent.getMoveState();
+        EntityState entityState = entityStateData.entityState;
         MoveDirectionState moveDirectionState = movementComponent.getMoveDirectionState();
+        boolean isSprinting = entityStateData.isSprinting;
 
-        if(entityState == EntityState.COMBAT){
-            return getKey(entityState);
+        if(entityStateData.isInAir && entityState != EntityState.FALLING){
+
+            return getKey(isSprinting, MoveDirectionState.TOP);
         }
 
-        if(moveState == MoveState.JUMP){
+        if(entityState == EntityState.MOVE){
 
-            return getKey(moveState, moveDirectionState);
+            return getKey(isSprinting, moveDirectionState);
         }
 
-        if(moveState != MoveState.STANDING){
-
-            return getKey(moveState, moveDirectionState);
-        }
-
-        return getKey(moveState);
+        return getKey(entityState);
     }
 
     public void setAnimation(String animationName){
@@ -211,11 +252,6 @@ public class AnimationComponent implements Component {
         actualAnimation.clear();
     }
 
-    public static String getKey(MoveState moveState){
-
-        return moveState.name();
-    }
-
     public static AnimationInfo getAnimationInfo(String animationModelInfo){
 
         return new AnimationInfo(animationModelInfo);
@@ -226,18 +262,15 @@ public class AnimationComponent implements Component {
         return new AnimationInfo(animationModelInfo, animationSpeedMultiplier);
     }
 
-    public static String getKey(MoveDirectionState moveDirectionState){
-
-        return moveDirectionState.name();
-    }
-
     public static String getKey(EntityState entityState){
 
         return entityState.name();
     }
 
-    public static String getKey(MoveState moveState, MoveDirectionState moveDirectionState){
+    public static String getKey(boolean isSprinting, MoveDirectionState moveDirectionState){
 
-        return moveState.name() + "_" + moveDirectionState.name();
+        String moveTypeKey = isSprinting ? IS_SPRINTING_KEY : IS_WALKING_KEY;
+
+        return moveTypeKey + MOVEMENT_KEY_SEPARATOR + moveDirectionState.name();
     }
 }

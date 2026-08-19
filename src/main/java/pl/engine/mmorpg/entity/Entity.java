@@ -17,7 +17,6 @@ public abstract class Entity implements Meshable {
     protected ComplexMesh mesh;
     protected Skeleton skeleton;
 
-    protected EntityState entityState = EntityState.STANDING;
     protected EntityStateData entityStateData = new EntityStateData();
 
     private final List<Component> components = new ArrayList<>();
@@ -59,7 +58,10 @@ public abstract class Entity implements Meshable {
     @Override
     public void update(double deltaTimeInSeconds) {
 
-        entityState = EntityState.STANDING;
+        if(entityStateData.canActionBeInterrupted) {
+
+            entityStateData.entityState = EntityState.STANDING;
+        }
 
         doForAllComponents(Component::clear);
         doForAllComponents(Component::update, deltaTimeInSeconds);
@@ -120,7 +122,7 @@ public abstract class Entity implements Meshable {
 
     public EntityState getEntityState(){
 
-        return entityState;
+        return entityStateData.entityState;
     }
 
     protected void addComponents(List<Component> components){
