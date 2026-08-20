@@ -10,7 +10,7 @@ import pl.engine.mmorpg.entity.move.MovementComponent;
 
 import java.util.Arrays;
 
-public class CombatComponent implements Component {
+public class ComboComponent implements Component {
 
     private final InputData inputData;
     private final EntityStateData entityStateData;
@@ -43,7 +43,7 @@ public class CombatComponent implements Component {
         return result;
     }
 
-    public CombatComponent(InputData inputData, EntityStateData entityStateData, MovementComponent movementComponent, TransformComponent transformComponent){
+    public ComboComponent(InputData inputData, EntityStateData entityStateData, MovementComponent movementComponent, TransformComponent transformComponent){
 
         this.inputData = inputData;
         this.entityStateData = entityStateData;
@@ -52,6 +52,10 @@ public class CombatComponent implements Component {
     }
 
     public void update(double deltaTime){
+
+        if(entityStateData.isWeaponHidden){
+            return;
+        }
 
         if(!entityStateData.canActionBeInterrupted && !isStartedCombo){
 
@@ -68,10 +72,7 @@ public class CombatComponent implements Component {
             return;
         }
 
-        Vector3f forward = transformComponent.getForward();
-        movementComponent.moveForward(deltaTime / 3, forward);
-
-        handleComboAnimations();
+        handleComboAnimations(deltaTime);
     }
 
     private void startCombo(){
@@ -82,7 +83,10 @@ public class CombatComponent implements Component {
         entityStateData.actionMinimumDuration = comboDurations[0];
     }
 
-    private void handleComboAnimations(){
+    private void handleComboAnimations(double deltaTime){
+
+        Vector3f forward = transformComponent.getForward();
+        movementComponent.moveForward(deltaTime / 3, forward);
 
         if(comboStartTime == 0){
 

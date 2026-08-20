@@ -5,6 +5,7 @@ import de.javagl.jgltf.model.MeshModel;
 import org.joml.Matrix4f;
 import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
+import pl.engine.mmorpg.animation.DynamicMesh;
 import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.mesh.Mesh;
 import pl.engine.mmorpg.mesh.Meshable;
@@ -110,6 +111,13 @@ public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh implements Animat
             aa.add(animatedMesh.getBoneFinalTransformations());
         }
         return aa;
+    }
+
+    @Override
+    public void addDynamicMesh(DynamicMesh dynamicMesh) {
+
+        AnimatedMesh firstAnimatedMesh = (AnimatedMesh) meshes.get(0);
+        firstAnimatedMesh.addDynamicMesh(dynamicMesh);
     }
 }
 

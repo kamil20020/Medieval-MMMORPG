@@ -14,6 +14,7 @@ public class GravityMovementComponent implements Component {
     private double airStartTime = 0d;
 
     public static final double GRAVITY_SPEED = 0.1d;
+    private static final double landingTime = 0.5;
 
     private final MovementComponent movementComponent;
     private final EntityStateData entityStateData;

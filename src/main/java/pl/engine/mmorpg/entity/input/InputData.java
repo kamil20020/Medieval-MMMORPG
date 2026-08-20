@@ -25,6 +25,7 @@ public class InputData {
 
     public boolean combatStart;
     public boolean useSkill;
+    public boolean switchShowWeapon;
 
     public void reset() {
 
@@ -51,5 +52,6 @@ public class InputData {
 
         this.combatStart = false;
         this.useSkill = false;
+        this.switchShowWeapon = false;
     }
 }

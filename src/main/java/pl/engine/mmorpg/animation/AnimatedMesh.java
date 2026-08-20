@@ -41,6 +41,8 @@ public abstract class AnimatedMesh extends Mesh {
     private int vboBoneIndices;
     private int vboBoneWeights;
 
+    private List<DynamicMesh> dynamicMeshes = new ArrayList<>();
+
     protected static final Integer MAX_NUMBER_OF_BONES = 200;
     protected static final Integer MAX_NUMBER_OF_BONS_PER_VERTEX = 4;
 
@@ -93,6 +95,7 @@ public abstract class AnimatedMesh extends Mesh {
         animationTime %= animationDurationInTicksPerSeconds;
 
         loadFinalTransformation(animationTime);
+        setDynamicMeshesModels(additionalMesh.getModel());
     }
 
     protected Matrix4f getGlobalTransformation(Matrix4f parentTransformation, Matrix4f nodeTransformation){
@@ -102,15 +105,16 @@ public abstract class AnimatedMesh extends Mesh {
 
     protected void loadFinalTransformation(String nodeName, Matrix4f globalTransformation){
 
-        if(skeleton.containsBone(nodeName)){
-
-            int boneIndex = skeleton.getBoneIndex(nodeName);
-            Matrix4f boneInverse = bonesInverses.get(boneIndex);
-
-            boneFinalTransformations[boneIndex] = new Matrix4f(rootNodeGlobalInverseTransform)
-                .mul(new Matrix4f(globalTransformation))
-                .mul(boneInverse);
+        if(!skeleton.containsBone(nodeName)) {
+            return;
         }
+
+        int boneIndex = skeleton.getBoneIndex(nodeName);
+        Matrix4f boneInverse = bonesInverses.get(boneIndex);
+
+        boneFinalTransformations[boneIndex] = new Matrix4f(rootNodeGlobalInverseTransform)
+            .mul(new Matrix4f(globalTransformation))
+            .mul(boneInverse);
     }
 
     @Override
@@ -169,6 +173,8 @@ public abstract class AnimatedMesh extends Mesh {
         additionalMesh.draw();
 
         shader.setPropertyValue(ShaderProps.IS_ANIMATED, Boolean.FALSE);
+
+        drawDynamicMeshes();
     }
 
     @Override
@@ -207,7 +213,7 @@ public abstract class AnimatedMesh extends Mesh {
     public void clear(){
 
         glDeleteBuffers(vboBoneIndices);
-        glDeleteBuffers(vboBoneWeights);;
+        glDeleteBuffers(vboBoneWeights);
     }
 
     public void reset(){
@@ -260,69 +266,6 @@ public abstract class AnimatedMesh extends Mesh {
         return result;
     }
 
-    private void printFinal(){
-
-        System.out.println("Submesh boneFinalTransformations:");
-
-        for(int i = 0; i < skeleton.getNumberOfBones(); i++){
-
-            String name = "";
-
-            for(var m : skeleton.getEntrySet()){
-
-                if(i == m.getValue()){
-
-                    name = m.getKey();
-                    break;
-                }
-            }
-
-            System.out.println(name + ": " + boneFinalTransformations[i]);
-        }
-    }
-
-    private void printVerticesBones(){
-
-        for (int i = 0; i < 100; i++) {
-
-            System.out.println("Vertex " + i);
-            System.out.println("  indices: " + verticesBonesIndices.get(i));
-            System.out.println("  weights: " + verticesBonesWeights.get(i));
-        }
-    }
-
-    protected void sortVerticesBones(){
-
-        for(int i = 0; i < numberOfVertices; i++){
-
-            List<Integer> indices = verticesBonesIndices.get(i);
-            List<Float> weights = verticesBonesWeights.get(i);
-
-            for(int j = 0; j < weights.size() - 1; j++){
-
-                for(int k = 0; k < weights.size() - j - 1; k++){
-
-                    if(weights.get(k) < weights.get(k + 1)){
-
-                        float tempWeight = weights.get(k);
-                        weights.set(k, weights.get(k + 1));
-                        weights.set(k + 1, tempWeight);
-
-
-                        int tempIndex = indices.get(k);
-                        indices.set(k, indices.get(k + 1));
-                        indices.set(k + 1, tempIndex);
-                    }
-                }
-            }
-
-            int maxBones = Math.min(MAX_NUMBER_OF_BONS_PER_VERTEX, weights.size());
-            float sum = 0f;
-            for (int j = 0; j < maxBones; j++) sum += weights.get(j);
-            for (int j = 0; j < maxBones; j++) weights.set(j, weights.get(j) / sum);
-        }
-    }
-
     protected void normalizeVerticesWeightsAndIndices(){
 
         for(int i = 0; i < numberOfVertices; i++) {
@@ -354,24 +297,6 @@ public abstract class AnimatedMesh extends Mesh {
         }
     }
 
-    private void printEmptyWeightsVertices(){
-
-        for(int i = 0; i < numberOfVertices; i++){
-
-            if(verticesBonesWeights.get(i).size() == 0){
-                System.out.println("Brak kości dla vertexa: " + i);
-            }
-        }
-    }
-
-    private void printVerticesBonesWeights(){
-
-        for(int i = 0; i < numberOfVertices; i++){
-
-            System.out.println(verticesBonesWeights.get(i));
-        }
-    }
-
     protected Map<String, Vector3f> getAnimatedBonesPositions() {
 
         Map<String, Vector3f> bonePositions = new LinkedHashMap<>();
@@ -387,6 +312,37 @@ public abstract class AnimatedMesh extends Mesh {
         }
 
         return bonePositions;
+    }
+
+    public void addDynamicMesh(DynamicMesh dynamicMesh){
+
+        dynamicMeshes.add(dynamicMesh);
+        dynamicMesh.uploadToGpu();
+    }
+
+    private void setDynamicMeshesModels(Matrix4f model){
+
+        for (DynamicMesh dynamicMesh : dynamicMeshes){
+
+            int boneIndex = skeleton.getBoneIndex(dynamicMesh.getBoneName());
+            Matrix4f finalMatrix = boneFinalTransformations[boneIndex];
+
+            Matrix4f finalModel = new Matrix4f(model)
+                .mul(finalMatrix)
+                .translate(dynamicMesh.getTranslation())
+                .rotateXYZ(dynamicMesh.getRotation())
+                .scale(dynamicMesh.getScale());
+
+            dynamicMesh.setModel(finalModel);
+        }
+    }
+
+    private void drawDynamicMeshes(){
+
+        for(DynamicMesh dynamicMesh : dynamicMeshes){
+
+            dynamicMesh.draw();
+        }
     }
 
     protected abstract void loadBonesData();

@@ -132,6 +132,11 @@ public abstract class Mesh implements Meshable{
         glDeleteVertexArrays(vertexArraysId);
     }
 
+    public Matrix4f getModel() {
+
+        return model;
+    }
+
     @Override
     public void setModel(Matrix4f model){
 

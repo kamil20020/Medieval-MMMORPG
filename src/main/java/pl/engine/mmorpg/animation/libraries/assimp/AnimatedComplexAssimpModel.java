@@ -3,6 +3,7 @@ package pl.engine.mmorpg.animation.libraries.assimp;
 import org.joml.Matrix4f;
 import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
+import pl.engine.mmorpg.animation.DynamicMesh;
 import pl.engine.mmorpg.mesh.Meshable;
 import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.mesh.libraries.assimp.ComplexAssimpMesh;
@@ -75,5 +76,12 @@ public class AnimatedComplexAssimpModel extends ComplexAssimpMesh implements Ani
     @Override
     public List<Matrix4f[]> getFinalBones() {
         return null;
+    }
+
+    @Override
+    public void addDynamicMesh(DynamicMesh dynamicMesh) {
+
+        AnimatedMesh firstAnimatedMesh = (AnimatedMesh) meshes.get(0);
+        firstAnimatedMesh.addDynamicMesh(dynamicMesh);
     }
 }

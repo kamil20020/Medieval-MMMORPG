@@ -6,7 +6,7 @@ import pl.engine.mmorpg.mesh.ComplexMesh;
 
 public class TransformComponent implements Component{
 
-    private final Vector3f position = new Vector3f(-200, 10, -200);
+    private final Vector3f position = new Vector3f(0, 10, 0);//new Vector3f(-200, 10, -200);
     private Vector3f angle = new Vector3f(0, 0, 0);
     private final ComplexMesh complexMesh;
 

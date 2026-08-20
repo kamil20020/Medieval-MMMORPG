@@ -3,6 +3,7 @@ package pl.engine.mmorpg.entity.animation;
 import org.joml.Matrix4f;
 import pl.engine.mmorpg.animation.AnimatedMesh;
 import pl.engine.mmorpg.animation.AnimatedMeshable;
+import pl.engine.mmorpg.animation.DynamicMesh;
 import pl.engine.mmorpg.entity.Component;
 import pl.engine.mmorpg.entity.EntityState;
 import pl.engine.mmorpg.entity.EntityStateData;
@@ -45,7 +46,11 @@ public class AnimationComponent implements Component {
 
     private static final String IS_SPRINTING_KEY = "is_sprinting";
     private static final String IS_WALKING_KEY = "is_walking";
-    private static final String MOVEMENT_KEY_SEPARATOR = "_";
+
+    private static final String IS_HIDDEN_WEAPON_KEY = "is_weapon_hidden";
+    private static final String IS_NOT_HIDDEN_WEAPON_KEY = "is_weapon_not_hidden";
+
+    private static final String KEY_SEPARATOR = "-";
 
     public AnimationComponent(
         ComplexMesh complexMesh,
@@ -98,6 +103,14 @@ public class AnimationComponent implements Component {
         }
     }
 
+    public void addDynamicMesh(DynamicMesh dynamicMesh){
+
+        for(AnimatedMeshable animatedMesh : animations.values()){
+
+            animatedMesh.addDynamicMesh(dynamicMesh);
+        }
+    }
+
     @Override
     public void update(double deltaTimeInSeconds){
 
@@ -128,7 +141,6 @@ public class AnimationComponent implements Component {
         }
 
         double animationDuration = getBlockingAnimationDuration();
-//        System.out.println(animationDuration + " " + entityStateData.actionMinimumDuration);
 
         if(animationDuration < entityStateData.actionMinimumDuration){
             return;
@@ -156,18 +168,19 @@ public class AnimationComponent implements Component {
         EntityState entityState = entityStateData.entityState;
         MoveDirectionState moveDirectionState = movementComponent.getMoveDirectionState();
         boolean isSprinting = entityStateData.isSprinting;
+        boolean isWeaponHidden = entityStateData.isWeaponHidden;
 
         if(entityStateData.isInAir && entityState != EntityState.FALLING){
 
-            return getKey(isSprinting, MoveDirectionState.TOP);
+            return getKey(isWeaponHidden, isSprinting, MoveDirectionState.TOP);
         }
 
         if(entityState == EntityState.MOVE){
 
-            return getKey(isSprinting, moveDirectionState);
+            return getKey(isWeaponHidden, isSprinting, moveDirectionState);
         }
 
-        return getKey(entityState);
+        return getKey(isWeaponHidden, entityState);
     }
 
     public void setAnimation(String animationName){
@@ -262,15 +275,18 @@ public class AnimationComponent implements Component {
         return new AnimationInfo(animationModelInfo, animationSpeedMultiplier);
     }
 
-    public static String getKey(EntityState entityState){
+    public static String getKey(boolean isWeaponHidden, EntityState entityState){
 
-        return entityState.name();
+        String isWeaponHiddenKey = isWeaponHidden ? IS_HIDDEN_WEAPON_KEY : IS_NOT_HIDDEN_WEAPON_KEY;
+
+        return isWeaponHiddenKey + KEY_SEPARATOR + entityState.name();
     }
 
-    public static String getKey(boolean isSprinting, MoveDirectionState moveDirectionState){
+    public static String getKey(boolean isWeaponHidden, boolean isSprinting, MoveDirectionState moveDirectionState){
 
+        String isWeaponHiddenKey = isWeaponHidden ? IS_HIDDEN_WEAPON_KEY : IS_NOT_HIDDEN_WEAPON_KEY;
         String moveTypeKey = isSprinting ? IS_SPRINTING_KEY : IS_WALKING_KEY;
 
-        return moveTypeKey + MOVEMENT_KEY_SEPARATOR + moveDirectionState.name();
+        return isWeaponHiddenKey + KEY_SEPARATOR + moveTypeKey + KEY_SEPARATOR + moveDirectionState.name();
     }
 }

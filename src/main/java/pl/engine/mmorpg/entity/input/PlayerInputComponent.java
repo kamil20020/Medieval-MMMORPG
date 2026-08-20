@@ -47,6 +47,12 @@ public class PlayerInputComponent extends InputComponent {
             inputData.gravitySwitchPressed = true;
             eventsHandler.resetKey(GLFW_KEY_G);
         }
+
+        if(eventsHandler.isKeyPressed(GLFW_KEY_Z)){
+
+            inputData.switchShowWeapon = true;
+            eventsHandler.resetKey(GLFW_KEY_Z);
+        }
     }
 
     private void handleMove(){

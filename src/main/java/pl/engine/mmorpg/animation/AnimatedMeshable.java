@@ -10,6 +10,7 @@ public interface AnimatedMeshable extends Meshable {
     public Skeleton getSkeleton();
     public void reset();
     public double getAnimationCompletion();
+    public void addDynamicMesh(DynamicMesh dynamicMesh);
     public AnimatedMesh getAnimatedMesh(int index);
     public List<Matrix4f[]> getFinalBones();
 }

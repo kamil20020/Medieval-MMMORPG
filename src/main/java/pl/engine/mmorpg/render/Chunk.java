@@ -2,6 +2,7 @@ package pl.engine.mmorpg.render;
 
 import org.joml.Vector4f;
 import pl.engine.mmorpg.EventsHandler;
+import pl.engine.mmorpg.animation.DynamicMesh;
 import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
 import pl.engine.mmorpg.entity.player.Player;
 import pl.engine.mmorpg.mesh.*;
@@ -42,6 +43,10 @@ public class Chunk {
 
         Meshable player = new Player(eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
         meshables.add(player);
+
+//        Meshable playerCopy = meshFactory.createComplexMesh("models/entities/warrior.glb");
+//        DynamicMesh dynamicMesh = new DynamicMesh(playerCopy, 1);
+//        meshables.add(dynamicMesh);
 
 //        Meshable model = new ComplexJgltfMesh("animations/dragon1.glb"); //new Player(camera, eventsHandler, meshFactory);
 //        meshables.add(model);
