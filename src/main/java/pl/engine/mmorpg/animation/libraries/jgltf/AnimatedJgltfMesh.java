@@ -233,41 +233,9 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
 
             NodeChannels foundNodeOrderedChannels = getNodeOrderedChannels(foundNodeChannels);
 
-            Vector3f translate = new Vector3f();
-            float[] translateData = node.getTranslation();
-            AnimationModel.Channel translateChannel = foundNodeOrderedChannels.translateChannel;
-            if(translateChannel != null){
-
-                translate = getInterpolatedVectorData(translateChannel, animationTime);
-            }
-            else if(translateData != null){
-                translate = new Vector3f(node.getTranslation());
-            }
-            Matrix4f translation = new Matrix4f().translation(translate);
-
-            Quaternionf rotate = new Quaternionf();
-            float[] rotateData = node.getRotation();
-            AnimationModel.Channel rotationChannel = foundNodeOrderedChannels.rotationChannel;
-            if(rotationChannel != null){
-
-                rotate = getRotationInterpolated(rotationChannel, animationTime);
-            }
-            else if(rotateData != null){
-                rotate = new Quaternionf(rotateData[0], rotateData[1], rotateData[2], rotateData[3]);
-            }
-            Matrix4f rotation = new Matrix4f().rotation(rotate);
-
-            Vector3f scale = new Vector3f(1, 1, 1);
-            float[] scaleData = node.getScale();
-            AnimationModel.Channel scaleChannel = foundNodeOrderedChannels.scaleChannel;
-            if(scaleChannel != null){
-
-                scale = getInterpolatedVectorData(scaleChannel, animationTime);
-            }
-            else if(scaleData != null){
-                scale = new Vector3f(node.getScale());
-            }
-            Matrix4f scaling = new Matrix4f().scaling(scale);
+            Matrix4f translation = getNodeTranslationMatrix(node, foundNodeOrderedChannels, animationTime);
+            Matrix4f rotation = getNodeRotationMatrix(node, foundNodeOrderedChannels, animationTime);
+            Matrix4f scaling = getNodeScaleMatrix(node, foundNodeOrderedChannels,  animationTime);
 
             nodeTransformation = new Matrix4f(translation)
                 .mul(rotation)
@@ -332,6 +300,54 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
         }
 
         return nodeChannels;
+    }
+
+    private Matrix4f getNodeTranslationMatrix(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
+
+        Vector3f translate = new Vector3f();
+        float[] translateData = node.getTranslation();
+        AnimationModel.Channel translateChannel = foundNodeOrderedChannels.translateChannel;
+        if(translateChannel != null){
+
+            translate = getInterpolatedVectorData(translateChannel, animationTime);
+        }
+        else if(translateData != null){
+            translate = new Vector3f(node.getTranslation());
+        }
+
+        return new Matrix4f().translation(translate);
+    }
+
+    private Matrix4f getNodeRotationMatrix(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
+
+        Quaternionf rotate = new Quaternionf();
+        float[] rotateData = node.getRotation();
+        AnimationModel.Channel rotationChannel = foundNodeOrderedChannels.rotationChannel;
+        if(rotationChannel != null){
+
+            rotate = getRotationInterpolated(rotationChannel, animationTime);
+        }
+        else if(rotateData != null){
+            rotate = new Quaternionf(rotateData[0], rotateData[1], rotateData[2], rotateData[3]);
+        }
+
+        return new Matrix4f().rotation(rotate);
+    }
+
+    private Matrix4f getNodeScaleMatrix(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
+
+        Vector3f scale = new Vector3f(1, 1, 1);
+        float[] scaleData = node.getScale();
+        AnimationModel.Channel scaleChannel = foundNodeOrderedChannels.scaleChannel;
+        if(scaleChannel != null){
+
+            scale = getInterpolatedVectorData(scaleChannel, animationTime);
+        }
+        else if(scaleData != null){
+            scale = new Vector3f(node.getScale());
+        }
+
+        return new Matrix4f().scaling(scale);
     }
 
     private Vector3f getInterpolatedVectorData(AnimationModel.Channel channel, double actualTimeInTicks){
