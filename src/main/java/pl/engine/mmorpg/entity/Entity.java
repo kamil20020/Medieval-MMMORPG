@@ -1,9 +1,7 @@
 package pl.engine.mmorpg.entity;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import pl.engine.mmorpg.animation.Skeleton;
-import pl.engine.mmorpg.entity.animation.AnimationInfo;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;

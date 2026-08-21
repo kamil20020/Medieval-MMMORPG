@@ -7,10 +7,8 @@ import pl.engine.mmorpg.entity.TransformComponent;
 import pl.engine.mmorpg.entity.animation.AnimationInfo;
 import pl.engine.mmorpg.entity.Entity;
 import pl.engine.mmorpg.entity.animation.AnimationComponent;
-import pl.engine.mmorpg.entity.combat.ComboComponent;
-import pl.engine.mmorpg.entity.combat.Skill;
+import pl.engine.mmorpg.entity.combat.*;
 import pl.engine.mmorpg.animation.DynamicMesh;
-import pl.engine.mmorpg.entity.combat.WeaponComponent;
 import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
 import pl.engine.mmorpg.entity.input.ActionsComponent;
@@ -34,12 +32,7 @@ public class Player extends Entity {
     private static final String MODEL_PATH = "models/entities/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(true, EntityState.STANDING);
 
-    private static final Map<String, AnimationInfo> animationNamesPathsMappings;
-    private static final Map<String, Skill> skillsNamesMappings;
-    static {
-        animationNamesPathsMappings = getAnimationNamesPathsMappings();
-        skillsNamesMappings = getSkillsNamesMappings();
-    }
+    private static final Map<String, AnimationInfo> animationNamesPathsMappings = getAnimationNamesPathsMappings();
 
     public Player(EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
         super(MODEL_PATH, meshFactory);
@@ -88,6 +81,8 @@ public class Player extends Entity {
 
         WeaponComponent weaponComponent = new WeaponComponent(meshFactory, animationComponent, entityStateData, inputData);
 
+        SkillComponent skillComponent = new SkillComponent(entityStateData, inputData, animationComponent, movementComponent, transformComponent);
+
         ActionsComponent actionsComponent = new ActionsComponent(inputData, entityStateData);
 
         CameraComponent cameraComponent = new CameraComponent(transformComponent, movementComponent, inputData);
@@ -100,6 +95,7 @@ public class Player extends Entity {
             terrainCollisionComponent,
             transformComponent,
             actionsComponent,
+            skillComponent,
             animationComponent,
             weaponComponent,
             cameraComponent
@@ -112,6 +108,7 @@ public class Player extends Entity {
 
         putAnimationsForHiddenWeapon(result);
         putAnimationsForNotHiddenWeapon(result);
+        putAnimationsSkills(result);
 
         return result;
     }
@@ -136,28 +133,29 @@ public class Player extends Entity {
 
     private static void putAnimationsForNotHiddenWeapon(Map<String, AnimationInfo> result){
 
-        result.put(getKey(false, EntityState.STANDING), getAnimationInfo("animations/warrior/idle.glb"));
-        result.put(getKey(false, EntityState.FALLING), getAnimationInfo("animations/warrior/move/jump/fall.glb"));
+        result.put(getKey(false, EntityState.STANDING), getAnimationInfo("animations/warrior/combat/sword/idle.glb"));
+        result.put(getKey(false, EntityState.FALLING), getAnimationInfo("animations/warrior/combat/sword/jump/fall.glb"));
         result.put(getKey(false, EntityState.EQUIP_WEAPON), getAnimationInfo("animations/warrior/combat/sword/show.glb"));
         result.put(getKey(false, EntityState.COMBAT), getAnimationInfo("animations/warrior/combat/sword/combo.glb", 1.5f));
 
-        result.put(getKey(false,false, MoveDirectionState.FRONT), getAnimationInfo("animations/warrior/move/walk/front.glb"));
-        result.put(getKey(false,false, MoveDirectionState.LEFT), getAnimationInfo("animations/warrior/move/walk/left.glb"));
-        result.put(getKey(false,false, MoveDirectionState.RIGHT), getAnimationInfo("animations/warrior/move/walk/right.glb"));
-        result.put(getKey(false,false, MoveDirectionState.BACK), getAnimationInfo("animations/warrior/move/walk/backward.glb"));
+        result.put(getKey(false,false, MoveDirectionState.FRONT), getAnimationInfo("animations/warrior/combat/sword/walk/front.glb"));
+        result.put(getKey(false,false, MoveDirectionState.LEFT), getAnimationInfo("animations/warrior/combat/sword/walk/left.glb"));
+        result.put(getKey(false,false, MoveDirectionState.RIGHT), getAnimationInfo("animations/warrior/combat/sword/walk/right.glb"));
+        result.put(getKey(false,false, MoveDirectionState.BACK), getAnimationInfo("animations/warrior/combat/sword/walk/backward.glb"));
 
-        result.put(getKey(false,true, MoveDirectionState.TOP), getAnimationInfo("animations/warrior/move/jump/jump.glb", 1.2f));
+        result.put(getKey(false,true, MoveDirectionState.TOP), getAnimationInfo("animations/warrior/combat/sword/jump/jump.glb", 1.2f));
         result.put(getKey(false,true, MoveDirectionState.FRONT), getAnimationInfo("animations/warrior/combat/sword/run/front.glb"));
-        result.put(getKey(false,true, MoveDirectionState.LEFT), getAnimationInfo("animations/warrior/move/run/left.glb"));
-        result.put(getKey(false,true, MoveDirectionState.RIGHT), getAnimationInfo("animations/warrior/move/run/right.glb"));
-        result.put(getKey(false,true, MoveDirectionState.BACK), getAnimationInfo("animations/warrior/move/run/backward.glb"));
+        result.put(getKey(false,true, MoveDirectionState.LEFT), getAnimationInfo("animations/warrior/combat/sword/run/left.glb"));
+        result.put(getKey(false,true, MoveDirectionState.RIGHT), getAnimationInfo("animations/warrior/combat/sword/run/right.glb"));
+        result.put(getKey(false,true, MoveDirectionState.BACK), getAnimationInfo("animations/warrior/combat/sword/run/backward.glb"));
     }
 
-    private static Map<String, Skill> getSkillsNamesMappings(){
+    private static void putAnimationsSkills(Map<String, AnimationInfo> result){
 
-        Map<String, Skill> results = new HashMap<>();
-
-        return results;
+        result.put(getKey(SkillType.WARRIOR_SLASH), getAnimationInfo("animations/warrior/combat/skills/slash.glb", 1.2f));
+        result.put(getKey(SkillType.WARRIOR_SPIN), getAnimationInfo("animations/warrior/combat/skills/spin.glb"));
+        result.put(getKey(SkillType.WARRIOR_STUN), getAnimationInfo("animations/warrior/combat/skills/stun.glb"));
+        result.put(getKey(SkillType.WARRIOR_DASH), getAnimationInfo("animations/warrior/combat/skills/dash.glb"));
     }
 
     @Override

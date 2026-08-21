@@ -1,24 +1,24 @@
 package pl.engine.mmorpg.entity.combat;
 
-public class Skill {
+public abstract class Skill {
 
-    private String animationName;
+    private SkillType skillType;
     private double animationDuration;
 
-    public Skill(String animationName, double animationDuration){
+    public Skill(SkillType skillType, double animationDuration){
 
-        this.animationName = animationName;
+        this.skillType = skillType;
         this.animationDuration = animationDuration;
     }
 
-    public String getAnimationName() {
+    public SkillType getSkillType() {
 
-        return animationName;
+        return skillType;
     }
 
-    public void setAnimationName(String animationName) {
+    public void setSkillType(SkillType skillType) {
 
-        this.animationName = animationName;
+        this.skillType = skillType;
     }
 
     public double getAnimationDuration() {
@@ -29,5 +29,12 @@ public class Skill {
     public void setAnimationDuration(double animationDuration) {
 
         this.animationDuration = animationDuration;
+    }
+
+    public abstract void update(double deltaTime);
+
+    public boolean hasOwnAnimation(){
+
+        return true;
     }
 }

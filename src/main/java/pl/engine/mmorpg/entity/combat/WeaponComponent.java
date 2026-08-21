@@ -17,6 +17,7 @@ public class WeaponComponent implements Component {
     private final EntityStateData entityStateData;
     private final InputData inputData;
     private DynamicMesh sword = null;
+    private boolean isHiddingWeapon = false;
 
     public WeaponComponent(MeshAbstractFactory meshFactory, AnimationComponent animationComponent, EntityStateData entityStateData, InputData inputData){
 
@@ -32,7 +33,7 @@ public class WeaponComponent implements Component {
         Meshable swordMesh = meshFactory.createComplexMesh("models/weapons/sword.glb");
         sword = new DynamicMesh(swordMesh);
         animationComponent.addDynamicMesh(sword);
-        showWeapon();
+        hideWeapon();
     }
 
     private void hideWeapon(){
@@ -46,13 +47,19 @@ public class WeaponComponent implements Component {
     private void showWeapon(){
 
         sword.setBoneName("mixamorig:RightHand");
-        sword.setRotation(new Vector3f((float) Math.toRadians(180), (float) Math.toRadians(90), 0));
-        sword.setTranslation(new Vector3f(1.62f, 1f, 0.8f));
+        sword.setRotation(new Vector3f((float) Math.toRadians(75), 0, 0));
+        sword.setTranslation(new Vector3f(-0f, 0.1f, 0.4f));
         sword.setScale(0.01f);
     }
 
     @Override
     public void update(double deltaTime) {
+
+        if(entityStateData.canActionBeInterrupted && isHiddingWeapon){
+
+            isHiddingWeapon = false;
+            hideWeapon();
+        }
 
         if(!entityStateData.canActionBeInterrupted || !inputData.switchShowWeapon){
             return;
@@ -65,13 +72,13 @@ public class WeaponComponent implements Component {
 
         if(entityStateData.isWeaponHidden){
 
-            hideWeapon();
-            entityStateData.actionMinimumDuration = 1d;
+            isHiddingWeapon = true;
+            entityStateData.actionMinimumDuration = 1.2d;
         }
         else{
 
             showWeapon();
-            entityStateData.actionMinimumDuration = 0.5d;
+            entityStateData.actionMinimumDuration = 0.7d;
         }
     }
 }

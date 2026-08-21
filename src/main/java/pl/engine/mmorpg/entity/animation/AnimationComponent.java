@@ -7,6 +7,7 @@ import pl.engine.mmorpg.animation.DynamicMesh;
 import pl.engine.mmorpg.entity.Component;
 import pl.engine.mmorpg.entity.EntityState;
 import pl.engine.mmorpg.entity.EntityStateData;
+import pl.engine.mmorpg.entity.combat.SkillType;
 import pl.engine.mmorpg.entity.move.MovementComponent;
 import pl.engine.mmorpg.entity.move.MoveDirectionState;
 import pl.engine.mmorpg.mesh.ComplexMesh;
@@ -116,6 +117,7 @@ public class AnimationComponent implements Component {
 
         if(entityStateData.canActionBeInterrupted){
 
+            blockingAnimationStartTime = 0;
             startNewAnimation();
         }
         else{
@@ -181,6 +183,18 @@ public class AnimationComponent implements Component {
         }
 
         return getKey(isWeaponHidden, entityState);
+    }
+
+    public void setBlockingAnimation(String animationName){
+
+        if(animationName == null){
+            startNewAnimation();
+            return;
+        }
+
+        blockingAnimationStartTime = System.nanoTime();
+
+        setAnimation(animationName);
     }
 
     public void setAnimation(String animationName){
@@ -288,5 +302,10 @@ public class AnimationComponent implements Component {
         String moveTypeKey = isSprinting ? IS_SPRINTING_KEY : IS_WALKING_KEY;
 
         return isWeaponHiddenKey + KEY_SEPARATOR + moveTypeKey + KEY_SEPARATOR + moveDirectionState.name();
+    }
+
+    public static String getKey(SkillType skillType){
+
+        return skillType.name();
     }
 }

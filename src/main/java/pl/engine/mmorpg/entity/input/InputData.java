@@ -24,8 +24,8 @@ public class InputData {
     public double mouseYPosForWindowHeight;
 
     public boolean combatStart;
-    public boolean useSkill;
     public boolean switchShowWeapon;
+    public Integer skillIndex;
 
     public void reset() {
 
@@ -51,7 +51,7 @@ public class InputData {
         this.mouseYPosForWindowHeight = 0;
 
         this.combatStart = false;
-        this.useSkill = false;
+        this.skillIndex = null;
         this.switchShowWeapon = false;
     }
 }

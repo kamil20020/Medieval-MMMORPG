@@ -9,6 +9,8 @@ public class PlayerInputComponent extends InputComponent {
 
     private final EventsHandler eventsHandler;
 
+    private static final int FIRST_SKILL_EVENT_CODE = GLFW_KEY_1;
+
     public PlayerInputComponent(EventsHandler eventsHandler){
 
         this.eventsHandler = eventsHandler;
@@ -52,6 +54,25 @@ public class PlayerInputComponent extends InputComponent {
 
             inputData.switchShowWeapon = true;
             eventsHandler.resetKey(GLFW_KEY_Z);
+        }
+
+        handleSkills();
+    }
+
+    private void handleSkills(){
+
+        int eventCode = FIRST_SKILL_EVENT_CODE;
+
+        for(int i = 0; i < 6; i++){
+
+            if(!eventsHandler.isKeyPressed(eventCode)) {
+                eventCode++;
+                continue;
+            }
+
+            inputData.skillIndex = i;
+            eventsHandler.resetKey(eventCode);
+            break;
         }
     }
 
