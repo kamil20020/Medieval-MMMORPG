@@ -80,7 +80,6 @@ public class ComboComponent implements Component {
         isStartedCombo = true;
         entityStateData.entityState = EntityState.COMBAT;
         entityStateData.canActionBeInterrupted = false;
-        entityStateData.actionMinimumDuration = comboDurations[0];
     }
 
     private void handleComboAnimations(double deltaTime){
@@ -88,7 +87,7 @@ public class ComboComponent implements Component {
         Vector3f forward = transformComponent.getForward();
         movementComponent.moveForward(deltaTime / 3, forward);
 
-        if(comboStartTime == 0){
+        if(comboStartTime == 0 || entityStateData.canActionBeInterrupted){
 
             startCombo();
             comboStartTime = System.nanoTime();
