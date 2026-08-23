@@ -11,6 +11,8 @@ public interface AnimatedMeshable extends Meshable {
     public void reset();
     public double getAnimationCompletion();
     public void addDynamicMesh(DynamicMesh dynamicMesh);
+    public void setBlendingProgress(float blendingProgress);
+    public void setNextAnimation(AnimatedMeshable nextAnimation);
     public AnimatedMesh getAnimatedMesh(int index);
     public List<Matrix4f[]> getFinalBones();
 }

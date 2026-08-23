@@ -221,34 +221,15 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
         }
     }
 
-    private Matrix4f getNodeTransformation(NodeModel node, double animationTime){
+    private Matrix4f getNodeTransformation(NodeModel node, double animationTime) throws IllegalStateException{
 
-        String nodeName = node.getName();
-
-        List<AnimationModel.Channel> foundNodeChannels = getChannelsWithName(nodeName);
-
-        Matrix4f nodeTransformation = new Matrix4f().identity();
-
-        if(!foundNodeChannels.isEmpty()){
-
-            NodeChannels foundNodeOrderedChannels = getNodeOrderedChannels(foundNodeChannels);
-
-            Matrix4f translation = getNodeTranslationMatrix(node, foundNodeOrderedChannels, animationTime);
-            Matrix4f rotation = getNodeRotationMatrix(node, foundNodeOrderedChannels, animationTime);
-            Matrix4f scaling = getNodeScaleMatrix(node, foundNodeOrderedChannels,  animationTime);
-
-            nodeTransformation = new Matrix4f(translation)
-                .mul(rotation)
-                .mul(scaling);
-        }
-        else{
-
-            float[] nodeTransformationData = new float[16];
-            node.computeLocalTransform(nodeTransformationData);
-            nodeTransformation.set(nodeTransformationData);
+        if(isBlending()) {
+            return getNodeTransformationWithBlending(node, animationTime);
         }
 
-        return nodeTransformation;
+        NodeTransformation nodeTransformation = getNodeTransformationData(node, animationTime);
+
+        return getNodeTransformation(nodeTransformation);
     }
 
     private List<AnimationModel.Channel> getChannelsWithName(String name){
@@ -302,7 +283,91 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
         return nodeChannels;
     }
 
-    private Matrix4f getNodeTranslationMatrix(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
+    private Matrix4f getNodeTransformationWithBlending(NodeModel node, double animationTime){
+
+        NodeTransformation actualAnimationNodeTransformation = getNodeTransformationData(node, animationTime);
+
+        float nextAnimationTime = BLENDING_DURATION * blendingProgress;
+        AnimatedJgltfMesh convertedNextAnimation = (AnimatedJgltfMesh) nextAnimation;
+        NodeTransformation nextAnimationNodeTransformation = convertedNextAnimation.getNodeTransformationData(
+            node.getName(),
+            nextAnimationTime
+        );
+
+        return blendAnimations(actualAnimationNodeTransformation, nextAnimationNodeTransformation);
+    }
+
+    public NodeTransformation getNodeTransformationData(String name, double animationTime){
+
+        Optional<NodeModel> foundNodeOpt = findAnimationNodeByName(name);
+
+        if(foundNodeOpt.isEmpty()){
+            throw new IllegalStateException("Nie odnaleziono węzła o nazwie " + name);
+        }
+
+        return getNodeTransformationData(foundNodeOpt.get(), animationTime);
+    }
+
+    public Optional<NodeModel> findAnimationNodeByName(String searchedNodeName){
+
+        NodeModel foundNode = findAnimationNodeByName(rootNode, searchedNodeName);
+
+        return Optional.ofNullable(foundNode);
+    }
+
+    private NodeModel findAnimationNodeByName(NodeModel node, String searchedNodeName){
+
+        if(Objects.equals(node.getName(), searchedNodeName)){
+
+            return node;
+        }
+
+        for(NodeModel childNode : node.getChildren()){
+
+            NodeModel foundNode = findAnimationNodeByName(childNode, searchedNodeName);
+
+            if(foundNode != null){
+
+                return foundNode;
+            }
+        }
+
+        return null;
+    }
+
+    private NodeTransformation getNodeTransformationData(NodeModel node, double animationTime){
+
+        List<AnimationModel.Channel> foundNodeChannels = getChannelsWithName(node.getName());
+
+        if(foundNodeChannels.isEmpty()) {
+
+           return getNodeTransformationDataWithoutChannels(node);
+        }
+
+        NodeChannels foundNodeOrderedChannels = getNodeOrderedChannels(foundNodeChannels);
+
+        return new NodeTransformation(
+            getNodeTranslation(node, foundNodeOrderedChannels, animationTime),
+            getNodeRotation(node, foundNodeOrderedChannels, animationTime),
+            getNodeScale(node, foundNodeOrderedChannels,  animationTime)
+        );
+    }
+
+    private NodeTransformation getNodeTransformationDataWithoutChannels(NodeModel node){
+
+        float[] nodeTransformationData = new float[16];
+        node.computeLocalTransform(nodeTransformationData);
+        Matrix4f nodeTransformation = new Matrix4f().identity();
+        nodeTransformation.set(nodeTransformationData);
+
+        return new NodeTransformation(
+            nodeTransformation.getTranslation(new Vector3f()),
+            nodeTransformation.getUnnormalizedRotation(new Quaternionf()),
+            nodeTransformation.getScale(new Vector3f())
+        );
+    }
+
+    private Vector3f getNodeTranslation(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
 
         Vector3f translate = new Vector3f();
         float[] translateData = node.getTranslation();
@@ -315,10 +380,10 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
             translate = new Vector3f(node.getTranslation());
         }
 
-        return new Matrix4f().translation(translate);
+        return translate;
     }
 
-    private Matrix4f getNodeRotationMatrix(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
+    private Quaternionf getNodeRotation(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
 
         Quaternionf rotate = new Quaternionf();
         float[] rotateData = node.getRotation();
@@ -331,10 +396,10 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
             rotate = new Quaternionf(rotateData[0], rotateData[1], rotateData[2], rotateData[3]);
         }
 
-        return new Matrix4f().rotation(rotate);
+        return rotate;
     }
 
-    private Matrix4f getNodeScaleMatrix(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
+    private Vector3f getNodeScale(NodeModel node, NodeChannels foundNodeOrderedChannels, double animationTime){
 
         Vector3f scale = new Vector3f(1, 1, 1);
         float[] scaleData = node.getScale();
@@ -347,7 +412,7 @@ public class AnimatedJgltfMesh extends AnimatedMesh {
             scale = new Vector3f(node.getScale());
         }
 
-        return new Matrix4f().scaling(scale);
+        return scale;
     }
 
     private Vector3f getInterpolatedVectorData(AnimationModel.Channel channel, double actualTimeInTicks){

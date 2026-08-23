@@ -79,6 +79,7 @@ public class ComboComponent implements Component {
 
         isStartedCombo = true;
         entityStateData.entityState = EntityState.COMBAT;
+        entityStateData.actionMinimumDuration = comboIncreasingDurations[0];
         entityStateData.canActionBeInterrupted = false;
     }
 

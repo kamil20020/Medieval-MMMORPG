@@ -41,12 +41,23 @@ public abstract class AnimatedMesh extends Mesh {
     private int vboBoneIndices;
     private int vboBoneWeights;
 
+    protected float blendingProgress = 0;
+    protected AnimatedMesh nextAnimation = null;
+
     private List<DynamicMesh> dynamicMeshes = new ArrayList<>();
 
     protected static final Integer MAX_NUMBER_OF_BONES = 200;
     protected static final Integer MAX_NUMBER_OF_BONS_PER_VERTEX = 4;
 
     public static final float DEFAULT_NUMBER_OF_TICS_PER_SECOND = 1;
+    public static final float BLENDING_DURATION = 0.2f;
+
+    public record NodeTransformation (
+
+        Vector3f translation,
+        Quaternionf rotation,
+        Vector3f scaling
+    ){}
 
     public AnimatedMesh(Mesh additionalMesh, Skeleton skeleton){
 
@@ -91,11 +102,21 @@ public abstract class AnimatedMesh extends Mesh {
 
     public void updateAnimation(double deltaTimeInSeconds){
 
-        animationTime += deltaTimeInSeconds * animationTicksPerSecond;
-        animationTime %= animationDurationInTicksPerSeconds;
+        updateAnimationTime(deltaTimeInSeconds);
+
+        if(nextAnimation != null){
+
+            nextAnimation.updateAnimationTime(deltaTimeInSeconds);
+        }
 
         loadFinalTransformation(animationTime);
         setDynamicMeshesModels(additionalMesh.getModel());
+    }
+
+    public void updateAnimationTime(double deltaTimeInSeconds){
+
+        animationTime += deltaTimeInSeconds * animationTicksPerSecond;
+        animationTime %= animationDurationInTicksPerSeconds;
     }
 
     protected Matrix4f getGlobalTransformation(Matrix4f parentTransformation, Matrix4f nodeTransformation){
@@ -115,6 +136,42 @@ public abstract class AnimatedMesh extends Mesh {
         boneFinalTransformations[boneIndex] = new Matrix4f(rootNodeGlobalInverseTransform)
             .mul(new Matrix4f(globalTransformation))
             .mul(boneInverse);
+    }
+
+    protected Matrix4f blendAnimations(
+        NodeTransformation actualAnimationTransformation,
+        NodeTransformation nextAnimationTransformation
+    ){
+        Vector3f translation1 = actualAnimationTransformation.translation();
+        Quaternionf rotation1 = actualAnimationTransformation.rotation();
+        Vector3f scaling1 = actualAnimationTransformation.scaling();
+
+        Vector3f translation2 = nextAnimationTransformation.translation();
+        Quaternionf rotation2 = nextAnimationTransformation.rotation();
+        Vector3f scaling2 = nextAnimationTransformation.scaling();
+
+        Vector3f combinedTranslation = translation1.lerp(translation2, blendingProgress, new Vector3f());
+        Quaternionf combinedRotation = rotation1.slerp(rotation2, blendingProgress, new Quaternionf());
+        Vector3f combinedScale = scaling1.lerp(scaling2, blendingProgress, new Vector3f());
+
+        return getNodeTransformation(combinedTranslation, combinedRotation, combinedScale);
+    }
+
+    protected Matrix4f getNodeTransformation(NodeTransformation nodeTransformation){
+
+        return getNodeTransformation(
+            nodeTransformation.translation(),
+            nodeTransformation.rotation(),
+            nodeTransformation.scaling()
+        );
+    }
+
+    protected Matrix4f getNodeTransformation(Vector3f translation, Quaternionf rotation, Vector3f scaling){
+
+        return new Matrix4f().identity()
+            .translate(translation)
+            .rotate(rotation)
+            .scale(scaling);
     }
 
     @Override
@@ -219,6 +276,8 @@ public abstract class AnimatedMesh extends Mesh {
     public void reset(){
 
         animationTime = 0;
+        nextAnimation = null;
+        blendingProgress = 0;
     }
 
     public double getAnimationCompletion(){
@@ -343,6 +402,21 @@ public abstract class AnimatedMesh extends Mesh {
 
             dynamicMesh.draw();
         }
+    }
+
+    public void setNextAnimation(AnimatedMesh nextAnimation){
+
+        this.nextAnimation = nextAnimation;
+    }
+
+    public void setBlendingProgress(float blendingProgress){
+
+        this.blendingProgress = blendingProgress;
+    }
+
+    protected boolean isBlending(){
+
+        return nextAnimation != null;
     }
 
     protected abstract void loadBonesData();

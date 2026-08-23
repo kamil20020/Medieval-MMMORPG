@@ -84,4 +84,25 @@ public class AnimatedComplexAssimpModel extends ComplexAssimpMesh implements Ani
         AnimatedMesh firstAnimatedMesh = (AnimatedMesh) meshes.get(0);
         firstAnimatedMesh.addDynamicMesh(dynamicMesh);
     }
+
+    @Override
+    public void setNextAnimation(AnimatedMeshable nextAnimation){
+
+        for(int i = 0; i < meshes.size(); i++){
+
+            AnimatedMesh actualAnimationMesh = getAnimatedMesh(i);
+            AnimatedMesh nextAnimationMesh = nextAnimation.getAnimatedMesh(i);
+            actualAnimationMesh.setNextAnimation(nextAnimationMesh);
+        }
+    }
+
+    @Override
+    public void setBlendingProgress(float blendingProgress) {
+
+        for(int i = 0; i < meshes.size(); i++){
+
+            AnimatedMesh animatedMesh = getAnimatedMesh(i);
+            animatedMesh.setBlendingProgress(blendingProgress);
+        }
+    }
 }

@@ -97,20 +97,22 @@ public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh implements Animat
 
     @Override
     public AnimatedMesh getAnimatedMesh(int index) {
+
         return (AnimatedMesh) meshes.get(index);
     }
 
     @Override
     public List<Matrix4f[]> getFinalBones() {
 
-        List<Matrix4f[]> aa = new ArrayList<>();
+        List<Matrix4f[]> result = new ArrayList<>();
 
         for(Meshable mesh : meshes){
 
             AnimatedMesh animatedMesh = (AnimatedMesh) mesh;
-            aa.add(animatedMesh.getBoneFinalTransformations());
+            result.add(animatedMesh.getBoneFinalTransformations());
         }
-        return aa;
+
+        return result;
     }
 
     @Override
@@ -118,6 +120,27 @@ public class AnimatedComplexJgltfMesh extends ComplexJgltfMesh implements Animat
 
         AnimatedMesh firstAnimatedMesh = (AnimatedMesh) meshes.get(0);
         firstAnimatedMesh.addDynamicMesh(dynamicMesh);
+    }
+
+    @Override
+    public void setNextAnimation(AnimatedMeshable nextAnimation){
+
+        for(int i = 0; i < meshes.size(); i++){
+
+            AnimatedMesh actualAnimationMesh = getAnimatedMesh(i);
+            AnimatedMesh nextAnimationMesh = nextAnimation.getAnimatedMesh(i);
+            actualAnimationMesh.setNextAnimation(nextAnimationMesh);
+        }
+    }
+
+    @Override
+    public void setBlendingProgress(float blendingProgress) {
+
+        for(int i = 0; i < meshes.size(); i++){
+
+            AnimatedMesh animatedMesh = getAnimatedMesh(i);
+            animatedMesh.setBlendingProgress(blendingProgress);
+        }
     }
 }
 

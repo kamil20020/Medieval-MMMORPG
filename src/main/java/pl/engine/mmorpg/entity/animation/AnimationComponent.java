@@ -34,13 +34,11 @@ public class AnimationComponent implements Component {
     private final MeshAbstractFactory meshFactory;
 
     protected String actualAnimationName = null;
-    protected String oldAnimationName = null;
-    protected String nextAnimationName = null;
 
     protected AnimatedMeshable actualAnimation = null;
     protected AnimatedMeshable nextAnimation = null;
 
-    protected double blendTime = 0;
+    protected double blendStartTime = 0;
     protected boolean isBlending = false;
 
     protected static final double BLEND_DURATION = 0.2;
@@ -67,7 +65,6 @@ public class AnimationComponent implements Component {
         this.meshFactory = meshFactory;
 
         this.actualAnimationName = firstAnimationName;
-        this.oldAnimationName = firstAnimationName;
 
         this.movementComponent = movementComponent;
         this.entityStateData = entityStateData;
@@ -115,6 +112,11 @@ public class AnimationComponent implements Component {
     @Override
     public void update(double deltaTimeInSeconds){
 
+        if(isBlending){
+
+            blendAnimations();
+        }
+
         if(entityStateData.canActionBeInterrupted){
 
             blockingAnimationStartTime = 0;
@@ -126,11 +128,6 @@ public class AnimationComponent implements Component {
         }
 
         actualAnimation.update(deltaTimeInSeconds);
-
-//        if(!Objects.equals(actualAnimationName, nextAnimationName)){
-//
-//            nextAnimation.update(deltaTimeInSeconds);
-//        }
     }
 
     private void handleBlockingAnimation(){
@@ -162,7 +159,7 @@ public class AnimationComponent implements Component {
     private void startNewAnimation(){
 
         String newAnimationName = getActualAnimationName();
-        setAnimation(newAnimationName);
+        startNewAnimation(newAnimationName);
     }
 
     private String getActualAnimationName(){
@@ -185,80 +182,61 @@ public class AnimationComponent implements Component {
         return getKey(isWeaponHidden, entityState);
     }
 
+    private void startNewAnimation(String animationName){
+
+        if(Objects.equals(actualAnimationName, animationName)){
+            return;
+        }
+
+        if(actualAnimationName != null){
+
+            nextAnimation = animations.get(animationName);
+            startAnimationsBlending();
+        }
+        else{
+            actualAnimation.reset();
+            actualAnimation = animations.get(animationName);
+        }
+
+        actualAnimationName = animationName;
+    }
+
     public void setBlockingAnimation(String animationName){
 
         if(animationName == null){
+
             startNewAnimation();
             return;
         }
 
         blockingAnimationStartTime = System.nanoTime();
 
-        setAnimation(animationName);
+        startNewAnimation(animationName);
     }
 
-    public void setAnimation(String animationName){
+    private void startAnimationsBlending(){
 
-//        blendAnimationsLogic();
+        isBlending = true;
+        blendStartTime = glfwGetTime();
+        actualAnimation.setNextAnimation(nextAnimation);
+    }
 
-        if(Objects.equals(oldAnimationName, animationName)){
+    private void blendAnimations(){
+
+        double actualTime = glfwGetTime();
+        double blendingTime = actualTime - blendStartTime;
+
+        float blendProgress = (float) Math.min(blendingTime / BLEND_DURATION, 1.0);
+
+        if(blendProgress < 1){
+            actualAnimation.setBlendingProgress(blendProgress);
             return;
         }
 
-        oldAnimationName = animationName;
-        actualAnimationName = animationName;
-
+        blendStartTime = 0;
+        isBlending = false;
         actualAnimation.reset();
-        actualAnimation = animations.get(animationName);
-    }
-
-    private void blendAnimationsLogic(){
-
-        if(Objects.equals(actualAnimationName, nextAnimationName)) {
-            return;
-        }
-
-        if(!isBlending){
-
-            isBlending = true;
-            blendTime = glfwGetTime();
-
-            return;
-        }
-
-        double time = glfwGetTime();
-        double diff = time - blendTime;
-
-        float t = (float) Math.min(diff / BLEND_DURATION, 1.0);
-        blendAnimations(t);
-
-        if(t >= 1.0){
-
-            isBlending = false;
-            actualAnimationName = nextAnimationName;
-            blendTime = 0;
-        }
-    }
-
-    private void blendAnimations(float t){
-
-        List<Matrix4f[]> actualFinals = actualAnimation.getFinalBones();
-        List<Matrix4f[]> nextFinals = nextAnimation.getFinalBones();
-
-        for(int i = 0; i < actualFinals.size(); i++){
-
-            Matrix4f[] actualFinal = actualFinals.get(i);
-            Matrix4f[] nextFinal = nextFinals.get(i);
-            Matrix4f[] finals = new Matrix4f[actualFinal.length];
-
-            for(int j = 0; j < actualFinal.length; j++){
-
-                finals[j] = actualFinal[j].lerp(nextFinal[j], t);
-            }
-
-            AnimatedMesh actual = actualAnimation.getAnimatedMesh(i);
-            actual.setFinals(finals);
-        }
+        actualAnimation = nextAnimation;
     }
 
     public void uploadToGpu(){
