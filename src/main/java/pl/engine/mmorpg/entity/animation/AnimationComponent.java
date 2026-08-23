@@ -41,8 +41,6 @@ public class AnimationComponent implements Component {
     protected double blendStartTime = 0;
     protected boolean isBlending = false;
 
-    protected static final double BLEND_DURATION = 0.2;
-
     private static final String IS_SPRINTING_KEY = "is_sprinting";
     private static final String IS_WALKING_KEY = "is_walking";
 
@@ -226,7 +224,7 @@ public class AnimationComponent implements Component {
         double actualTime = glfwGetTime();
         double blendingTime = actualTime - blendStartTime;
 
-        float blendProgress = (float) Math.min(blendingTime / BLEND_DURATION, 1.0);
+        float blendProgress = (float) Math.min(blendingTime / AnimatedMesh.BLENDING_DURATION, 1.0);
 
         if(blendProgress < 1){
             actualAnimation.setBlendingProgress(blendProgress);

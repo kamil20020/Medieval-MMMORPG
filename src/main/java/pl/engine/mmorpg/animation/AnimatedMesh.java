@@ -102,11 +102,14 @@ public abstract class AnimatedMesh extends Mesh {
 
     public void updateAnimation(double deltaTimeInSeconds){
 
-        updateAnimationTime(deltaTimeInSeconds);
+//        updateAnimationTime(deltaTimeInSeconds);
 
         if(nextAnimation != null){
 
             nextAnimation.updateAnimationTime(deltaTimeInSeconds);
+        }
+        else{
+            updateAnimationTime(deltaTimeInSeconds);
         }
 
         loadFinalTransformation(animationTime);
