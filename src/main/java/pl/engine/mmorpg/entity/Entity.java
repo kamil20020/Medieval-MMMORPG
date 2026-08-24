@@ -17,7 +17,7 @@ public abstract class Entity implements Meshable {
 
     protected EntityStateData entityStateData = new EntityStateData();
 
-    private final List<Component> components = new ArrayList<>();
+    protected final List<Component> components = new ArrayList<>();
 
     protected double deltaTimeInSeconds = 0;
 

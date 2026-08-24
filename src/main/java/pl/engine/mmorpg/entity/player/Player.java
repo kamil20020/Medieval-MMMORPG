@@ -1,11 +1,8 @@
 package pl.engine.mmorpg.entity.player;
 
 import org.joml.Vector3f;
-import pl.engine.mmorpg.entity.Component;
-import pl.engine.mmorpg.entity.EntityState;
-import pl.engine.mmorpg.entity.TransformComponent;
+import pl.engine.mmorpg.entity.*;
 import pl.engine.mmorpg.entity.animation.AnimationInfo;
-import pl.engine.mmorpg.entity.Entity;
 import pl.engine.mmorpg.entity.animation.AnimationComponent;
 import pl.engine.mmorpg.entity.combat.*;
 import pl.engine.mmorpg.animation.DynamicMesh;
@@ -26,9 +23,6 @@ import static pl.engine.mmorpg.entity.animation.AnimationComponent.*;
 
 public class Player extends Entity {
 
-    private AnimationComponent animationComponent = null;
-    private final MeshAbstractFactory meshFactory;
-
     private static final String MODEL_PATH = "models/entities/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(true, EntityState.STANDING);
 
@@ -36,8 +30,6 @@ public class Player extends Entity {
 
     public Player(EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
         super(MODEL_PATH, meshFactory);
-
-        this.meshFactory = meshFactory;
 
         List<Component> components = initComponents(eventsHandler, meshFactory);
         addComponents(components);
@@ -70,7 +62,7 @@ public class Player extends Entity {
 
         ComboComponent comboComponent = new ComboComponent(inputData, entityStateData, movementComponent, transformComponent);
 
-        this.animationComponent = new AnimationComponent(
+        AnimationComponent animationComponent = new AnimationComponent(
             mesh,
             animationNamesPathsMappings,
             meshFactory,
@@ -87,6 +79,8 @@ public class Player extends Entity {
 
         CameraComponent cameraComponent = new CameraComponent(transformComponent, movementComponent, inputData);
 
+        ShadowComponent shadowComponent = new ShadowComponent(transformComponent);
+
         return List.of(
             inputComponent,
             comboComponent,
@@ -94,6 +88,7 @@ public class Player extends Entity {
             gravityMovementComponent,
             terrainCollisionComponent,
             transformComponent,
+            shadowComponent,
             actionsComponent,
             skillComponent,
             animationComponent,
@@ -167,7 +162,10 @@ public class Player extends Entity {
     @Override
     public void draw() {
 
-        animationComponent.draw();
+        for(Component component : components){
+
+            component.draw();
+        }
     }
 
     @Override

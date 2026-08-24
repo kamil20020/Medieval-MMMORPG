@@ -3,6 +3,7 @@
 uniform sampler2D texture0;
 uniform int isGivenColor;
 uniform vec4 color;
+uniform int isDisabledLight;
 
 in vec2 vTexCoord;
 in vec3 modelPosition;
@@ -24,9 +25,18 @@ vec4 getLight(){
 void main() {
 
     if(isGivenColor == 1){
+
         fragColor = color;
+        return;
     }
-    else{
-        fragColor = texture(texture0, vTexCoord) * getLight();
+
+    vec4 textureColor = texture(texture0, vTexCoord);
+
+    if(isDisabledLight == 1){
+
+        fragColor = textureColor;
+        return;
     }
+
+    fragColor = textureColor * getLight();
 }

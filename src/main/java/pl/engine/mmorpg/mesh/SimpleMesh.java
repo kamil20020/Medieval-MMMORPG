@@ -6,12 +6,12 @@ import pl.engine.mmorpg.texture.Texture;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class SimpleMesh extends Mesh{
+public abstract class SimpleMesh extends Mesh{
 
     private final float[][] vertices;
     private final int[][] faces;
 
-    private final IntBuffer[] facesVerticesBuffers = new IntBuffer[2];
+    private final IntBuffer[] facesVerticesBuffers;
 
     public SimpleMesh(float[][] vertices, int[][] faces, Texture texture){
 
@@ -24,6 +24,7 @@ public class SimpleMesh extends Mesh{
 
         this.vertices = vertices;
         this.faces = faces;
+        this.facesVerticesBuffers = new IntBuffer[faces.length];
 
         for(int i = 0; i < facesVerticesBuffers.length; i++){
 
@@ -54,6 +55,7 @@ public class SimpleMesh extends Mesh{
 
             appendVertex(buffer, i);
             texture.appendUv(buffer, i);
+            appendNormals(buffer);
         }
     }
 
@@ -64,6 +66,13 @@ public class SimpleMesh extends Mesh{
         buffer.put(vertex[0]);
         buffer.put(vertex[1]);
         buffer.put(vertex[2]);
+    }
+
+    private void appendNormals(FloatBuffer buffer){
+
+        buffer.put(1);
+        buffer.put(1);
+        buffer.put(1);
     }
 
     @Override

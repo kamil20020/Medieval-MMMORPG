@@ -12,7 +12,9 @@ public enum ShaderProps {
     FINAL_BONE_MATRICES("finalBoneMatrices", ShaderPropsTypes.MATRIX4f_ARRAY),
 
     IS_GIVEN_COLOR("isGivenColor", ShaderPropsTypes.BOOLEAN),
-    COLOR("color", ShaderPropsTypes.VECTOR4F);
+    COLOR("color", ShaderPropsTypes.VECTOR4F),
+
+    IS_DISABLED_LIGHT("isDisabledLight", ShaderPropsTypes.BOOLEAN);
 
     private final String key;
     private final ShaderPropsTypes type;

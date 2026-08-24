@@ -244,6 +244,7 @@ public class AnimationComponent implements Component {
         }
     }
 
+    @Override
     public void draw(){
 
         actualAnimation.draw();

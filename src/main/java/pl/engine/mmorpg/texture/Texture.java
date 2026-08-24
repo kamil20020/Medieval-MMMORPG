@@ -21,6 +21,7 @@ public abstract class Texture {
     protected String textureFileUrl;
 
     public Texture(String textureFileUrl){
+        
         this.textureFileUrl = textureFileUrl;
         textureId = createNonEmptyTexture();
     }

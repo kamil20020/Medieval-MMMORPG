@@ -40,6 +40,7 @@ public class Chunk {
 
         TerrainMesh terrain = TerrainMesh.getInstance("models/snow1.glb", meshFactory);
         terrain.generateHeightMap();
+        meshables.add(terrain);
 
         Meshable player = new Player(eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
         meshables.add(player);
@@ -73,7 +74,7 @@ public class Chunk {
 //        DenseHeightMapVisualizeMesh denseHeightMapVisualizeMesh = new DenseHeightMapVisualizeMesh(terrain);
 //        VisualizeMesh visualizeMesh = new VisualizeMesh(terrain.getVertices(), new Vector4f(0, 0, 1, 1));
 //        meshables.add(visualizeMesh);
-        meshables.add(terrain);
+//        meshables.add(terrain);
 //        meshables.add(denseHeightMapVisualizeMesh);
 //        meshables.add(heightMapVisualizeMesh);
 //        TerrainMeshHeightMapGenerator.saveToCsv(heightMap, "");
