@@ -1,8 +1,10 @@
 package pl.engine.mmorpg.render;
 
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFWVidMode;
 import pl.engine.mmorpg.shaders.Shader;
 import org.lwjgl.opengl.GL;
+import pl.engine.mmorpg.shaders.ShaderProps;
 
 import java.util.function.BiConsumer;
 
@@ -128,6 +130,15 @@ public class Window {
         Perspective.init(width, height);
 
         glViewport(0, 0, width, height);
+        updateOrthogonalMatrix();
+    }
+
+    private void updateOrthogonalMatrix(){
+
+        Shader shader = Shader.getInstance();
+
+        Matrix4f orthogonalMatrix = new Matrix4f().ortho(0, width, height, 0, 0, -1);
+        shader.setPropertyValue(ShaderProps.WINDOW_ORTHOGONAL_MATRIX, orthogonalMatrix);
     }
 
     public int getWidth(){

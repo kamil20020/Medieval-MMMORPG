@@ -40,10 +40,11 @@ public class Chunk {
 
         TerrainMesh terrain = TerrainMesh.getInstance("models/snow1.glb", meshFactory);
         terrain.generateHeightMap();
-        meshables.add(terrain);
 
         Meshable player = new Player(eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
         meshables.add(player);
+
+        meshables.add(terrain);
 
 //        Meshable playerCopy = meshFactory.createComplexMesh("models/entities/warrior.glb");
 //        DynamicMesh dynamicMesh = new DynamicMesh(playerCopy, 1);

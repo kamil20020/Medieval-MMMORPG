@@ -26,6 +26,7 @@ public class Player extends Entity {
     private static final String MODEL_PATH = "models/entities/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(true, EntityState.STANDING);
 
+    private AnimationComponent animationComponent;
     private static final Map<String, AnimationInfo> animationNamesPathsMappings = getAnimationNamesPathsMappings();
 
     public Player(EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
@@ -62,7 +63,7 @@ public class Player extends Entity {
 
         ComboComponent comboComponent = new ComboComponent(inputData, entityStateData, movementComponent, transformComponent);
 
-        AnimationComponent animationComponent = new AnimationComponent(
+        this.animationComponent = new AnimationComponent(
             mesh,
             animationNamesPathsMappings,
             meshFactory,

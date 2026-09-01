@@ -14,7 +14,10 @@ public enum ShaderProps {
     IS_GIVEN_COLOR("isGivenColor", ShaderPropsTypes.BOOLEAN),
     COLOR("color", ShaderPropsTypes.VECTOR4F),
 
-    IS_DISABLED_LIGHT("isDisabledLight", ShaderPropsTypes.BOOLEAN);
+    IS_DISABLED_LIGHT("isDisabledLight", ShaderPropsTypes.BOOLEAN),
+
+    WINDOW_ORTHOGONAL_MATRIX("windowOrthogonalMatrix", ShaderPropsTypes.MATRIX4f),
+    IS_DRAWING_UI("isDrawingUI", ShaderPropsTypes.BOOLEAN);
 
     private final String key;
     private final ShaderPropsTypes type;
