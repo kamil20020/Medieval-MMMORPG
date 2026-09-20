@@ -1,10 +1,12 @@
-package pl.engine.mmorpg.entity.combat;
+package pl.engine.mmorpg.entity.combat.warrior;
 
 import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.TransformComponent;
+import pl.engine.mmorpg.entity.combat.Skill;
+import pl.engine.mmorpg.entity.combat.SkillType;
 import pl.engine.mmorpg.entity.move.MovementComponent;
 
-public class WarriorSlashSkill extends Skill{
+public class WarriorSlashSkill extends Skill {
 
     private final MovementComponent movementComponent;
     private final TransformComponent transformComponent;

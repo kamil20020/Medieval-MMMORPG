@@ -1,6 +1,7 @@
 package pl.engine.mmorpg.shaders;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
@@ -78,6 +79,18 @@ public enum ShaderPropsTypes {
             Vector4f vec = (Vector4f) value;
 
             glUniform4f(locationId, vec.x, vec.y, vec.z, vec.w); // GL_TEXTURE0
+        }
+    },
+    VECTOR3F{
+
+        @Override
+        public void setValue(int locationId, Object value) {
+
+            validateShaderPropertyValue(Vector3f.class, value);
+
+            Vector3f vec = (Vector3f) value;
+
+            glUniform3f(locationId, vec.x, vec.y, vec.z); // GL_TEXTURE0
         }
     };
 

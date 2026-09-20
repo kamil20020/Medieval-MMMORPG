@@ -5,6 +5,7 @@ import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.animation.DynamicMesh;
 import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
 import pl.engine.mmorpg.entity.player.Player;
+import pl.engine.mmorpg.entity.ui.UIDrawer;
 import pl.engine.mmorpg.mesh.*;
 import pl.engine.mmorpg.terrain.*;
 import pl.engine.mmorpg.texture.FileTexture;
@@ -19,6 +20,7 @@ public class Chunk {
     protected final EventsHandler eventsHandler;
     protected final Window window;
     private final MeshAbstractFactory meshFactory;
+    private UIDrawer uiDrawer;
 
     public Chunk(Window window, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
 
@@ -35,16 +37,21 @@ public class Chunk {
     private void uploadToGpu(){
 
         Texture texture = new FileTexture("textures/grass.png", Rect.TEXTURE_COORDS);
-        Meshable grass = new Rect(texture);
+//        Meshable grass = new Rect(texture);
 //        meshables.add(grass);
+//        uiDrawer = new UIDrawer();
+//        uiDrawer.init();
 
         TerrainMesh terrain = TerrainMesh.getInstance("models/snow1.glb", meshFactory);
         terrain.generateHeightMap();
+        meshables.add(terrain);
 
-        Meshable player = new Player(eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
+//        Meshable playerCopy = meshFactory.createComplexMesh("models/entities/warrior.glb");
+//        meshables.add(playerCopy);
+
+        Meshable player = new Player(window, eventsHandler, meshFactory); //new Player(camera, eventsHandler, meshFactory);
         meshables.add(player);
 
-        meshables.add(terrain);
 
 //        Meshable playerCopy = meshFactory.createComplexMesh("models/entities/warrior.glb");
 //        DynamicMesh dynamicMesh = new DynamicMesh(playerCopy, 1);

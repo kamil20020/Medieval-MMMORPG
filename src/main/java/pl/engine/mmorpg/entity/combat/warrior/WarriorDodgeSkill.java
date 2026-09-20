@@ -1,13 +1,15 @@
-package pl.engine.mmorpg.entity.combat;
+package pl.engine.mmorpg.entity.combat.warrior;
 
 import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.EntityState;
 import pl.engine.mmorpg.entity.EntityStateData;
 import pl.engine.mmorpg.entity.TransformComponent;
+import pl.engine.mmorpg.entity.combat.Skill;
+import pl.engine.mmorpg.entity.combat.SkillType;
 import pl.engine.mmorpg.entity.input.InputData;
 import pl.engine.mmorpg.entity.move.MovementComponent;
 
-public class WarriorDodgeSkill extends Skill{
+public class WarriorDodgeSkill extends Skill {
 
     private final InputData inputData;
     private final EntityStateData entityStateData;

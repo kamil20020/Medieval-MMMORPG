@@ -1,11 +1,9 @@
 package pl.engine.mmorpg.entity.player;
 
-import org.joml.Vector3f;
 import pl.engine.mmorpg.entity.*;
 import pl.engine.mmorpg.entity.animation.AnimationInfo;
 import pl.engine.mmorpg.entity.animation.AnimationComponent;
 import pl.engine.mmorpg.entity.combat.*;
-import pl.engine.mmorpg.animation.DynamicMesh;
 import pl.engine.mmorpg.entity.gravity.GravityMovementComponent;
 import pl.engine.mmorpg.entity.gravity.TerrainCollisionComponent;
 import pl.engine.mmorpg.entity.input.ActionsComponent;
@@ -15,7 +13,9 @@ import pl.engine.mmorpg.entity.input.PlayerInputComponent;
 import pl.engine.mmorpg.entity.move.MoveDirectionState;
 import pl.engine.mmorpg.entity.move.MovementComponent;
 import pl.engine.mmorpg.EventsHandler;
+import pl.engine.mmorpg.entity.ui.UiComponent;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
+import pl.engine.mmorpg.render.Window;
 
 import java.util.*;
 
@@ -26,17 +26,16 @@ public class Player extends Entity {
     private static final String MODEL_PATH = "models/entities/warrior.glb";
     private static final String FIRST_ANIMATION_NAME = getKey(true, EntityState.STANDING);
 
-    private AnimationComponent animationComponent;
     private static final Map<String, AnimationInfo> animationNamesPathsMappings = getAnimationNamesPathsMappings();
 
-    public Player(EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
+    public Player(Window window, EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
         super(MODEL_PATH, meshFactory);
 
-        List<Component> components = initComponents(eventsHandler, meshFactory);
+        List<Component> components = initComponents(eventsHandler, meshFactory, window);
         addComponents(components);
     }
 
-    private List<Component> initComponents(EventsHandler eventsHandler, MeshAbstractFactory meshFactory){
+    private List<Component> initComponents(EventsHandler eventsHandler, MeshAbstractFactory meshFactory, Window window){
 
         TransformComponent transformComponent = new TransformComponent(mesh);
 
@@ -63,7 +62,7 @@ public class Player extends Entity {
 
         ComboComponent comboComponent = new ComboComponent(inputData, entityStateData, movementComponent, transformComponent);
 
-        this.animationComponent = new AnimationComponent(
+        AnimationComponent animationComponent = new AnimationComponent(
             mesh,
             animationNamesPathsMappings,
             meshFactory,
@@ -82,6 +81,8 @@ public class Player extends Entity {
 
         ShadowComponent shadowComponent = new ShadowComponent(transformComponent);
 
+        UiComponent uiComponent = new UiComponent(window);
+
         return List.of(
             inputComponent,
             comboComponent,
@@ -94,7 +95,8 @@ public class Player extends Entity {
             skillComponent,
             animationComponent,
             weaponComponent,
-            cameraComponent
+            cameraComponent,
+            uiComponent
         );
     }
 
@@ -155,23 +157,8 @@ public class Player extends Entity {
     }
 
     @Override
-    public void uploadToGpu() {
-
-        super.uploadToGpu();
-    }
-
-    @Override
     public void draw() {
 
-        for(Component component : components){
-
-            component.draw();
-        }
-    }
-
-    @Override
-    public void update(double deltaTimeInSeconds){
-
-        super.update(deltaTimeInSeconds);
+       doForAllComponents(Component::draw);
     }
 }

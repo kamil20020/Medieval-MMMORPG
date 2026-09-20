@@ -38,7 +38,7 @@ public class VisualizeMesh extends Mesh{
         this.numberOfVertices = getNumberOfVertices();
         this.numberOfFaces = getNumberOfFaces();
 
-        FloatBuffer buffer = loadVerticesBuffer();
+        FloatBuffer buffer = initVerticesBuffer();
 
         vertexArraysId = glGenVertexArrays();
         glBindVertexArray(vertexArraysId);
@@ -47,7 +47,7 @@ public class VisualizeMesh extends Mesh{
     }
 
     @Override
-    protected FloatBuffer loadVerticesBuffer(){
+    protected FloatBuffer initVerticesBuffer(){
 
         FloatBuffer buffer = BufferUtils.createFloatBuffer(numberOfVertices * 3);
 

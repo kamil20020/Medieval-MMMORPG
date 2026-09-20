@@ -14,10 +14,8 @@ import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
@@ -240,6 +238,7 @@ public class AnimationComponent implements Component {
     public void uploadToGpu(){
 
         for(AnimatedMeshable animatedMeshable : animations.values()){
+
             animatedMeshable.uploadToGpu();
         }
     }
@@ -284,5 +283,14 @@ public class AnimationComponent implements Component {
     public static String getKey(SkillType skillType){
 
         return skillType.name();
+    }
+
+    @Override
+    public void destroy(){
+
+        for(AnimatedMeshable animatedMeshable : animations.values()){
+
+            animatedMeshable.clear();
+        }
     }
 }

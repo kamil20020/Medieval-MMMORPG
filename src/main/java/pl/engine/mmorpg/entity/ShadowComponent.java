@@ -39,7 +39,7 @@ public class ShadowComponent implements Component{
         TerrainMesh terrainMesh = TerrainMesh.getInstance();
         float terrainMaxY = (float) terrainMesh.getTerrainMaxY(position.x, position.z);
 
-        Vector3f translate = new Vector3f(position.x - 0.25f, terrainMaxY, position.z - 0.25f);
+        Vector3f translate = new Vector3f(position.x - 0.25f, terrainMaxY + 0.1f, position.z - 0.25f);
         Matrix4f model = new Matrix4f().identity()
             .translate(translate);
 
@@ -65,5 +65,11 @@ public class ShadowComponent implements Component{
         glDepthMask(true);
 
         shader.setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, Boolean.FALSE);
+    }
+
+    @Override
+    public void destroy(){
+
+        shadowRect.clear();
     }
 }

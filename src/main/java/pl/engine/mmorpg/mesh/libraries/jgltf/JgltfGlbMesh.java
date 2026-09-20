@@ -100,20 +100,21 @@ public class JgltfGlbMesh extends Mesh {
     @Override
     public IntBuffer getFaceVerticesBuffer(int faceIndex) {
 
-        IntBuffer buffer = BufferUtils.createIntBuffer(3);
+        IntBuffer faceBuffer = BufferUtils.createIntBuffer(3);
 
-        int firstIndexIndex = faceIndex * 3;
+        int firstFaceIndex = faceIndex * 3;
 
-        if (firstIndexIndex + 2 >= indices.capacity()) {
-            throw new IllegalArgumentException("Face index out of bounds: " + firstIndexIndex);
+        if (firstFaceIndex + 2 >= indices.capacity()) {
+
+            throw new IllegalArgumentException("Face index out of bounds: " + firstFaceIndex);
         }
 
-        buffer.put(indices.get(firstIndexIndex));
-        buffer.put(indices.get(firstIndexIndex + 1));
-        buffer.put(indices.get(firstIndexIndex + 2));
-        buffer.flip();
+        faceBuffer.put(indices.get(firstFaceIndex));
+        faceBuffer.put(indices.get(firstFaceIndex + 1));
+        faceBuffer.put(indices.get(firstFaceIndex + 2));
+        faceBuffer.flip();
 
-        return buffer;
+        return faceBuffer;
     }
 
     @Override

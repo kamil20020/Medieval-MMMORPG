@@ -19,11 +19,18 @@ public class Window {
     private int width;
     private int height;
 
-    public Window(int width, int height){
+    public Window(){
 
         if(!glfwInit()){
             throw new IllegalStateException("Could now init glfw");
         }
+
+        glfwAfterInitConfig();
+        windowId = createWindow();
+        windowConfig();
+    }
+
+    private void glfwAfterInitConfig(){
 
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
 
@@ -34,16 +41,19 @@ public class Window {
 
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+    }
+
+    private long createWindow(){
 
         // Pobranie trybu wideo monitora (rozdzielczość)
         long primaryMonitor = glfwGetPrimaryMonitor();
         GLFWVidMode vidMode = glfwGetVideoMode(primaryMonitor);
 
-        this.width = vidMode.width() / 2;
-        this.height = vidMode.height();
+        this.width = 1400;//vidMode.width() / 2;
+        this.height = 800;
 
 //        windowId = glfwCreateWindow(width, height, "Engine 3d - OpenGL from lwjgl", NULL, NULL);
-        windowId = glfwCreateWindow(this.width, this.height, "Engine 3d - OpenGL from lwjgl", 0, 0);
+        long windowId = glfwCreateWindow(this.width, this.height, "Engine 3d - OpenGL from lwjgl", 0, 0);
 
         if(windowId == NULL){
 
@@ -51,6 +61,11 @@ public class Window {
 
             throw new IllegalStateException("Could not create glfw window");
         }
+
+        return windowId;
+    }
+
+    private void windowConfig(){
 
         glfwMakeContextCurrent(windowId);
         glfwSetFramebufferSizeCallback(windowId, (windowId, newWidth, newHeight) -> updateViewPort(newWidth, newHeight));
@@ -137,7 +152,7 @@ public class Window {
 
         Shader shader = Shader.getInstance();
 
-        Matrix4f orthogonalMatrix = new Matrix4f().ortho(0, width, height, 0, 0, -1);
+        Matrix4f orthogonalMatrix = new Matrix4f().ortho(0, width, 0, height, -1f, 1f);
         shader.setPropertyValue(ShaderProps.WINDOW_ORTHOGONAL_MATRIX, orthogonalMatrix);
     }
 

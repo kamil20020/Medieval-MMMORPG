@@ -2,6 +2,7 @@ package pl.engine.mmorpg.mesh;
 
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
+import pl.engine.mmorpg.entity.player.Player;
 import pl.engine.mmorpg.shaders.Shader;
 import pl.engine.mmorpg.shaders.ShaderProps;
 import pl.engine.mmorpg.texture.Texture;
@@ -37,19 +38,19 @@ public abstract class Mesh implements Meshable{
         this.numberOfVertices = getNumberOfVertices();
         this.numberOfFaces = getNumberOfFaces();
 
-        FloatBuffer buffer = loadVerticesBuffer();
+        FloatBuffer verticesBuffer = initVerticesBuffer();
         IntBuffer indicesBuffer = initIndicesBuffer();
 
         vertexArraysId = glGenVertexArrays();
         glBindVertexArray(vertexArraysId);
 
-        bindVerticesBuffer(buffer);
+        bindVerticesBuffer(verticesBuffer);
         bindEboBuffer(indicesBuffer);
 
         model.get(modelBuffer);
     }
 
-    protected FloatBuffer loadVerticesBuffer(){
+    protected FloatBuffer initVerticesBuffer(){
 
         //3 - x, y, z, 2 - uv texture, 3 - normals
         FloatBuffer buffer = BufferUtils.createFloatBuffer(numberOfVertices * VERTEX_LENGTH);
@@ -94,7 +95,7 @@ public abstract class Mesh implements Meshable{
         glVertexAttribPointer(1, 2, GL_FLOAT, false, STRIDE, 3 * Float.BYTES);
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, 3, GL_FLOAT, false, STRIDE, 3 * Float.BYTES);
+        glVertexAttribPointer(2, 3, GL_FLOAT, false, STRIDE, 5 * Float.BYTES);
         glEnableVertexAttribArray(2);
     }
 
@@ -116,6 +117,7 @@ public abstract class Mesh implements Meshable{
 
         glBindVertexArray(vertexArraysId);
         glDrawElements(GL_TRIANGLES, getNumberOfFaces() * 3, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
     }
 
     @Override

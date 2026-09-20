@@ -226,9 +226,11 @@ public abstract class AnimatedMesh extends Mesh {
 
         shader.setPropertyValue(ShaderProps.IS_ANIMATED, Boolean.TRUE);
 
+        Shader.getInstance().setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, true);
         shader.setPropertyValue(ShaderProps.FINAL_BONE_MATRICES, boneFinalTransformations);
 
         additionalMesh.draw();
+        Shader.getInstance().setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, false);
 
         shader.setPropertyValue(ShaderProps.IS_ANIMATED, Boolean.FALSE);
 

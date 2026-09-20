@@ -4,6 +4,7 @@ import pl.engine.mmorpg.entity.Component;
 import pl.engine.mmorpg.entity.EntityStateData;
 import pl.engine.mmorpg.entity.TransformComponent;
 import pl.engine.mmorpg.entity.animation.AnimationComponent;
+import pl.engine.mmorpg.entity.combat.warrior.*;
 import pl.engine.mmorpg.entity.input.InputData;
 import pl.engine.mmorpg.entity.move.MovementComponent;
 

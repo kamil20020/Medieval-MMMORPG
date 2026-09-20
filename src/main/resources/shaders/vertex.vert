@@ -17,6 +17,8 @@ uniform mat4 finalBoneMatrices[MAX_BONES];
 uniform int isGivenColor;
 
 uniform int isDrawingUI;
+uniform vec3 bottomLeftCorner;
+uniform vec2 size;
 uniform mat4 windowOrthogonalMatrix;
 
 out vec2 vTexCoord;
@@ -27,8 +29,8 @@ void main() {
 
     if(isDrawingUI == 1){
 
-        gl_Position = windowOrthogonalMatrix * vec4(modelPosition, 1.0);
-        vTexCoord = texCoord;
+        gl_Position = windowOrthogonalMatrix * vec4(position, 1.0);
+//        vTexCoord = texCoord;
         return;
     }
 

@@ -16,6 +16,7 @@ public enum ShaderProps {
 
     IS_DISABLED_LIGHT("isDisabledLight", ShaderPropsTypes.BOOLEAN),
 
+    BOTTOM_LEFT_CORNER("bottomLeftCorner", ShaderPropsTypes.VECTOR3F),
     WINDOW_ORTHOGONAL_MATRIX("windowOrthogonalMatrix", ShaderPropsTypes.MATRIX4f),
     IS_DRAWING_UI("isDrawingUI", ShaderPropsTypes.BOOLEAN);
 

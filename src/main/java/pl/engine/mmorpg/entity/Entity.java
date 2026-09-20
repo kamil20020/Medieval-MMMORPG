@@ -5,6 +5,8 @@ import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
+import pl.engine.mmorpg.shaders.Shader;
+import pl.engine.mmorpg.shaders.ShaderProps;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -17,7 +19,7 @@ public abstract class Entity implements Meshable {
 
     protected EntityStateData entityStateData = new EntityStateData();
 
-    protected final List<Component> components = new ArrayList<>();
+    protected final List<Component> components = Collections.synchronizedList(new ArrayList<>());
 
     protected double deltaTimeInSeconds = 0;
 
@@ -45,12 +47,16 @@ public abstract class Entity implements Meshable {
     public void draw() {
 
         mesh.draw();
+
+        doForAllComponents(Component::draw);
     }
 
     @Override
     public void clear() {
 
         mesh.clear();
+
+        doForAllComponents(Component::destroy);
     }
 
     @Override
@@ -68,7 +74,7 @@ public abstract class Entity implements Meshable {
         this.deltaTimeInSeconds = deltaTimeInSeconds;
     }
 
-    private void doForAllComponents(Consumer<Component> consumer){
+    protected void doForAllComponents(Consumer<Component> consumer){
 
         for(Component component : components){
 
