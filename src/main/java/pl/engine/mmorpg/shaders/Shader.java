@@ -1,5 +1,7 @@
 package pl.engine.mmorpg.shaders;
 
+import pl.engine.mmorpg.shaders.props.ShaderProps;
+
 import static org.lwjgl.opengl.GL20.*;
 
 import java.io.IOException;
@@ -16,44 +18,16 @@ public class Shader {
     private final int shaderProgramId;
     private final Map<ShaderProps, Integer> shaderPropsIds = new HashMap<>();
 
-    private static volatile Shader INSTANCE;
-
-    private Shader(String vertexPath, String fragmentPath){
+    public Shader(String vertexPath, String fragmentPath, ShaderProps[] shadersProps){
 
         shaderProgramId = load(vertexPath, fragmentPath);
 
-        for(ShaderProps shaderProperty : ShaderProps.values()){
+        for(ShaderProps shaderProperty : shadersProps){
 
             int locationId = glGetUniformLocation(shaderProgramId, shaderProperty.getKey());
 
             shaderPropsIds.put(shaderProperty, locationId);
         }
-    }
-
-    public static Shader getInstance(){
-
-        return INSTANCE;
-    }
-
-    public static Shader getInstance(String vertexPath, String fragmentPath){
-
-        if(INSTANCE == null) {
-
-            synchronized (Shader.class){
-
-                if(INSTANCE == null){
-
-                    INSTANCE = new Shader(vertexPath, fragmentPath);
-                }
-            }
-        }
-
-        return INSTANCE;
-    }
-
-    public void useShader(){
-
-        glUseProgram(shaderProgramId);
     }
 
     public void setPropertyValue(ShaderProps shaderProperty, Object value) throws IllegalArgumentException, IllegalStateException{
@@ -66,6 +40,11 @@ public class Shader {
         int locationId = shaderPropsIds.get(shaderProperty);
 
         shaderProperty.setValue(locationId, value);
+    }
+
+    public void useShader(){
+
+        glUseProgram(shaderProgramId);
     }
 
     private static int load(String vertexPath, String fragmentPath) throws IllegalStateException{

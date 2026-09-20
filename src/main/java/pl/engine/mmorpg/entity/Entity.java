@@ -5,8 +5,6 @@ import pl.engine.mmorpg.animation.Skeleton;
 import pl.engine.mmorpg.mesh.ComplexMesh;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.Meshable;
-import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
 
 import java.util.*;
 import java.util.function.BiConsumer;

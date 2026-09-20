@@ -2,15 +2,12 @@ package pl.engine.mmorpg.render;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
 import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
 
-import java.nio.FloatBuffer;
-
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public class Camera {
 
@@ -110,8 +107,8 @@ public class Camera {
             eye, destination, top
         );
 
-        Shader shader = Shader.getInstance();
+        Shader meshShader = Shaders.getShader(ShaderType.MESH);
 
-        shader.setPropertyValue(ShaderProps.CAMERA, view);
+        meshShader.setPropertyValue(MeshShaderProps.CAMERA, view);
     }
 }

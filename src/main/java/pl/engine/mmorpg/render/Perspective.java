@@ -1,11 +1,10 @@
 package pl.engine.mmorpg.render;
 
 import org.joml.Matrix4f;
-import org.lwjgl.BufferUtils;
 import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
-
-import java.nio.FloatBuffer;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
 
 import static org.lwjgl.opengl.GL11.glLoadMatrixf;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
@@ -18,7 +17,7 @@ public class Perspective {
 
         Matrix4f perspectiveMatrix = new Matrix4f().setPerspective((float)Math.toRadians(90), aspectRatio, 0.1f, 10000);
 
-        Shader shader = Shader.getInstance();
-        shader.setPropertyValue(ShaderProps.PERSPECTIVE, perspectiveMatrix);
+        Shader meshShader = Shaders.getShader(ShaderType.MESH);
+        meshShader.setPropertyValue(MeshShaderProps.PERSPECTIVE, perspectiveMatrix);
     }
 }

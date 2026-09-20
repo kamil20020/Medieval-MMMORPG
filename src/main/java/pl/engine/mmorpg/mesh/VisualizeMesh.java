@@ -3,7 +3,9 @@ package pl.engine.mmorpg.mesh;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -124,16 +126,16 @@ public class VisualizeMesh extends Mesh{
     @Override
     public void draw() {
 
-        Shader shader = Shader.getInstance();
-        shader.setPropertyValue(ShaderProps.MODEL, model);
-        shader.setPropertyValue(ShaderProps.IS_GIVEN_COLOR, Boolean.TRUE);
-        shader.setPropertyValue(ShaderProps.COLOR, color);
+        Shader meshShader = Shaders.getShader(ShaderType.MESH);
+        meshShader.setPropertyValue(MeshShaderProps.MODEL, model);
+        meshShader.setPropertyValue(MeshShaderProps.IS_GIVEN_COLOR, Boolean.TRUE);
+        meshShader.setPropertyValue(MeshShaderProps.COLOR, color);
 
         glPointSize(10.0f);
         glBindVertexArray(vertexArraysId);
         glDrawArrays(GL_POINTS, 0, numberOfVertices);
         glBindVertexArray(0);
 
-        shader.setPropertyValue(ShaderProps.IS_GIVEN_COLOR, Boolean.FALSE);
+        meshShader.setPropertyValue(MeshShaderProps.IS_GIVEN_COLOR, Boolean.FALSE);
     }
 }

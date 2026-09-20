@@ -8,6 +8,7 @@ uniform int isDisabledLight;
 in vec2 vTexCoord;
 in vec3 modelPosition;
 in vec3 normal;
+
 out vec4 fragColor;
 
 vec4 lightColor = vec4(1.0);

@@ -1,14 +1,12 @@
 package pl.engine.mmorpg.entity.ui;
 
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
-import pl.engine.mmorpg.mesh.Rect;
-import pl.engine.mmorpg.render.Window;
 import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
-import pl.engine.mmorpg.texture.FileTexture;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
+import pl.engine.mmorpg.shaders.props.UiShaderProps;
 import pl.engine.mmorpg.texture.Texture;
 
 import java.nio.FloatBuffer;
@@ -32,26 +30,13 @@ public class UIDrawer {
 
     private List<UIElement> uiElements = new ArrayList<>();
 
-    private FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(NUMBER_OF_VERTICES * VERTEX_SIZE);
+    private final FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(NUMBER_OF_VERTICES * VERTEX_SIZE);
 
     private static final int MAX_NUMBER_OF_UI_ELEMENTS = 50;
     private static final int NUMBER_OF_VERTICES = MAX_NUMBER_OF_UI_ELEMENTS * 4;
     private static final int NUMBER_OF_FACES = MAX_NUMBER_OF_UI_ELEMENTS * 2;
     private static final int VERTEX_SIZE = 3;
     private static final int STRIDE = VERTEX_SIZE * Float.BYTES;
-
-    private final Window window;
-
-    public UIDrawer(Window window){
-
-        this.window = window;
-
-//        this.texture = new FileTexture("textures/ground-test.png", Rect.TEXTURE_COORDS);
-//        this.rect = new Rect(texture);
-
-        UIElement uiElement = new UIElement(new Vector2f(0, 0), window.getWidth(), 50, 0, 1);
-        uiElements.add(uiElement);
-    }
 
     public void init(){
 
@@ -125,11 +110,9 @@ public class UIDrawer {
 
     private void beforeDraw(){
 
-        Shader shader = Shader.getInstance();
-        shader.setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, true);
-        shader.setPropertyValue(ShaderProps.IS_GIVEN_COLOR, true);
-        shader.setPropertyValue(ShaderProps.COLOR, new Vector4f(0, 1, 1, 1));
-        shader.setPropertyValue(ShaderProps.IS_DRAWING_UI, true);
+        Shader uiShader = Shaders.getShader(ShaderType.UI);
+        uiShader.setPropertyValue(UiShaderProps.IS_GIVEN_COLOR, true);
+        uiShader.setPropertyValue(UiShaderProps.COLOR, new Vector4f(0, 1, 1, 1));
 
         if(texture != null){
 //            Texture.useTexture(rect.getTexture().getId());
@@ -158,10 +141,8 @@ public class UIDrawer {
 
     private void afterDraw(){
 
-        Shader shader = Shader.getInstance();
-        shader.setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, false);
-        shader.setPropertyValue(ShaderProps.IS_GIVEN_COLOR, false);
-        shader.setPropertyValue(ShaderProps.IS_DRAWING_UI, false);
+        Shader uiShader = Shaders.getShader(ShaderType.UI);
+        uiShader.setPropertyValue(UiShaderProps.IS_GIVEN_COLOR, false);
 
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
@@ -173,5 +154,10 @@ public class UIDrawer {
         glDeleteBuffers(vertexBufferId);
         glDeleteBuffers(eboId);
         glDeleteVertexArrays(vertexArraysId);
+    }
+
+    public void addUiElement(UIElement uiElement){
+
+        uiElements.add(uiElement);
     }
 }

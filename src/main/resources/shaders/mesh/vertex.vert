@@ -16,23 +16,11 @@ uniform int isAnimated;
 uniform mat4 finalBoneMatrices[MAX_BONES];
 uniform int isGivenColor;
 
-uniform int isDrawingUI;
-uniform vec3 bottomLeftCorner;
-uniform vec2 size;
-uniform mat4 windowOrthogonalMatrix;
-
 out vec2 vTexCoord;
 out vec3 modelPosition;
 out vec3 normal;
 
 void main() {
-
-    if(isDrawingUI == 1){
-
-        gl_Position = windowOrthogonalMatrix * vec4(position, 1.0);
-//        vTexCoord = texCoord;
-        return;
-    }
 
     vec4 skinnedPos = vec4(position, 1.0);
     normal = vec3(0, 0, 0);

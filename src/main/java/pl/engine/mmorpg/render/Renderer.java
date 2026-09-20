@@ -1,12 +1,13 @@
 package pl.engine.mmorpg.render;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import pl.engine.mmorpg.EventsHandler;
 import pl.engine.mmorpg.mesh.MeshAbstractFactory;
 import pl.engine.mmorpg.mesh.libraries.jgltf.JgltfMeshAbstractFactory;
 import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -33,14 +34,14 @@ public class Renderer {
 
         glEnable(GL_TEXTURE_2D);
 
-        Shader shader = Shader.getInstance();
+        Shader meshShader = Shaders.getShader(ShaderType.MESH);
 
-        shader.setPropertyValue(ShaderProps.TEXTURE0, 0);
+        meshShader.setPropertyValue(MeshShaderProps.TEXTURE0, 0);
 
         Matrix4f identityMatrix = new Matrix4f().identity();
-        shader.setPropertyValue(ShaderProps.MODEL, identityMatrix);
+        meshShader.setPropertyValue(MeshShaderProps.MODEL, identityMatrix);
 
-        shader.setPropertyValue(ShaderProps.IS_ANIMATED, Boolean.TRUE);
+        meshShader.setPropertyValue(MeshShaderProps.IS_ANIMATED, Boolean.TRUE);
     }
 
     public void update(double deltaTime){

@@ -1,14 +1,13 @@
 package pl.engine.mmorpg.entity.ui;
 
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import pl.engine.mmorpg.texture.Texture;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class UIElement {
+public abstract class UIElement {
 
     private final Vector2f bottomLeftCorner;
     private float width;
@@ -82,4 +81,6 @@ public class UIElement {
 
         return faceBuffer;
     }
+
+    public abstract void update(double deltaTime);
 }

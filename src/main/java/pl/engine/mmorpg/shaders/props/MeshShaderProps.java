@@ -1,6 +1,6 @@
-package pl.engine.mmorpg.shaders;
+package pl.engine.mmorpg.shaders.props;
 
-public enum ShaderProps {
+public enum MeshShaderProps implements ShaderProps{
 
     PERSPECTIVE("projection", ShaderPropsTypes.MATRIX4f),
     MODEL("model", ShaderPropsTypes.MATRIX4f),
@@ -14,16 +14,12 @@ public enum ShaderProps {
     IS_GIVEN_COLOR("isGivenColor", ShaderPropsTypes.BOOLEAN),
     COLOR("color", ShaderPropsTypes.VECTOR4F),
 
-    IS_DISABLED_LIGHT("isDisabledLight", ShaderPropsTypes.BOOLEAN),
-
-    BOTTOM_LEFT_CORNER("bottomLeftCorner", ShaderPropsTypes.VECTOR3F),
-    WINDOW_ORTHOGONAL_MATRIX("windowOrthogonalMatrix", ShaderPropsTypes.MATRIX4f),
-    IS_DRAWING_UI("isDrawingUI", ShaderPropsTypes.BOOLEAN);
+    IS_DISABLED_LIGHT("isDisabledLight", ShaderPropsTypes.BOOLEAN);
 
     private final String key;
     private final ShaderPropsTypes type;
 
-    private ShaderProps(String key, ShaderPropsTypes type){
+    private MeshShaderProps(String key, ShaderPropsTypes type){
 
         this.key = key;
         this.type = type;

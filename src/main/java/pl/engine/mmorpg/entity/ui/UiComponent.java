@@ -7,12 +7,17 @@ public class UiComponent implements Component {
 
     private UIDrawer uiDrawer;
 
-    private final Window window;
-
     public UiComponent(Window window){
 
-        this.window = window;
-        this.uiDrawer = new UIDrawer(window);
+        this.uiDrawer = new UIDrawer();
+
+        addUiElements(window);
+    }
+
+    private void addUiElements(Window window){
+
+        UiHealthBar healthBar = new UiHealthBar(window);
+        uiDrawer.addUiElement(healthBar);
     }
 
     @Override

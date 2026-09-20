@@ -6,7 +6,9 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -222,17 +224,17 @@ public abstract class AnimatedMesh extends Mesh {
     @Override
     public void draw() {
 
-        Shader shader = Shader.getInstance();
+        Shader meshShader = Shaders.getShader(ShaderType.MESH);
 
-        shader.setPropertyValue(ShaderProps.IS_ANIMATED, Boolean.TRUE);
+        meshShader.setPropertyValue(MeshShaderProps.IS_ANIMATED, Boolean.TRUE);
 
-        Shader.getInstance().setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, true);
-        shader.setPropertyValue(ShaderProps.FINAL_BONE_MATRICES, boneFinalTransformations);
+        meshShader.setPropertyValue(MeshShaderProps.IS_DISABLED_LIGHT, true);
+        meshShader.setPropertyValue(MeshShaderProps.FINAL_BONE_MATRICES, boneFinalTransformations);
 
         additionalMesh.draw();
-        Shader.getInstance().setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, false);
 
-        shader.setPropertyValue(ShaderProps.IS_ANIMATED, Boolean.FALSE);
+        meshShader.setPropertyValue(MeshShaderProps.IS_DISABLED_LIGHT, false);
+        meshShader.setPropertyValue(MeshShaderProps.IS_ANIMATED, Boolean.FALSE);
 
         drawDynamicMeshes();
     }

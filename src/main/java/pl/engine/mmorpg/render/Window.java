@@ -4,7 +4,10 @@ import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFWVidMode;
 import pl.engine.mmorpg.shaders.Shader;
 import org.lwjgl.opengl.GL;
-import pl.engine.mmorpg.shaders.ShaderProps;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
+import pl.engine.mmorpg.shaders.props.UiShaderProps;
 
 import java.util.function.BiConsumer;
 
@@ -86,8 +89,7 @@ public class Window {
         glFrontFace(GL_CCW);
         glClearColor(0f, 0f, 0f, 1.0f);
 
-        Shader shader = Shader.getInstance("shaders/vertex.vert", "shaders/fragment.frag");
-        shader.useShader();
+        Shaders.init();
 
         updateViewPort(width, height);
     }
@@ -150,10 +152,10 @@ public class Window {
 
     private void updateOrthogonalMatrix(){
 
-        Shader shader = Shader.getInstance();
+        Shader uiShader = Shaders.getShader(ShaderType.UI);
 
         Matrix4f orthogonalMatrix = new Matrix4f().ortho(0, width, 0, height, -1f, 1f);
-        shader.setPropertyValue(ShaderProps.WINDOW_ORTHOGONAL_MATRIX, orthogonalMatrix);
+        uiShader.setPropertyValue(UiShaderProps.WINDOW_ORTHOGONAL_MATRIX, orthogonalMatrix);
     }
 
     public int getWidth(){

@@ -4,7 +4,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import pl.engine.mmorpg.mesh.Rect;
 import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
 import pl.engine.mmorpg.terrain.TerrainMesh;
 import pl.engine.mmorpg.texture.FileTexture;
 import pl.engine.mmorpg.texture.Texture;
@@ -49,9 +51,9 @@ public class ShadowComponent implements Component{
     @Override
     public void draw(){
 
-        Shader shader = Shader.getInstance();
+        Shader meshShader = Shaders.getShader(ShaderType.MESH);
 
-        shader.setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, Boolean.TRUE);
+        meshShader.setPropertyValue(MeshShaderProps.IS_DISABLED_LIGHT, Boolean.TRUE);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -64,7 +66,7 @@ public class ShadowComponent implements Component{
         glEnable(GL_CULL_FACE);
         glDepthMask(true);
 
-        shader.setPropertyValue(ShaderProps.IS_DISABLED_LIGHT, Boolean.FALSE);
+        meshShader.setPropertyValue(MeshShaderProps.IS_DISABLED_LIGHT, Boolean.FALSE);
     }
 
     @Override

@@ -2,9 +2,10 @@ package pl.engine.mmorpg.mesh;
 
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
-import pl.engine.mmorpg.entity.player.Player;
 import pl.engine.mmorpg.shaders.Shader;
-import pl.engine.mmorpg.shaders.ShaderProps;
+import pl.engine.mmorpg.shaders.ShaderType;
+import pl.engine.mmorpg.shaders.Shaders;
+import pl.engine.mmorpg.shaders.props.MeshShaderProps;
 import pl.engine.mmorpg.texture.Texture;
 
 import java.nio.FloatBuffer;
@@ -112,8 +113,8 @@ public abstract class Mesh implements Meshable{
         if(texture != null){
             Texture.useTexture(texture.getId());
         }
-        Shader shader = Shader.getInstance();
-        shader.setPropertyValue(ShaderProps.MODEL, model);
+        Shader meshShader = Shaders.getShader(ShaderType.MESH);
+        meshShader.setPropertyValue(MeshShaderProps.MODEL, model);
 
         glBindVertexArray(vertexArraysId);
         glDrawElements(GL_TRIANGLES, getNumberOfFaces() * 3, GL_UNSIGNED_INT, 0);
